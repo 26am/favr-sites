@@ -1,0 +1,364 @@
+/* The Favr dashboard. Everything is scoped to the Favr screen; the rest of wp-admin is untouched. */
+
+body.favr-dash-screen,
+.favr-dash-screen #wpcontent,
+.favr-dash-screen #wpbody-content {
+	background: var(--favr-paper);
+}
+
+.favr-dash-screen #screen-meta-links {
+	display: none;
+}
+
+.favr-dash {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--favr-gap);
+	max-width: 1180px;
+	margin: 24px 24px 48px 4px;
+	color: var(--favr-ink);
+	font-family: var(--favr-font-sans);
+	font-size: 14px;
+	line-height: 1.55;
+}
+
+.favr-dash a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.favr-dash a:hover {
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.favr-dash a:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+	border-radius: 4px;
+	box-shadow: none;
+}
+
+:where(.favr-dash) h2 {
+	margin: 0;
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 19px;
+	font-weight: 500;
+	line-height: 1.25;
+}
+
+:where(.favr-dash) p {
+	margin: 0;
+	font-size: inherit;
+}
+
+.favr-dash__icon {
+	flex: none;
+}
+
+/* Header */
+.favr-dash__head {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px 24px;
+	align-items: center;
+	justify-content: space-between;
+	padding-bottom: 8px;
+}
+
+.favr-dash__site {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+	min-width: 0;
+}
+
+.favr-dash__logo {
+	display: block;
+	width: auto;
+	max-width: 160px;
+	height: auto;
+	max-height: 52px;
+	object-fit: contain;
+}
+
+.favr-dash__logo--icon {
+	width: 48px;
+	height: 48px;
+	border-radius: var(--favr-radius-sm);
+}
+
+.favr-dash__site-name {
+	color: var(--favr-muted);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.favr-dash__greeting {
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 34px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	line-height: 1.15;
+	text-wrap: balance;
+}
+
+.favr-dash__greeting span {
+	color: var(--favr-accent);
+}
+
+.favr-dash__head-side {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+}
+
+.favr-dash__view-site {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+	color: var(--favr-muted) !important;
+	font-weight: 600;
+}
+
+.favr-dash__brand {
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 20px;
+	letter-spacing: -0.02em;
+	opacity: 0.55;
+}
+
+/* Needs your attention */
+.favr-dash__attention {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 24px;
+	align-items: center;
+	padding: 16px 20px;
+	border: 1px solid rgba(165, 84, 10, 0.22);
+	border-radius: var(--favr-radius);
+	background: var(--favr-attention-soft);
+}
+
+.favr-dash__attention h2 {
+	color: var(--favr-attention);
+	font-family: var(--favr-font-sans);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.favr-dash__attention ul {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 20px;
+	margin: 0;
+}
+
+.favr-dash__attention li {
+	margin: 0;
+}
+
+.favr-dash__attention strong {
+	color: var(--favr-attention);
+	font-variant-numeric: tabular-nums;
+}
+
+.favr-dash__attention-go {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+	margin-left: auto;
+	color: var(--favr-attention) !important;
+	font-weight: 600;
+}
+
+/* Quick actions */
+.favr-dash__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.favr-dash__action {
+	display: inline-flex;
+	gap: 8px;
+	align-items: center;
+	min-height: 40px;
+	padding: 0 16px;
+	border: 1px solid var(--favr-line);
+	border-radius: 999px;
+	background: var(--favr-surface);
+	color: var(--favr-ink) !important;
+	font-weight: 600;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.favr-dash__action .favr-dash__icon {
+	color: var(--favr-accent);
+}
+
+.favr-dash__action:hover {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	text-decoration: none;
+}
+
+/* Cards */
+.favr-dash__cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: var(--favr-gap);
+}
+
+.favr-dash__card {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 20px 22px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+}
+
+.favr-dash__stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 24px;
+}
+
+.favr-dash__stat {
+	display: flex;
+	flex-direction: column;
+	color: var(--favr-muted);
+}
+
+.favr-dash__stat strong {
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 30px;
+	font-variant-numeric: tabular-nums lining-nums;
+	font-weight: 500;
+	line-height: 1.1;
+}
+
+a.favr-dash__stat:hover {
+	text-decoration: none;
+}
+
+a.favr-dash__stat:hover strong {
+	color: var(--favr-accent);
+}
+
+.favr-dash__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.favr-dash__list li {
+	display: flex;
+	gap: 12px;
+	align-items: baseline;
+	justify-content: space-between;
+	margin: 0;
+	padding: 9px 0;
+	border-top: 1px solid var(--favr-line);
+}
+
+.favr-dash__list li:first-child {
+	border-top: 0;
+	padding-top: 0;
+}
+
+.favr-dash__list a {
+	font-weight: 600;
+}
+
+.favr-dash__meta {
+	flex: none;
+	color: var(--favr-muted);
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+}
+
+.favr-dash__empty {
+	color: var(--favr-muted);
+}
+
+.favr-dash__empty a {
+	color: var(--favr-accent) !important;
+	font-weight: 600;
+}
+
+.favr-dash__card-link {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+	align-self: flex-start;
+	margin-top: auto;
+	color: var(--favr-accent) !important;
+	font-weight: 600;
+}
+
+/* Activity + help */
+.favr-dash__bottom {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+	gap: var(--favr-gap);
+	align-items: start;
+}
+
+.favr-dash__help-links {
+	display: grid;
+	gap: 10px;
+	margin: 0;
+}
+
+.favr-dash__help-links li {
+	margin: 0;
+}
+
+.favr-dash__help-links a {
+	display: inline-flex;
+	gap: 10px;
+	align-items: center;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+.favr-dash__help-links .favr-dash__icon {
+	color: var(--favr-accent);
+}
+
+@media (max-width: 782px) {
+	.favr-dash {
+		margin: 16px 12px 32px 0;
+	}
+
+	.favr-dash__greeting {
+		font-size: 28px;
+	}
+
+	.favr-dash__bottom {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.favr-dash__attention-go {
+		margin-left: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.favr-dash__action {
+		transition: none;
+	}
+}

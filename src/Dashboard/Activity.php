@@ -52,7 +52,7 @@ final class Activity {
 	}
 
 	/**
-	 * Recent changes.
+	 * Recent changes. `who` is '' when the change has no known author (e.g. imported content).
 	 *
 	 * @param int $limit Max rows.
 	 * @return list<array{who: string, verb: string, title: string, url: string, ago: string}>
@@ -85,7 +85,7 @@ final class Activity {
 			$user_id = (int) get_post_meta( $post->ID, '_edit_last', true ) ?: (int) $post->post_author;
 			$user    = $user_id ? get_userdata( $user_id ) : false;
 			$out[]   = array(
-				'who'   => $user ? $user->display_name : __( 'Someone', 'favr-sites' ),
+				'who'   => $user ? $user->display_name : '',
 				'verb'  => self::verb( $post->post_date_gmt, $post->post_modified_gmt ),
 				'title' => self::title( $post->post_title ),
 				'url'   => (string) get_edit_post_link( $post->ID, 'raw' ),

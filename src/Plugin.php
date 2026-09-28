@@ -30,6 +30,7 @@ final class Plugin {
 
 		if ( is_admin() ) {
 			( new Admin\SettingsPage() )->hook();
+			( new Dashboard\Takeover() )->hook();
 		}
 	}
 }
