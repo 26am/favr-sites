@@ -1,0 +1,44 @@
+# CLAUDE.md
+
+## What this is
+
+**Favr Sites** (namespace `FavrSites\`, prefix `favr_sites_`) is the plugin that owns the Favr
+experience on every client site. v1 replaces the wp-admin dashboard for Editors and below with a
+Favr home screen. PHP 8.1+, WP 6.7+, no runtime dependencies, no JS build step. Design:
+`docs/superpowers/specs/2026-09-28-favr-dashboard-design.md`.
+
+Not to be confused with `favr/core` (the shared library bundled inside Directory, Members and
+Events). Favr Sites does not use it.
+
+## Commands
+
+```bash
+composer install   # dev tools only; the plugin runs from a plain zip (bundled autoloader)
+composer test      # PHPUnit + Brain Monkey (pure logic only)
+composer lint      # WPCS, keep at 0 errors
+```
+
+Local test site: `http://sermonator-test.local/`, with this repo symlinked to
+`wp-content/plugins/favr-sites`. The site has an `editor` user for checking the Favr screen.
+
+## Architecture
+
+- `Dashboard\Audience`: who gets the Favr screen (can `read`, lacks `manage_options`, then the
+  `favr_sites_dashboard_enabled` filter).
+- `Dashboard\Takeover`: on `load-index.php` it draws the admin frame, renders `Screen` and exits,
+  so `wp_dashboard_setup()` never runs and no widget is built. It also strips notices and the
+  WordPress footer on that screen.
+- `Dashboard\Screen` builds the view model; `templates/dashboard.php` escapes everything.
+- Other plugins contribute **plain data only** via `favr_sites_quick_actions` and
+  `favr_sites_dashboard_cards` (arrays, or closures/[object, method] returning an array, which are
+  built inside try/catch). `Dashboard\Items` normalizes, filters by capability and sorts.
+- `Dashboard\Attention` reads the existing `favr_approvals_providers` contract (favr/core inbox).
+- `Dashboard\Activity`: 10 most recent changes across editable post types; nothing is stored.
+- `Help\Links`: constant (`FAVR_SITES_HELP_URL`, …) → `favr_sites_help` option → default.
+- Styles: brand tokens only in `assets/dashboard/tokens.css`; everything else in
+  `dashboard.css`, scoped under `.favr-dash-screen` / `.favr-dash`.
+
+## Conventions
+
+- Match the siblings: WPCS formatting, camelCase methods, PSR-4 classes in `src/`.
+- Keep it simple: no JS, no caching layer, no new tables. Add unit tests for pure logic.
