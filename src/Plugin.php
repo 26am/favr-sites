@@ -27,5 +27,9 @@ final class Plugin {
 			return;
 		}
 		self::$booted = true;
+
+		if ( is_admin() ) {
+			( new Admin\SettingsPage() )->hook();
+		}
 	}
 }
