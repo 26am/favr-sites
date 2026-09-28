@@ -26,6 +26,7 @@ abstract class TestCase extends Base {
 				'sanitize_text_field' => static fn( $v ) => trim( preg_replace( '/[\r\n\t ]+/', ' ', strip_tags( (string) $v ) ) ),
 				'sanitize_email'      => static fn( $v ) => filter_var( trim( (string) $v ), FILTER_VALIDATE_EMAIL ) ? trim( (string) $v ) : '',
 				'esc_url_raw'         => static fn( $v ) => filter_var( $v, FILTER_VALIDATE_URL ) ? $v : '',
+				'wp_strip_all_tags'   => static fn( $v ) => strip_tags( (string) $v ),
 				'__'                  => static fn( $v ) => $v,
 				'apply_filters'       => static fn( $hook, $value ) => $value,
 			)
