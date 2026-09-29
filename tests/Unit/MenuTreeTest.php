@@ -47,6 +47,28 @@ final class MenuTreeTest extends TestCase {
 		$this->assertSame( array( 'page', 'page', 'page', 'custom', 'other' ), array_column( $rows, 'type' ) );
 	}
 
+	public function test_rows_group_children_under_their_parent_whatever_the_menu_order(): void {
+		// Items added by code often get the next menu_order, landing after later top-level items.
+		$rows = Tree::rows(
+			array(
+				self::item( 1, 0, 1, 'About' ),
+				self::item( 2, 0, 2, 'Events' ),
+				self::item( 3, 1, 3, 'Board' ),
+				self::item( 4, 3, 4, 'Past boards' ),
+				self::item( 5, 0, 5, 'Contact' ),
+				self::item( 6, 2, 6, 'Calendar' ),
+			)
+		);
+		$this->assertSame( array( 1, 3, 4, 2, 6, 5 ), array_column( $rows, 'id' ) );
+		$this->assertSame( array( 0, 1, 2, 0, 1, 0 ), array_column( $rows, 'level' ) );
+	}
+
+	public function test_rows_survive_a_parent_loop(): void {
+		$rows = Tree::rows( array( self::item( 1, 2, 1, 'A' ), self::item( 2, 1, 2, 'B' ), self::item( 3, 0, 3, 'C' ) ) );
+		$this->assertSame( array( 3, 1, 2 ), array_column( $rows, 'id' ) );
+		$this->assertSame( array( 0, 0, 1 ), array_column( $rows, 'level' ) );
+	}
+
 	public function test_plan_reorders_renames_nests_adds_and_deletes(): void {
 		$existing = Tree::rows( array( self::item( 1, 0, 1, 'About', 'post_type', 'page', 10 ), self::item( 2, 0, 2, 'Events', 'post_type', 'page', 11 ), self::item( 3, 0, 3, 'Old', 'custom', 'custom', 0, '/old/' ) ) );
 		$plan     = Tree::plan(

@@ -157,6 +157,21 @@
 		setLevel( row, 0 );
 		listOf( form ).appendChild( row );
 		changed( form );
+		if ( 'page' === data.type ) {
+			untray( document.querySelector( '.favr-menus__tray-list li[data-id="' + data.objectId + '"]' ) );
+		}
+	}
+
+	// A page added to a menu leaves the "not in a menu yet" tray.
+	function untray( item ) {
+		if ( ! item ) {
+			return;
+		}
+		const tray = item.closest( '.favr-menus__tray' );
+		item.remove();
+		if ( ! tray.querySelector( 'li' ) ) {
+			tray.hidden = true;
+		}
 	}
 
 	// Mirrors FavrSites\Menus\Tree::cleanUrl(), plus two conveniences: "name@site.org" becomes a
@@ -324,11 +339,6 @@
 			return;
 		}
 		append( form, { type: 'page', objectId: item.dataset.id, title: item.dataset.title } );
-		const tray = item.closest( '.favr-menus__tray' );
-		item.remove();
-		if ( ! tray.querySelector( 'li' ) ) {
-			tray.hidden = true;
-		}
 	} );
 
 	window.addEventListener( 'beforeunload', ( event ) => {

@@ -19,33 +19,54 @@ final class Tree {
 	private const SCHEMES = array( 'http', 'https', 'mailto', 'tel' );
 
 	/**
-	 * Ordered rows with levels.
+	 * Rows in menu order with levels: each item followed by its children (like WordPress's own
+	 * editor), whatever their menu_order. Items whose parent is missing are top level.
 	 *
 	 * @param array<object> $items Nav menu items.
 	 * @return list<array{id: int, level: int, title: string, url: string, type: string, object_id: int}>
 	 */
 	public static function rows( array $items ): array {
 		usort( $items, static fn( $a, $b ): int => (int) $a->menu_order <=> (int) $b->menu_order );
-		$parents = array();
+		$ids = array();
 		foreach ( $items as $item ) {
-			$parents[ (int) $item->ID ] = (int) $item->menu_item_parent;
+			$ids[ (int) $item->ID ] = true;
 		}
-		$rows = array();
+		$roots    = array();
+		$children = array();
 		foreach ( $items as $item ) {
-			$level  = 0;
 			$parent = (int) $item->menu_item_parent;
-			while ( $parent && isset( $parents[ $parent ] ) && $level < 10 ) {
-				++$level;
-				$parent = $parents[ $parent ];
+			if ( $parent && $parent !== (int) $item->ID && isset( $ids[ $parent ] ) ) {
+				$children[ $parent ][] = $item;
+			} else {
+				$roots[] = $item;
 			}
-			$rows[] = array(
-				'id'        => (int) $item->ID,
+		}
+
+		$rows = array();
+		$seen = array();
+		$walk = static function ( object $item, int $level ) use ( &$walk, &$rows, &$seen, $children ): void {
+			$id = (int) $item->ID;
+			if ( isset( $seen[ $id ] ) ) {
+				return;
+			}
+			$seen[ $id ] = true;
+			$rows[]      = array(
+				'id'        => $id,
 				'level'     => $level,
 				'title'     => (string) $item->title,
 				'url'       => (string) $item->url,
 				'type'      => self::type( (string) $item->type, (string) $item->object ),
 				'object_id' => (int) $item->object_id,
 			);
+			foreach ( $children[ $id ] ?? array() as $child ) {
+				$walk( $child, $level + 1 );
+			}
+		};
+		foreach ( $roots as $item ) {
+			$walk( $item, 0 );
+		}
+		foreach ( $items as $item ) {
+			$walk( $item, 0 ); // Parent loops: anything no root reached.
 		}
 		return $rows;
 	}
