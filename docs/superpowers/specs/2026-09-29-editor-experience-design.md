@@ -22,7 +22,7 @@ reads like a Favr product, not a WordPress control panel.
 | Posts ("News") | Block editor only, with a short block list. Elementor off for posts. |
 | Enforcement | Permission-level (routing + `map_meta_cap`), not CSS. |
 | Lists | Keep title link and View; Trash as a small icon; drop Quick Edit, Preview, "Edit with Elementor" and plugin extras; hide Comments and Yoast columns. |
-| Menu | Dashboard, Pages, News, Media, Approvals, Directory, Events, Members, Profile, Tools. Everything else hidden for Editors (allow-list). "Posts" renamed "News". |
+| Menu | Dashboard, Pages, News, Media, Approvals, Directory, Events, Members, Profile. Everything else hidden (Tools hidden too: nothing in it for Editors) for Editors (allow-list). "Posts" renamed "News". |
 | Comments | Off site-wide for all users; data kept. |
 
 ## Units (`src/`)

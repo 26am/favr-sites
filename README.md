@@ -25,7 +25,7 @@ For the Editor role (Administrators keep stock WordPress):
   list, quote, image, gallery, embed, button, separator, table, file), no patterns, Openverse or
   code editor. Elementor is off for posts.
 - **Lists:** only View and a small bin icon under titles; no Comments or Yoast columns.
-- **Menu:** Dashboard, Pages, News, Media, Approvals, Directory, Events, Members, Profile, Tools.
+- **Menu:** Dashboard, Pages, News, Media, Approvals, Directory, Events, Members, Profile.
   Everything else is hidden (allow-list). "Posts" is called "News".
 
 For everyone: **comments are off** (no forms, REST route, pingbacks, menu or admin-bar bubble).

@@ -27,7 +27,6 @@ final class Menu {
 		'edit.php?post_type=favr_event',
 		'edit.php?post_type=favr_member',
 		'profile.php',
-		'tools.php',
 	);
 
 	/**
