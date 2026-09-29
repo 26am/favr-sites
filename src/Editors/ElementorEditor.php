@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FavrSites\Editors;
 
 use FavrSites\Dashboard\Audience;
+use FavrSites\Site\Protect;
 use FavrSites\Help\Links;
 
 /**
@@ -42,6 +43,31 @@ final class ElementorEditor {
 		return null;
 	}
 
+	/**
+	 * Publish-menu items Editors don't get: display conditions stay Favr's (Editors can't save
+	 * them anyway). "Save Draft" stays: on a published document Elementor only autosaves.
+	 */
+	public const HIDE = array( 'document-display-conditions' );
+
+	/**
+	 * Where Exit goes: the Header & Footer screen for those templates, else the Pages list.
+	 *
+	 * @param string|null $role Protect role of the document being edited.
+	 * @return array{label: string, href: string}
+	 */
+	public static function back( ?string $role ): array {
+		if ( 'header' === $role || 'footer' === $role ) {
+			return array(
+				'label' => __( 'Back to Header & Footer', 'favr-sites' ),
+				'href'  => admin_url( 'admin.php?page=favr-menus' ),
+			);
+		}
+		return array(
+			'label' => __( 'Back to Pages', 'favr-sites' ),
+			'href'  => admin_url( 'edit.php?post_type=page' ),
+		);
+	}
+
 	/** Hooks. */
 	public function hook(): void {
 		// After Elementor's own enqueues (priority 10) on both of its editor hooks.
@@ -65,10 +91,8 @@ final class ElementorEditor {
 			'favrSitesElementor',
 			array(
 				'help' => self::helpLink( Links::all() ),
-				'back' => array(
-					'label' => __( 'Back to Pages', 'favr-sites' ),
-					'href'  => admin_url( 'edit.php?post_type=page' ),
-				),
+				'back' => self::back( Protect::role( isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0, Protect::ids() ) ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				'hide' => self::HIDE,
 			)
 		);
 	}

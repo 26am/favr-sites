@@ -29,10 +29,14 @@ final class PageLock {
 	 * @param string $status               Post status.
 	 * @param bool   $built_with_elementor _elementor_edit_mode = builder.
 	 * @param bool   $elementor_active     Elementor loaded.
+	 * @param bool   $posts_page           The News (posts) page, whose own content WordPress doesn't show.
 	 */
-	public static function isLocked( string $post_type, string $status, bool $built_with_elementor, bool $elementor_active ): bool {
+	public static function isLocked( string $post_type, string $status, bool $built_with_elementor, bool $elementor_active, bool $posts_page = false ): bool {
 		if ( ! $elementor_active || 'auto-draft' === $status ) {
 			return false;
+		}
+		if ( $posts_page && 'page' === $post_type ) {
+			return true;
 		}
 		if ( 'page' === $post_type ) {
 			return ! $built_with_elementor;
@@ -91,6 +95,6 @@ final class PageLock {
 			return false; // Skip the meta read for attachments, listings, events and so on.
 		}
 		$mode = (string) get_post_meta( $post->ID, '_elementor_edit_mode', true );
-		return self::isLocked( $post->post_type, $post->post_status, 'builder' === $mode, (bool) did_action( 'elementor/loaded' ) );
+		return self::isLocked( $post->post_type, $post->post_status, 'builder' === $mode, (bool) did_action( 'elementor/loaded' ), 'page' === $post->post_type && (int) get_option( 'page_for_posts' ) === (int) $post->ID );
 	}
 }

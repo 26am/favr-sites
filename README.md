@@ -26,7 +26,7 @@ For the Editor role (Administrators keep stock WordPress):
   list, quote, image, gallery, embed, button, separator, table, file), no pattern library, Openverse or
   code editor. Elementor is off for posts.
 - **Lists:** only View and a small bin icon under titles; no Comments or Yoast columns.
-- **Menu:** Dashboard, Pages, News, Menus, Media, Approvals, Directory, Events, Members, Profile.
+- **Menu:** Dashboard, Pages, News, Header & Footer, Media, Approvals, Directory, Events, Members, Profile.
   Everything else is hidden (allow-list). "Posts" is called "News".
 - **Admin bar** (wp-admin and the public site): the WordPress logo menu becomes a Favr help menu
   (help centre, email and phone from the help links); the account menu shows the first name,
@@ -44,7 +44,7 @@ For the Editor role (Administrators keep stock WordPress):
   infinite scrolling on, application passwords off, Elementor AI off. Saving uses WordPress's own
   profile update.
 
-- **Menus** (0.7): a Favr screen for the site's **Header** and **Footer** menus instead of
+- **Header & Footer** (0.7 as Menus; renamed in 0.8): a Favr screen for the site's **Header** and **Footer** menus instead of
   Appearance → Menus. Drag or use the arrows to reorder, rename in place, make an item a dropdown
   item (one level), remove (its dropdown items move up), add a page or a link (web address, email,
   phone or a `/path`). "Pages not in a menu yet" suggests published pages in neither menu. Each
@@ -79,6 +79,36 @@ define( 'FAVR_SITES_SUPPORT_EMAIL', 'support@example.com' );
 define( 'FAVR_SITES_SUPPORT_PHONE', '407 555 0100' );
 define( 'FAVR_SITES_BOOKING_URL', 'https://example.com/book' );
 ```
+
+## Site foundations (0.8)
+
+Every Favr site always has four pieces, kept in place when an Administrator opens wp-admin:
+
+- **Home**, the static front page, and **News**, the posts page (Settings → Reading). The current
+  front/posts page is adopted; otherwise a published page called "Home"/"News"; otherwise Favr
+  creates one (Home as a full-width Elementor page with the site name and tagline).
+- **Header** and **Footer**: Elementor Pro Theme Builder templates shown on the Entire Site. The
+  existing Entire Site header/footer is adopted; otherwise Favr creates a starter (site logo or
+  title + the Header menu; the Footer menu + "© year Site name"), styled by the Site Kit. Needs
+  Elementor Pro; without it only Home and News apply.
+
+Favr adopts first and only creates what's missing; a site that's already in order (e.g. GOAABA) is
+left untouched. It also repairs: a Header/Footer that was unpublished or trashed is republished and
+its display conditions go back to Entire Site; a Home/News page set as draft while the site shows a
+static front page is republished. It never makes a private or scheduled page public, ignores stale
+Reading ids on a "latest posts" site, and won't turn a designed Elementor "News" page into the
+posts index (it creates a plain News page instead). A trashed Home/News is replaced by a new one
+(WordPress clears Reading when the page is trashed). The template ids are stored in the
+`favr_sites_foundations` option; if anything goes wrong while repairing, it's logged and wp-admin
+keeps working.
+
+Editors can edit Home, Header and Footer (the Header & Footer screen's "Edit header design" /
+"Edit footer design", or the dashboard's "Edit header" / "Edit footer"), but can't delete or
+unpublish any of the four, or change any Elementor template's display conditions. The News page
+is "Managed by Favr" (WordPress shows posts there, not the page's own content). In Elementor,
+Editors don't get "Display Conditions" (Save Draft stays: on a published page Elementor only saves
+a draft revision), and Exit returns to Header & Footer.
+Administrators are never locked; they can add more specific headers (e.g. for Events).
 
 ## Menus
 

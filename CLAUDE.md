@@ -54,6 +54,12 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   `admin-post.php?action=favr_sites_save_menu`, re-passing each existing item's full data because
   `wp_update_nav_menu_item()` resets anything omitted). `assets/menus/menus.js` (jQuery UI
   Sortable) mirrors `Tree`'s rules; keep `cleanUrl` in sync with `Tree::cleanUrl`.
+- `Site\*` (0.8, site foundations): `Foundations` (pure: snapshot → per-role decisions: adopt id or
+  create, publish/restore, reset conditions; `settled()` means no writes), `Starter` (pure starter
+  Elementor elements; Kit globals only), `Setup` (snapshot + apply on `admin_init` priority 20,
+  after `Slots::ensureDefaults`; Elementor document API + Pro's conditions manager), `Protect`
+  (Editors: no delete, always published, no `_elementor_conditions` writes). Keep `settled()`
+  exact: a settled site must never be written to on each Administrator page load.
 - `Comments\Off`: comments off for everyone; no data touched.
 - `Brand\ColorScheme`: the "Favr" admin colour scheme (default for Editors with no saved choice).
   Edit `assets/admin-colors/favr/colors.scss`, then rebuild `colors.css` with

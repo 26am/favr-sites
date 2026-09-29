@@ -8,6 +8,11 @@ use FavrSites\Editors\PageLock;
 
 final class PageLockTest extends TestCase {
 
+	protected function setUp(): void {
+		parent::setUp();
+		Functions\when( 'get_option' )->justReturn( 0 ); // No posts page.
+	}
+
 	public function test_only_existing_non_elementor_pages_are_locked_when_elementor_runs(): void {
 		$this->assertTrue( PageLock::isLocked( 'page', 'publish', false, true ) );
 		$this->assertTrue( PageLock::isLocked( 'page', 'draft', false, true ) );
@@ -18,6 +23,8 @@ final class PageLockTest extends TestCase {
 		$this->assertFalse( PageLock::isLocked( 'post', 'publish', true, false ) );    // …unless Elementor is off
 		$this->assertFalse( PageLock::isLocked( 'favr_event', 'publish', false, true ) );
 		$this->assertFalse( PageLock::isLocked( 'page', 'publish', false, false ) );   // Elementor off
+		$this->assertTrue( PageLock::isLocked( 'page', 'publish', true, true, true ) );    // The News (posts) page, even if built with Elementor.
+		$this->assertFalse( PageLock::isLocked( 'page', 'publish', true, false, true ) );  // …unless Elementor is off.
 	}
 
 	public function test_editor_is_denied_every_meta_cap_elementor_and_core_use_on_a_locked_page(): void {

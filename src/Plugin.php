@@ -30,6 +30,7 @@ final class Plugin {
 
 		( new Comments\Off() )->hook();
 		( new Editors\PageLock() )->hook();
+		( new Site\Protect() )->hook();
 		( new Editors\BlockList() )->hook();
 		( new Editors\Routing() )->hook();
 		( new Editors\AdminBar() )->hook();
@@ -42,6 +43,7 @@ final class Plugin {
 			( new Admin\SettingsPage() )->hook();
 			( new Menus\Slots() )->hook();
 			( new Menus\Screen() )->hook();
+			( new Site\Setup() )->hook();
 			( new Dashboard\Takeover() )->hook();
 			( new Editors\ListTables() )->hook();
 		}
