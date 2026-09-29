@@ -38,6 +38,12 @@ For the Editor role (Administrators keep stock WordPress):
   "What's new" megaphone are removed. Done through Elementor's own menu registry
   (`assets/elementor/editor.js`), so a renamed Elementor item falls back to its default.
 
+- **Your profile** (0.6): Editors get a short Favr profile page: name, email (WordPress's confirm-by-email
+  step still applies), password, photo via Gravatar, and a one-row colour-scheme picker (50px swatches).
+  Nickname and display name follow First/Last name. Pinned for Editors: toolbar always on, Media
+  infinite scrolling on, application passwords off, Elementor AI off. Saving uses WordPress's own
+  profile update.
+
 For everyone: **comments are off** (no forms, REST route, pingbacks, menu or admin-bar bubble).
 Existing comments are kept, so deactivating Favr Sites brings them back.
 

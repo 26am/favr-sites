@@ -35,6 +35,7 @@ final class Plugin {
 		( new Editors\AdminBar() )->hook();
 		( new Brand\ColorScheme() )->hook();
 		( new Editors\ElementorEditor() )->hook();
+		( new Profile\ProfilePage() )->hook();
 		( new Editors\Menu() )->hook(); // Also on the front end: the admin bar uses the "News" labels.
 
 		if ( is_admin() ) {

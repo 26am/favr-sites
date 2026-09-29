@@ -44,6 +44,9 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
 - `ElementorEditor` + `assets/elementor/editor.js` (the plugin's only JS): re-registers Elementor
   app-bar items by id with `overwrite: true` (ids/groups from Elementor's editor-app-bar package) and
   dequeues `e-editor-notifications`. Check the ids when Elementor updates.
+- `Profile\ProfilePage` + `templates/profile.php`: Editors' profile.php takeover (GET and the
+  `action=update` POST, which it saves via `personal_options_update` + `edit_user()`); core's
+  `newuseremail`/`dismiss` GET links are left to core.
 - `Comments\Off`: comments off for everyone; no data touched.
 - `Brand\ColorScheme`: the "Favr" admin colour scheme (default for Editors with no saved choice).
   Edit `assets/admin-colors/favr/colors.scss`, then rebuild `colors.css` with
