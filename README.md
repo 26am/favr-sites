@@ -19,10 +19,11 @@ For the Editor role (Administrators keep stock WordPress):
 
 - **Pages open only in Elementor.** Titles, Edit links and direct `post.php?action=edit` URLs go to
   Elementor; "Add Page" creates an Elementor page; Elementor's Exit returns to the Pages list.
-- **Pages not built with Elementor are locked** ("Managed by Favr"), e.g. Favr Members' login and
-  account pages, so a shortcode page can't be broken. Enforced through WordPress capabilities.
+- **Anything that doesn't fit is locked** ("Managed by Favr"): pages not built with Elementor
+  (e.g. Favr Members' login and account pages, so a shortcode page can't be broken) and News posts
+  built with Elementor. Enforced through WordPress capabilities.
 - **News (posts) open only in the block editor**, with a short block list (paragraph, heading,
-  list, quote, image, gallery, embed, button, separator, table, file), no patterns, Openverse or
+  list, quote, image, gallery, embed, button, separator, table, file), no pattern library, Openverse or
   code editor. Elementor is off for posts.
 - **Lists:** only View and a small bin icon under titles; no Comments or Yoast columns.
 - **Menu:** Dashboard, Pages, News, Media, Approvals, Directory, Events, Members, Profile.
