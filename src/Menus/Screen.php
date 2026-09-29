@@ -159,13 +159,18 @@ final class Screen {
 			if ( null === $args ) {
 				continue;
 			}
-			$saved = wp_update_nav_menu_item( $menu_id, (int) $row['id'], $args );
+			$saved = wp_update_nav_menu_item( $menu_id, (int) $row['id'], wp_slash( $args ) ); // Core unslashes post fields and meta.
 			if ( is_wp_error( $saved ) ) {
 				$failed = true;
 				continue;
 			}
 			$ids[ $row['ref'] ] = (int) $saved;
 		}
+
+		// Page caches purge on this, as they do when a menu is saved in Appearance → Menus.
+		$menu = wp_get_nav_menu_object( $menu_id );
+		/** This action is documented in wp-includes/nav-menu.php */
+		do_action( 'wp_update_nav_menu', $menu_id, array( 'menu-name' => $menu ? $menu->name : '' ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hook.
 
 		// Elementor caches rendered widgets; Nav Menu widgets must show the new menu.
 		if ( did_action( 'elementor/loaded' ) && class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->files_manager ) ) {
@@ -219,7 +224,9 @@ final class Screen {
 		}
 
 		$title = (string) $row['title'];
-		if ( 'post_type' === $args['menu-item-type'] ) {
+		if ( $item && ! empty( $row['keep_title'] ) ) {
+			$title = (string) $item->post_title; // Unedited: exactly as stored (blank follows the page title).
+		} elseif ( 'post_type' === $args['menu-item-type'] ) {
 			$title = self::syncedTitle( $title, (int) $args['menu-item-object-id'] );
 		} elseif ( '' === $title && $item ) {
 			$title = (string) $item->post_title; // A link keeps its label.

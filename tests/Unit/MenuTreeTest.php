@@ -121,6 +121,34 @@ final class MenuTreeTest extends TestCase {
 		$this->assertCount( 2, $plan['errors'] );
 	}
 
+	public function test_unchanged_labels_are_kept_exactly(): void {
+		// An Administrator's markup in a label must survive an Editor's unrelated reorder.
+		$existing = Tree::rows(
+			array(
+				self::item( 1, 0, 1, '<i class="fa fa-phone"></i> Call us', 'custom', 'custom', 0, 'tel:123' ),
+				self::item( 2, 0, 2, 'What&#8217;s On' ),
+				self::item( 3, 0, 3, 'Old' ),
+			)
+		);
+		$plan     = Tree::plan(
+			$existing,
+			array(
+				array( 'id' => 2, 'level' => 0, 'title' => 'What’s On' ),
+				array( 'id' => 1, 'level' => 0, 'title' => '<i class="fa fa-phone"></i> Call us' ),
+				array( 'id' => 3, 'level' => 0, 'title' => 'New <b>name</b>' ),
+				array( 'id' => 0, 'level' => 0, 'title' => 'Join', 'type' => 'custom', 'url' => '/join/' ),
+			)
+		);
+		$this->assertSame( array( true, true, false, false ), array_column( $plan['rows'], 'keep_title' ) );
+		$this->assertSame( 'New name', $plan['rows'][2]['title'] );
+	}
+
+	public function test_phone_links_keep_only_dialable_characters(): void {
+		$this->assertSame( 'tel:+14078899987', Tree::cleanUrl( 'tel:+1 (407) 889-9987' ) );
+		$this->assertSame( 'tel:4075550100', Tree::cleanUrl( 'tel:407.555.0100' ) );
+		$this->assertSame( '', Tree::cleanUrl( 'tel:call-us' ) );
+	}
+
 	public function test_clean_url(): void {
 		$this->assertSame( 'https://example.com/a', Tree::cleanUrl( 'https://example.com/a' ) );
 		$this->assertSame( '/directory/', Tree::cleanUrl( '/directory/' ) );

@@ -174,8 +174,8 @@
 		}
 	}
 
-	// Mirrors FavrSites\Menus\Tree::cleanUrl(), plus two conveniences: "name@site.org" becomes a
-	// mailto: link and "site.org/page" gets https://.
+	// Mirrors FavrSites\Menus\Tree::cleanUrl(), plus three conveniences: "name@site.org" becomes a
+	// mailto: link, "407 555 0100" a tel: link and "site.org/page" gets https://.
 	function cleanUrl( raw ) {
 		let url = raw.trim();
 		if ( ! url ) {
@@ -186,10 +186,16 @@
 		}
 		if ( /^[^\s@/:]+@[^\s@/:]+\.[^\s@/:]+$/.test( url ) ) {
 			url = 'mailto:' + url;
+		} else if ( /^\+?[\d\s().-]{7,}$/.test( url ) ) {
+			url = 'tel:' + url;
 		} else if ( ! /^[a-z][a-z0-9+.-]*:/i.test( url ) && /^[^\s/:]+\.[^\s/:]+(\/\S*)?$/.test( url ) ) {
 			url = 'https://' + url;
 		}
-		return /^(https?:\/\/\S+|mailto:\S+|tel:\S+)$/i.test( url ) ? url : '';
+		if ( /^tel:/i.test( url ) ) {
+			const number = url.slice( 4 ).replace( /[^\d+]/g, '' );
+			return /\d{3}/.test( number ) ? 'tel:' + number : '';
+		}
+		return /^(https?:\/\/\S+|mailto:\S+)$/i.test( url ) ? url : '';
 	}
 
 	function showError( form, message ) {
@@ -329,6 +335,7 @@
 			}
 			form.querySelector( '[name="rows"]' ).value = JSON.stringify( serialize( form ) );
 			dirty.delete( form );
+			form.querySelector( '.favr-menu__save' ).disabled = true; // One save per click.
 		} );
 
 		refresh( form );
@@ -349,6 +356,11 @@
 		}
 		append( form, { type: 'page', objectId: item.dataset.id, title: item.dataset.title } );
 	} );
+
+	// Back/forward cache: a restored page must be able to save again.
+	window.addEventListener( 'pageshow', () => forms.forEach( ( form ) => {
+		form.querySelector( '.favr-menu__save' ).disabled = false;
+	} ) );
 
 	window.addEventListener( 'beforeunload', ( event ) => {
 		if ( dirty.size ) {

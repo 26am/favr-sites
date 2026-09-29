@@ -76,7 +76,7 @@ final class Tree {
 	 *
 	 * @param list<array<string, mixed>> $existing  Tree::rows() of the menu.
 	 * @param array<mixed>               $submitted Rows: id (0 = new), level, title, type, url, object_id.
-	 * @return array{rows: list<array<string, mixed>>, delete: list<int>, errors: list<string>}
+	 * @return array{rows: list<array<string, mixed>>, delete: list<int>, errors: list<string>} Rows carry keep_title: true when the label wasn't edited.
 	 */
 	public static function plan( array $existing, array $submitted ): array {
 		$known = array();
@@ -99,6 +99,8 @@ final class Tree {
 			if ( $id && ! isset( $known[ $id ] ) ) {
 				continue; // Not an item of this menu.
 			}
+			// A label left as shown keeps its stored value exactly (markup and all).
+			$keep = $id && is_scalar( $row['title'] ?? null ) && trim( (string) $row['title'] ) === trim( html_entity_decode( (string) $known[ $id ]['title'], ENT_QUOTES, 'UTF-8' ) );
 
 			if ( $id ) {
 				$base = $known[ $id ];
@@ -136,6 +138,7 @@ final class Tree {
 				'parent_ref' => $level > 0 ? (string) ( $last_at[ $level - 1 ] ?? '' ) : '',
 				'position'   => count( $rows ) + 1,
 				'title'      => $title,
+				'keep_title' => $keep,
 				'url'        => $url,
 				'type'       => $type,
 				'object_id'  => $obj,
@@ -170,6 +173,10 @@ final class Tree {
 		$scheme = strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) );
 		if ( ! in_array( $scheme, self::SCHEMES, true ) ) {
 			return '';
+		}
+		if ( 'tel' === $scheme ) {
+			$number = (string) preg_replace( '/[^\d+]/', '', substr( $url, 4 ) );
+			return preg_match( '/\d{3}/', $number ) ? 'tel:' . $number : '';
 		}
 		return (string) esc_url_raw( $url, self::SCHEMES );
 	}
