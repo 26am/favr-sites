@@ -12,8 +12,10 @@ namespace FavrSites\Editors;
 use FavrSites\Dashboard\Audience;
 
 /**
- * Plugin pages (login, account, register…) hold a shortcode that makes them work; opening them in
- * Elementor could lose it. Editors can't edit, trash or publish them; they're tagged "Managed by Favr".
+ * Editors get one editor per type: pages in Elementor, News in the block editor. Anything that doesn't
+ * fit is locked ("Managed by Favr"): pages not built with Elementor (plugin pages holding a shortcode
+ * that makes them work) and News posts built with Elementor (block-editor edits wouldn't reach
+ * visitors). Editors can't edit, trash or publish them.
  */
 final class PageLock {
 
@@ -29,7 +31,13 @@ final class PageLock {
 	 * @param bool   $elementor_active     Elementor loaded.
 	 */
 	public static function isLocked( string $post_type, string $status, bool $built_with_elementor, bool $elementor_active ): bool {
-		return $elementor_active && 'page' === $post_type && 'auto-draft' !== $status && ! $built_with_elementor;
+		if ( ! $elementor_active || 'auto-draft' === $status ) {
+			return false;
+		}
+		if ( 'page' === $post_type ) {
+			return ! $built_with_elementor;
+		}
+		return 'post' === $post_type && $built_with_elementor;
 	}
 
 	/** Hooks. */
@@ -51,7 +59,7 @@ final class PageLock {
 		if ( ! in_array( $cap, self::CAPS, true ) || empty( $args[0] ) ) {
 			return $caps;
 		}
-		$post = get_post( (int) $args[0] );
+		$post = get_post( $args[0] ); // An id or a WP_Post.
 		if ( ! $post || ! self::lockedPost( $post ) ) {
 			return $caps;
 		}
@@ -74,11 +82,14 @@ final class PageLock {
 	}
 
 	/**
-	 * Is this post a locked page?
+	 * Is this post locked for Editors?
 	 *
 	 * @param \WP_Post $post Post.
 	 */
 	public static function lockedPost( \WP_Post $post ): bool {
+		if ( 'page' !== $post->post_type && 'post' !== $post->post_type ) {
+			return false; // Skip the meta read for attachments, listings, events and so on.
+		}
 		$mode = (string) get_post_meta( $post->ID, '_elementor_edit_mode', true );
 		return self::isLocked( $post->post_type, $post->post_status, 'builder' === $mode, (bool) did_action( 'elementor/loaded' ) );
 	}
