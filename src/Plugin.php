@@ -30,6 +30,7 @@ final class Plugin {
 
 		( new Comments\Off() )->hook();
 		( new Editors\PageLock() )->hook();
+		( new Site\Protect() )->hook();
 		( new Editors\BlockList() )->hook();
 		( new Editors\Routing() )->hook();
 		( new Editors\AdminBar() )->hook();
