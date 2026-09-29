@@ -9,8 +9,12 @@ declare(strict_types=1);
 
 namespace FavrSites\Menus;
 
+use FavrSites\Editors\Routing;
+use FavrSites\Site\Protect;
+use FavrSites\Site\Setup;
+
 /**
- * A Favr screen (Menus) instead of Appearance → Menus: reorder, rename, add a page or link, remove,
+ * A Favr screen (Header & Footer) instead of Appearance → Menus: reorder, rename, add a page or link, remove,
  * one dropdown level. Edits the real WordPress menus connected to the Header and Footer slots, so
  * Elementor Nav Menu widgets and theme locations update on save.
  */
@@ -28,7 +32,7 @@ final class Screen {
 
 	/** Menu entry. */
 	public function menu(): void {
-		$hook = add_menu_page( __( 'Menus', 'favr-sites' ), __( 'Menus', 'favr-sites' ), 'edit_pages', self::PAGE, array( $this, 'render' ), 'dashicons-menu-alt3', 21 );
+		$hook = add_menu_page( __( 'Header & Footer', 'favr-sites' ), __( 'Header & Footer', 'favr-sites' ), 'edit_pages', self::PAGE, array( $this, 'render' ), 'dashicons-menu-alt3', 21 );
 		if ( $hook ) {
 			add_action( 'load-' . $hook, array( $this, 'load' ) );
 		}
@@ -65,10 +69,15 @@ final class Screen {
 		$connected = Slots::current();
 		$in_menus  = array();
 		$slots     = array();
+		$templates = Setup::pro() ? Protect::ids() : array();
 		foreach ( Slots::SLOTS as $slot ) {
-			$menu = $connected[ $slot ] ? wp_get_nav_menu_object( $connected[ $slot ] ) : false;
+			$design = isset( $templates[ $slot ] ) ? Routing::elementorUrl( $templates[ $slot ] ) : '';
+			$menu   = $connected[ $slot ] ? wp_get_nav_menu_object( $connected[ $slot ] ) : false;
 			if ( ! $menu instanceof \WP_Term ) {
-				$slots[ $slot ] = array( 'menu' => null );
+				$slots[ $slot ] = array(
+					'menu'   => null,
+					'design' => $design,
+				);
 				continue;
 			}
 			$items   = (array) wp_get_nav_menu_items( $menu->term_id );
@@ -86,6 +95,7 @@ final class Screen {
 				'rows'    => Tree::rows( $items ),
 				'invalid' => $invalid,
 				'usage'   => Usage::where( $menu ),
+				'design'  => $design,
 			);
 		}
 

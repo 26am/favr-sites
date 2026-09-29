@@ -52,7 +52,56 @@
 	display: none !important;
 }
 
-/* A menu card */
+/* A card: Header or Footer */
+.favr-menu__top {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 16px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.favr-menu__where {
+	margin: 2px 0 0;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+}
+
+.favr-dash a.favr-menu__design {
+	display: inline-flex;
+	align-items: center;
+	min-height: 40px;
+	padding: 0 18px;
+	border-radius: 999px;
+	background: var(--favr-aubergine);
+	color: var(--favr-paper);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.favr-dash a.favr-menu__design:hover {
+	background: var(--favr-ink);
+	color: var(--favr-paper);
+	text-decoration: none;
+}
+
+.favr-dash a.favr-menu__design:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+.favr-menu__head h3 {
+	margin: 0;
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.favr-menu__head {
+	padding-top: 14px;
+	border-top: 1px solid var(--favr-line);
+}
+
 .favr-menu__head {
 	display: flex;
 	flex-wrap: wrap;

@@ -9,7 +9,10 @@ declare(strict_types=1);
 
 namespace FavrSites\Dashboard;
 
+use FavrSites\Editors\Routing;
 use FavrSites\Help\Links;
+use FavrSites\Site\Protect;
+use FavrSites\Site\Setup;
 
 /**
  * Builds the view model and renders templates/dashboard.php.
@@ -67,7 +70,7 @@ final class Screen {
 	 * @return list<array<string, mixed>>
 	 */
 	private static function coreActions(): array {
-		return array(
+		$actions   = array(
 			array(
 				'id'         => 'add-post',
 				'label'      => __( 'Add news post', 'favr-sites' ),
@@ -85,5 +88,22 @@ final class Screen {
 				'priority'   => 90,
 			),
 		);
+		$templates = Setup::pro() ? Protect::ids() : array();
+		foreach ( array(
+			'header' => __( 'Edit header', 'favr-sites' ),
+			'footer' => __( 'Edit footer', 'favr-sites' ),
+		) as $role => $label ) {
+			if ( isset( $templates[ $role ] ) ) {
+				$actions[] = array(
+					'id'         => 'edit-' . $role,
+					'label'      => $label,
+					'url'        => Routing::elementorUrl( $templates[ $role ] ),
+					'capability' => 'edit_pages',
+					'icon'       => 'page',
+					'priority'   => 'header' === $role ? 20 : 21,
+				);
+			}
+		}
+		return $actions;
 	}
 }

@@ -40,6 +40,11 @@
 		return { title: config.help.label, href: config.help.href, target: '_blank', icon: icons.HelpIcon };
 	} : hidden );
 
+	// Favr keeps the Header and Footer published and site-wide: no drafts, no display conditions.
+	( config.hide || [] ).forEach( function ( id ) {
+		replace( bar.documentOptionsMenu, 'registerAction', id, 'document-save-draft' === id ? 'save' : 'default', hidden );
+	} );
+
 	// Exit says where it goes.
 	if ( config.back ) {
 		replace( bar.mainMenu, 'registerLink', 'exit-to-wordpress', 'exits', function () {

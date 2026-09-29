@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FavrSites\Editors;
 
 use FavrSites\Dashboard\Audience;
+use FavrSites\Site\Protect;
 
 /**
  * Routes every way into a page editor to Elementor, and takes Elementor off posts.
@@ -61,11 +62,12 @@ final class Routing {
 		return 'display' === $context ? esc_url( $url ) : $url;
 	}
 
-	/** Post.php?action=edit on a page → Elementor (only when the Editor may edit it). */
+	/** Post.php?action=edit on a page or the Header/Footer template → Elementor (only when the Editor may edit it). */
 	public function redirectEdit(): void {
 		$post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$action  = isset( $_GET['action'] ) ? sanitize_key( wp_unslash( $_GET['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( 'edit' !== $action || ! $post_id || ! self::active() || 'page' !== get_post_type( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
+		$type    = get_post_type( $post_id );
+		if ( 'edit' !== $action || ! $post_id || ! self::active() || ! ( 'page' === $type || self::isHeaderOrFooter( $post_id ) ) || ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
 		wp_safe_redirect( self::elementorUrl( $post_id ) );
@@ -83,17 +85,30 @@ final class Routing {
 	}
 
 	/**
-	 * Elementor's "Exit" returns to the Pages list.
+	 * Elementor's "Exit" returns to the Pages list (the Header & Footer screen for those templates).
 	 *
 	 * @param string $url      URL.
 	 * @param mixed  $document Elementor document.
 	 * @return string
 	 */
 	public function exitUrl( $url, $document ) {
-		if ( ! Audience::current() || ! is_object( $document ) || ! method_exists( $document, 'get_main_id' ) || 'page' !== get_post_type( (int) $document->get_main_id() ) ) {
+		if ( ! Audience::current() || ! is_object( $document ) || ! method_exists( $document, 'get_main_id' ) ) {
 			return $url;
 		}
-		return admin_url( 'edit.php?post_type=page' );
+		$id = (int) $document->get_main_id();
+		if ( self::isHeaderOrFooter( $id ) ) {
+			return admin_url( 'admin.php?page=favr-menus' );
+		}
+		return 'page' === get_post_type( $id ) ? admin_url( 'edit.php?post_type=page' ) : $url;
+	}
+
+	/**
+	 * The site's Header or Footer template?
+	 *
+	 * @param int $post_id Post.
+	 */
+	private static function isHeaderOrFooter( int $post_id ): bool {
+		return in_array( Protect::role( $post_id, Protect::ids() ), array( 'header', 'footer' ), true );
 	}
 
 	/** Elementor offers nothing on posts for Editors (no row action, switch button or editor). */

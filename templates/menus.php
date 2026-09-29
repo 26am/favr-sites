@@ -45,8 +45,8 @@ $favr_row   = static function ( array $row, bool $invalid ) use ( $favr_tools ):
 ?>
 <div class="wrap favr-dash favr-menus">
 	<header class="favr-menus__head">
-		<h1 class="favr-menus__title"><?php esc_html_e( 'Menus', 'favr-sites' ); ?></h1>
-		<p class="favr-menus__sub"><?php esc_html_e( 'The links in your site’s header and footer. Drag to reorder, or use the arrows. Changes go live when you save.', 'favr-sites' ); ?></p>
+		<h1 class="favr-menus__title"><?php esc_html_e( 'Header & Footer', 'favr-sites' ); ?></h1>
+		<p class="favr-menus__sub"><?php esc_html_e( 'Your site’s header and footer appear on every page. Edit their design in Elementor; manage their menu links here (drag to reorder, or use the arrows). Changes go live when you save.', 'favr-sites' ); ?></p>
 	</header>
 
 	<?php if ( '' !== $view['saved'] && in_array( $view['saved'], Slots::SLOTS, true ) ) : ?>
@@ -69,8 +69,17 @@ $favr_row   = static function ( array $row, bool $invalid ) use ( $favr_tools ):
 	<?php foreach ( $view['slots'] as $favr_slot => $favr_data ) : ?>
 		<?php $favr_title_id = 'favr-menu-' . $favr_slot . '-title'; ?>
 		<section class="favr-dash__card favr-menu" id="favr-menu-<?php echo esc_attr( $favr_slot ); ?>" aria-labelledby="<?php echo esc_attr( $favr_title_id ); ?>">
+			<div class="favr-menu__top">
+				<div>
+					<h2 id="<?php echo esc_attr( $favr_title_id ); ?>"><?php echo esc_html( 'footer' === $favr_slot ? __( 'Footer', 'favr-sites' ) : __( 'Header', 'favr-sites' ) ); ?></h2>
+					<p class="favr-menu__where"><?php esc_html_e( 'Shown on every page', 'favr-sites' ); ?></p>
+				</div>
+				<?php if ( '' !== $favr_data['design'] ) : ?>
+					<a class="favr-menu__design" href="<?php echo esc_url( $favr_data['design'] ); ?>"><?php echo esc_html( 'footer' === $favr_slot ? __( 'Edit footer design', 'favr-sites' ) : __( 'Edit header design', 'favr-sites' ) ); ?></a>
+				<?php endif; ?>
+			</div>
 			<div class="favr-menu__head">
-				<h2 id="<?php echo esc_attr( $favr_title_id ); ?>"><?php echo esc_html( Slots::label( $favr_slot ) ); ?></h2>
+				<h3><?php esc_html_e( 'Menu links', 'favr-sites' ); ?></h3>
 				<?php if ( $favr_data['menu'] ) : ?>
 					<p class="favr-menu__usage">
 						<?php

@@ -147,7 +147,7 @@ final class Setup {
 	}
 
 	/** Elementor Pro's Theme Builder is available. */
-	private static function pro(): bool {
+	public static function pro(): bool {
 		return did_action( 'elementor/loaded' ) && class_exists( '\ElementorPro\Modules\ThemeBuilder\Module' );
 	}
 
