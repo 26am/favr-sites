@@ -41,6 +41,9 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   `ListTables`, `Menu` (allow-list + "News"; hooked on the front end too for the admin bar
   labels), `AdminBar` (Favr help menu, account menu, short "New", no Elementor dropdown). Opening a page in Elementor stamps it as an Elementor
   page immediately, so never "test" a locked page by loading `action=elementor` on a real site.
+- `ElementorEditor` + `assets/elementor/editor.js` (the plugin's only JS): re-registers Elementor
+  app-bar items by id with `overwrite: true` (ids/groups from Elementor's editor-app-bar package) and
+  dequeues `e-editor-notifications`. Check the ids when Elementor updates.
 - `Comments\Off`: comments off for everyone; no data touched.
 - `Brand\ColorScheme`: the "Favr" admin colour scheme (default for Editors with no saved choice).
   Edit `assets/admin-colors/favr/colors.scss`, then rebuild `colors.css` with
@@ -52,4 +55,4 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
 ## Conventions
 
 - Match the siblings: WPCS formatting, camelCase methods, PSR-4 classes in `src/`.
-- Keep it simple: no JS, no caching layer, no new tables. Add unit tests for pure logic.
+- Keep it simple: no JS beyond the Elementor editor tweak, no caching layer, no new tables. Add unit tests for pure logic.

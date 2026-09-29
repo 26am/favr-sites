@@ -32,6 +32,11 @@ For the Editor role (Administrators keep stock WordPress):
   (help centre, email and phone from the help links); the account menu shows the first name,
   "Site editor", "Your profile" and "Log out"; "New" lists only News post, Page and Media; Elementor's
   "Edit with Elementor" dropdown is hidden (WordPress's Edit link already opens pages in Elementor).
+- **Elementor editor** (0.5): the main menu keeps User Preferences and Keyboard Shortcuts; Site
+  Settings, Theme Builder and "Connect my account" are hidden; Help becomes "Favr help" (or "Email
+  Favr"); Exit becomes "Back to Pages". Angie (Elementor's AI assistant), "Send feedback" and the
+  "What's new" megaphone are removed. Done through Elementor's own menu registry
+  (`assets/elementor/editor.js`), so a renamed Elementor item falls back to its default.
 
 For everyone: **comments are off** (no forms, REST route, pingbacks, menu or admin-bar bubble).
 Existing comments are kept, so deactivating Favr Sites brings them back.
