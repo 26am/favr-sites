@@ -254,9 +254,18 @@
 			forcePlaceholderSize: true,
 			start( event, ui ) {
 				// Children travel inside the dragged row, then land right after it.
+				// (Sortable has already put its placeholder after the row, so step over it.)
 				const row = ui.item[ 0 ];
 				const carry = row.querySelector( '.favr-menu-row__carry' );
-				block( row ).slice( 1 ).forEach( ( el ) => carry.appendChild( el ) );
+				const children = [];
+				let next = row.nextElementSibling;
+				while ( next && ( next === ui.placeholder[ 0 ] || level( next ) > level( row ) ) ) {
+					if ( next !== ui.placeholder[ 0 ] ) {
+						children.push( next );
+					}
+					next = next.nextElementSibling;
+				}
+				children.forEach( ( el ) => carry.appendChild( el ) );
 				row.dataset.from = String( level( row ) );
 				$( list ).sortable( 'refreshPositions' );
 			},
