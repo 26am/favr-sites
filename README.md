@@ -13,6 +13,26 @@ site editors (users with the Editor role) with a Favr home screen:
 Everyone else, Administrators included, keeps the stock WordPress dashboard. No stock or third-party dashboard widgets and no
 plugin notices appear on the Favr screen.
 
+## Editor experience (0.2)
+
+For the Editor role (Administrators keep stock WordPress):
+
+- **Pages open only in Elementor.** Titles, Edit links and direct `post.php?action=edit` URLs go to
+  Elementor; "Add Page" creates an Elementor page; Elementor's Exit returns to the Pages list.
+- **Pages not built with Elementor are locked** ("Managed by Favr"), e.g. Favr Members' login and
+  account pages, so a shortcode page can't be broken. Enforced through WordPress capabilities.
+- **News (posts) open only in the block editor**, with a short block list (paragraph, heading,
+  list, quote, image, gallery, embed, button, separator, table, file), no patterns, Openverse or
+  code editor. Elementor is off for posts.
+- **Lists:** only View and a small bin icon under titles; no Comments or Yoast columns.
+- **Menu:** Dashboard, Pages, News, Media, Approvals, Directory, Events, Members, Profile, Tools.
+  Everything else is hidden (allow-list). "Posts" is called "News".
+
+For everyone: **comments are off** (no forms, REST route, pingbacks, menu or admin-bar bubble).
+Existing comments are kept, so deactivating Favr Sites brings them back.
+
+If Elementor isn't active, the page rules switch off and pages use the block editor.
+
 ## Help links
 
 Settings → Favr (Administrators). Values resolve as: `wp-config.php` constant → site setting →

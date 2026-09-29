@@ -35,6 +35,12 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
 - `Dashboard\Attention` reads the existing `favr_approvals_providers` contract (favr/core inbox).
 - `Dashboard\Activity`: 10 most recent changes across editable post types; nothing is stored.
 - `Help\Links`: constant (`FAVR_SITES_HELP_URL`, …) → `favr_sites_help` option → default.
+- `Editors\*` (Editor role only, via `Audience::current()`): `PageLock` (map_meta_cap denies
+  edit/delete/publish incl. `edit_page`/`delete_page`, which Elementor checks, on pages not built
+  with Elementor), `Routing` (pages → Elementor, no Elementor on posts), `BlockList`,
+  `ListTables`, `Menu` (allow-list + "News"). Opening a page in Elementor stamps it as an Elementor
+  page immediately, so never "test" a locked page by loading `action=elementor` on a real site.
+- `Comments\Off`: comments off for everyone; no data touched.
 - Styles: brand tokens only in `assets/dashboard/tokens.css`; everything else in
   `dashboard.css`, scoped under `.favr-dash-screen` / `.favr-dash`.
 
