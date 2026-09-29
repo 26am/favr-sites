@@ -32,12 +32,13 @@ final class Plugin {
 		( new Editors\PageLock() )->hook();
 		( new Editors\BlockList() )->hook();
 		( new Editors\Routing() )->hook();
+		( new Editors\AdminBar() )->hook();
+		( new Editors\Menu() )->hook(); // Also on the front end: the admin bar uses the "News" labels.
 
 		if ( is_admin() ) {
 			( new Admin\SettingsPage() )->hook();
 			( new Dashboard\Takeover() )->hook();
 			( new Editors\ListTables() )->hook();
-			( new Editors\Menu() )->hook();
 		}
 	}
 }

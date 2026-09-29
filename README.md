@@ -28,6 +28,10 @@ For the Editor role (Administrators keep stock WordPress):
 - **Lists:** only View and a small bin icon under titles; no Comments or Yoast columns.
 - **Menu:** Dashboard, Pages, News, Media, Approvals, Directory, Events, Members, Profile.
   Everything else is hidden (allow-list). "Posts" is called "News".
+- **Admin bar** (wp-admin and the public site): the WordPress logo menu becomes a Favr help menu
+  (help centre, email and phone from the help links); the account menu shows the first name,
+  "Site editor", "Your profile" and "Log out"; "New" lists only News post, Page and Media; Elementor's
+  "Edit with Elementor" dropdown is hidden (WordPress's Edit link already opens pages in Elementor).
 
 For everyone: **comments are off** (no forms, REST route, pingbacks, menu or admin-bar bubble).
 Existing comments are kept, so deactivating Favr Sites brings them back.

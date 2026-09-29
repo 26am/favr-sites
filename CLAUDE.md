@@ -38,7 +38,8 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
 - `Editors\*` (Editor role only, via `Audience::current()`): `PageLock` (map_meta_cap denies
   edit/delete/publish incl. `edit_page`/`delete_page`, which Elementor checks, on pages not built
   with Elementor and on News posts built with Elementor), `Routing` (pages → Elementor, no Elementor on posts), `BlockList`,
-  `ListTables`, `Menu` (allow-list + "News"). Opening a page in Elementor stamps it as an Elementor
+  `ListTables`, `Menu` (allow-list + "News"; hooked on the front end too for the admin bar
+  labels), `AdminBar` (Favr help menu, account menu, short "New", no Elementor dropdown). Opening a page in Elementor stamps it as an Elementor
   page immediately, so never "test" a locked page by loading `action=elementor` on a real site.
 - `Comments\Off`: comments off for everyone; no data touched.
 - Styles: brand tokens only in `assets/dashboard/tokens.css`; everything else in
