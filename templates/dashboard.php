@@ -40,7 +40,7 @@ $favr_link  = static function ( string $url, string $inner, string $css_class = 
 		</div>
 		<div class="favr-dash__head-side">
 			<a class="favr-dash__view-site" href="<?php echo esc_url( $view['site_url'] ); ?>"><?php esc_html_e( 'View site', 'favr-sites' ); ?><?php echo Icons::svg( 'external', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?></a>
-			<span class="favr-dash__brand" aria-label="<?php esc_attr_e( 'Favr', 'favr-sites' ); ?>">favr</span>
+			<span class="favr-dash__brand" aria-label="<?php esc_attr_e( 'Favr', 'favr-sites' ); ?>"><span class="favr-dash__brand-mark" aria-hidden="true">f</span><span aria-hidden="true">favr</span></span>
 		</div>
 	</header>
 

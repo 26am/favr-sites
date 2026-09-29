@@ -1,0 +1,31 @@
+// Favr admin colour scheme, from the Favr brand (favr-site.lovable.app, .favr-marketing palette).
+// Built on WordPress's own scheme sources (../_admin.scss etc., copied from WP 7.1, GPL).
+// Rebuild after changing: npx --yes sass@1 --no-source-map --style=compressed assets/admin-colors/favr/colors.scss assets/admin-colors/favr/colors.css
+
+@use "../_admin.scss" with (
+	$scheme-name: "favr",
+	$base-color: #3a2738,               // aubergine
+	$text-color: #fbf6ef,               // cream
+	$icon-color: #d9c7d2,               // soft pink-cream
+	$highlight-color: #a9472a,          // rust
+	$notification-color: #e3a044,       // gold
+	$menu-bubble-text: #2e2230,         // ink on gold
+	$menu-submenu-focus-text: #e3a044,
+	$body-background: #fbf6ef,
+	$link: #a9472a,
+	$link-focus: #8e3a21,
+	$button-color: #a9472a,
+	$form-checked: #a9472a,
+	$custom-welcome-panel: "false"
+);
+
+
+// The block editor's accent (WordPress only defines these for its built-in schemes).
+body.admin-color-favr {
+	--wp-admin-theme-color: #a9472a;
+	--wp-admin-theme-color--rgb: 169, 71, 42;
+	--wp-admin-theme-color-darker-10: #953e25;
+	--wp-admin-theme-color-darker-10--rgb: 149, 62, 37;
+	--wp-admin-theme-color-darker-20: #803620;
+	--wp-admin-theme-color-darker-20--rgb: 128, 54, 32;
+}

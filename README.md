@@ -38,6 +38,16 @@ Existing comments are kept, so deactivating Favr Sites brings them back.
 
 If Elementor isn't active, the page rules switch off and pages use the block editor.
 
+## Favr look (0.4)
+
+- **Favr admin colour scheme** (Profile → Admin Color Scheme), from the Favr brand palette:
+  aubergine menus and admin bar, rust highlights, links and buttons, gold notification bubbles and
+  a cream page. It's the default for Editors who have never picked a scheme; everyone can choose it.
+  Source: `assets/admin-colors/favr/colors.scss` (built on WordPress's own scheme sources);
+  rebuild with `npx --yes sass@1 --no-source-map --style=compressed assets/admin-colors/favr/colors.scss assets/admin-colors/favr/colors.css`.
+- **Favr screens** (dashboard, admin-bar logo) use the brand tokens in `assets/dashboard/tokens.css`
+  and the brand fonts Fraunces and Source Sans 3 (self-hosted, OFL).
+
 ## Help links
 
 Settings → Favr (Administrators). Values resolve as: `wp-config.php` constant → site setting →
@@ -93,4 +103,4 @@ composer test
 composer lint
 ```
 
-Fonts: Newsreader and Instrument Sans, SIL Open Font License (see `assets/fonts/`).
+Fonts: Fraunces and Source Sans 3, SIL Open Font License (see `assets/fonts/`).

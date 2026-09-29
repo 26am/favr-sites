@@ -135,7 +135,7 @@ final class AdminBar {
 			$bar->add_node(
 				array(
 					'id'    => 'wp-logo',
-					'title' => '<span class="favr-ab-mark" aria-hidden="true">favr</span><span class="screen-reader-text">' . esc_html__( 'Favr help', 'favr-sites' ) . '</span>',
+					'title' => '<span class="favr-ab-logo" aria-hidden="true"><span class="favr-ab-f">f</span>favr</span><span class="screen-reader-text">' . esc_html__( 'Favr help', 'favr-sites' ) . '</span>',
 					'href'  => admin_url(),
 				)
 			);
@@ -196,11 +196,16 @@ final class AdminBar {
 		return $settings;
 	}
 
-	/** The Favr mark in place of the WordPress logo; it takes the bar's own colours, so every admin colour scheme works. */
+	/** The Favr logo (rust "f" disc + wordmark in Fraunces) in place of the WordPress logo. */
 	public function css(): void {
 		if ( ! is_admin_bar_showing() || ! Audience::current() ) {
 			return;
 		}
-		echo '<style>#wpadminbar #wp-admin-bar-wp-logo>.ab-item{padding:0 10px}#wpadminbar #wp-admin-bar-wp-logo>.ab-item .ab-icon{display:none}#wpadminbar .favr-ab-mark{font:italic 600 17px/32px Georgia,"Times New Roman",serif;letter-spacing:-.02em;color:inherit}</style>';
+		$font = esc_url( FAVR_SITES_URL . 'assets/fonts/fraunces.woff2' );
+		$css  = '@font-face{font-family:"Favr Display";src:url(' . $font . ') format("woff2");font-weight:400 700;font-display:swap}'
+			. '#wpadminbar #wp-admin-bar-wp-logo>.ab-item{padding:0 10px}#wpadminbar #wp-admin-bar-wp-logo>.ab-item .ab-icon{display:none}'
+			. '#wpadminbar .favr-ab-logo{display:inline-flex;align-items:center;gap:6px;font:600 16px/32px "Favr Display",Georgia,serif;color:inherit}'
+			. '#wpadminbar .favr-ab-f{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#a9472a;color:#fbf6ef;font-size:13px;line-height:1}';
+		echo '<style>' . $css . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static CSS; the font URL is escaped above.
 	}
 }

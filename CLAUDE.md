@@ -42,6 +42,10 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   labels), `AdminBar` (Favr help menu, account menu, short "New", no Elementor dropdown). Opening a page in Elementor stamps it as an Elementor
   page immediately, so never "test" a locked page by loading `action=elementor` on a real site.
 - `Comments\Off`: comments off for everyone; no data touched.
+- `Brand\ColorScheme`: the "Favr" admin colour scheme (default for Editors with no saved choice).
+  Edit `assets/admin-colors/favr/colors.scss`, then rebuild `colors.css` with
+  `npx --yes sass@1 --no-source-map --style=compressed assets/admin-colors/favr/colors.scss assets/admin-colors/favr/colors.css`
+  and commit both (no build step on client sites).
 - Styles: brand tokens only in `assets/dashboard/tokens.css`; everything else in
   `dashboard.css`, scoped under `.favr-dash-screen` / `.favr-dash`.
 

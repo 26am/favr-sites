@@ -18,7 +18,7 @@ body.favr-dash-screen,
 	margin: 24px 24px 48px 4px;
 	color: var(--favr-ink);
 	font-family: var(--favr-font-sans);
-	font-size: 14px;
+	font-size: 15px;
 	line-height: 1.55;
 }
 
@@ -127,11 +127,26 @@ body.favr-dash-screen,
 }
 
 .favr-dash__brand {
+	display: inline-flex;
+	gap: 8px;
+	align-items: center;
 	color: var(--favr-ink);
 	font-family: var(--favr-font-display);
 	font-size: 20px;
-	letter-spacing: -0.02em;
-	opacity: 0.55;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+}
+
+.favr-dash__brand-mark {
+	display: inline-grid;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: var(--favr-accent);
+	color: var(--favr-paper);
+	font-size: 17px;
+	line-height: 1;
+	place-items: center;
 }
 
 /* Needs your attention */
@@ -141,7 +156,7 @@ body.favr-dash-screen,
 	gap: 10px 24px;
 	align-items: center;
 	padding: 16px 20px;
-	border: 1px solid rgba(165, 84, 10, 0.22);
+	border: 1px solid rgba(169, 71, 42, 0.2);
 	border-radius: var(--favr-radius);
 	background: var(--favr-attention-soft);
 }

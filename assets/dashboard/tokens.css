@@ -1,36 +1,39 @@
 /*
- * Favr brand tokens: the only place the Favr look is defined.
- * Replace these values when the Favr brand is settled.
+ * Favr brand tokens: the only place the Favr look is defined for Favr screens.
+ * Palette and type from the Favr site (favr-site.lovable.app, .favr-marketing).
  */
 @font-face {
 	font-family: "Favr Display";
-	src: url("../fonts/newsreader-500.woff2") format("woff2");
-	font-weight: 500;
+	src: url("../fonts/fraunces.woff2") format("woff2");
+	font-weight: 400 700;
 	font-display: swap;
 }
 
 @font-face {
 	font-family: "Favr Sans";
-	src: url("../fonts/instrument-sans.woff2") format("woff2");
+	src: url("../fonts/source-sans-3.woff2") format("woff2");
 	font-weight: 400 700;
 	font-display: swap;
 }
 
 .favr-dash-screen {
-	--favr-ink: #1b1f24;
-	--favr-muted: #5e636b;
-	--favr-paper: #f6f6f3;
-	--favr-surface: #fff;
-	--favr-line: #e3e3dd;
-	--favr-accent: #1f6f5c;
-	--favr-accent-strong: #185a4a;
-	--favr-accent-soft: #e4f0eb;
-	--favr-attention: #a5540a;
-	--favr-attention-soft: #fbefe3;
-	--favr-radius: 12px;
-	--favr-radius-sm: 8px;
+	--favr-ink: #2e2230;
+	--favr-muted: #5b4b57;
+	--favr-paper: #fbf6ef;
+	--favr-surface: #fffdf9;
+	--favr-sand: #f4eadc;
+	--favr-line: #eadfcf;
+	--favr-accent: #a9472a;
+	--favr-accent-strong: #8e3a21;
+	--favr-accent-soft: #f3ddd2;
+	--favr-gold: #e3a044;
+	--favr-aubergine: #3a2738;
+	--favr-attention: #a9472a;
+	--favr-attention-soft: #f8e6c8;
+	--favr-radius: 14px;
+	--favr-radius-sm: 10px;
 	--favr-gap: 20px;
-	--favr-shadow: 0 1px 2px rgba(27, 31, 36, 0.04), 0 4px 16px rgba(27, 31, 36, 0.04);
+	--favr-shadow: 0 1px 2px rgba(46, 34, 48, 0.04), 0 6px 20px rgba(46, 34, 48, 0.05);
 	--favr-font-display: "Favr Display", georgia, "Times New Roman", serif;
 	--favr-font-sans: "Favr Sans", -apple-system, blinkmacsystemfont, "Segoe UI", roboto, sans-serif;
 }
