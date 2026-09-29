@@ -28,9 +28,16 @@ final class Plugin {
 		}
 		self::$booted = true;
 
+		( new Comments\Off() )->hook();
+		( new Editors\PageLock() )->hook();
+		( new Editors\BlockList() )->hook();
+		( new Editors\Routing() )->hook();
+
 		if ( is_admin() ) {
 			( new Admin\SettingsPage() )->hook();
 			( new Dashboard\Takeover() )->hook();
+			( new Editors\ListTables() )->hook();
+			( new Editors\Menu() )->hook();
 		}
 	}
 }

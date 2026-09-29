@@ -33,3 +33,20 @@ if ( ! class_exists( 'WP_User' ) ) {
 		}
 	}
 }
+
+if ( ! class_exists( 'WP_Post' ) ) {
+	/** Minimal stand-in for tests. */
+	class WP_Post {
+		/** @var int */
+		public $ID = 0;
+		/** @var string */
+		public $post_type = 'post';
+		/** @var string */
+		public $post_status = 'publish';
+		public function __construct( array $props = array() ) {
+			foreach ( $props as $key => $value ) {
+				$this->$key = $value;
+			}
+		}
+	}
+}

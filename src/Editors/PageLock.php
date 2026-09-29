@@ -17,7 +17,8 @@ use FavrSites\Dashboard\Audience;
  */
 final class PageLock {
 
-	private const CAPS = array( 'edit_post', 'delete_post', 'publish_post' );
+	// Core checks edit_post/delete_post; Elementor checks the post type's own meta caps (edit_page…).
+	private const CAPS = array( 'edit_post', 'edit_page', 'delete_post', 'delete_page', 'publish_post' );
 
 	/**
 	 * Locked for Editors?
