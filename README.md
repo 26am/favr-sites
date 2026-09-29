@@ -26,7 +26,7 @@ For the Editor role (Administrators keep stock WordPress):
   list, quote, image, gallery, embed, button, separator, table, file), no pattern library, Openverse or
   code editor. Elementor is off for posts.
 - **Lists:** only View and a small bin icon under titles; no Comments or Yoast columns.
-- **Menu:** Dashboard, Pages, News, Media, Approvals, Directory, Events, Members, Profile.
+- **Menu:** Dashboard, Pages, News, Menus, Media, Approvals, Directory, Events, Members, Profile.
   Everything else is hidden (allow-list). "Posts" is called "News".
 - **Admin bar** (wp-admin and the public site): the WordPress logo menu becomes a Favr help menu
   (help centre, email and phone from the help links); the account menu shows the first name,
@@ -43,6 +43,15 @@ For the Editor role (Administrators keep stock WordPress):
   Nickname and display name follow First/Last name. Pinned for Editors: toolbar always on, Media
   infinite scrolling on, application passwords off, Elementor AI off. Saving uses WordPress's own
   profile update.
+
+- **Menus** (0.7): a Favr screen for the site's **Header** and **Footer** menus instead of
+  Appearance → Menus. Drag or use the arrows to reorder, rename in place, make an item a dropdown
+  item (one level), remove (its dropdown items move up), add a page or a link (web address, email,
+  phone or a `/path`). "Pages not in a menu yet" suggests published pages in neither menu. Each
+  menu shows where it appears ("Shown in: …", from Elementor Nav Menu widgets and theme menu
+  locations). Saving edits the real WordPress menu, keeping each item's own settings (new tab,
+  CSS classes, description), and clears Elementor's cache. Items that were already nested deeper
+  than one level are kept and flagged. Editors can't create, rename or delete menus.
 
 For everyone: **comments are off** (no forms, REST route, pingbacks, menu or admin-bar bubble).
 Existing comments are kept, so deactivating Favr Sites brings them back.
@@ -70,6 +79,14 @@ define( 'FAVR_SITES_SUPPORT_EMAIL', 'support@example.com' );
 define( 'FAVR_SITES_SUPPORT_PHONE', '407 555 0100' );
 define( 'FAVR_SITES_BOOKING_URL', 'https://example.com/book' );
 ```
+
+## Menus
+
+Settings → Favr connects the Header and Footer slots to real menus (option `favr_sites_menus`).
+A slot left unset uses the menu whose slug is `header` / `footer`. On a site with no menus at all,
+Favr Sites creates "Header" and "Footer" the first time an Administrator opens wp-admin. Existing
+sites are connected by hand (for example GOAABA: Primary Navigation → Header, Footer Explore →
+Footer).
 
 ## Contributing to the dashboard (for Favr plugins)
 

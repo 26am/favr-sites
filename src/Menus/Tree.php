@@ -1,0 +1,216 @@
+<?php
+/**
+ * Menu rules for Favr Menus (pure).
+ *
+ * @package FavrSites
+ */
+
+declare(strict_types=1);
+
+namespace FavrSites\Menus;
+
+/**
+ * Turns WordPress nav menu items into ordered rows with levels, and a submitted list of rows into
+ * the operations that make the menu match it. Editors get one dropdown level; existing deeper
+ * items are kept as they are.
+ */
+final class Tree {
+
+	private const SCHEMES = array( 'http', 'https', 'mailto', 'tel' );
+
+	/**
+	 * Rows in menu order with levels: each item followed by its children (like WordPress's own
+	 * editor), whatever their menu_order. Items whose parent is missing are top level.
+	 *
+	 * @param array<object> $items Nav menu items.
+	 * @return list<array{id: int, level: int, title: string, url: string, type: string, object_id: int}>
+	 */
+	public static function rows( array $items ): array {
+		usort( $items, static fn( $a, $b ): int => (int) $a->menu_order <=> (int) $b->menu_order );
+		$ids = array();
+		foreach ( $items as $item ) {
+			$ids[ (int) $item->ID ] = true;
+		}
+		$roots    = array();
+		$children = array();
+		foreach ( $items as $item ) {
+			$parent = (int) $item->menu_item_parent;
+			if ( $parent && $parent !== (int) $item->ID && isset( $ids[ $parent ] ) ) {
+				$children[ $parent ][] = $item;
+			} else {
+				$roots[] = $item;
+			}
+		}
+
+		$rows = array();
+		$seen = array();
+		$walk = static function ( object $item, int $level ) use ( &$walk, &$rows, &$seen, $children ): void {
+			$id = (int) $item->ID;
+			if ( isset( $seen[ $id ] ) ) {
+				return;
+			}
+			$seen[ $id ] = true;
+			$rows[]      = array(
+				'id'        => $id,
+				'level'     => $level,
+				'title'     => (string) $item->title,
+				'url'       => (string) $item->url,
+				'type'      => self::type( (string) $item->type, (string) $item->object ),
+				'object_id' => (int) $item->object_id,
+			);
+			foreach ( $children[ $id ] ?? array() as $child ) {
+				$walk( $child, $level + 1 );
+			}
+		};
+		foreach ( $roots as $item ) {
+			$walk( $item, 0 );
+		}
+		foreach ( $items as $item ) {
+			$walk( $item, 0 ); // Parent loops: anything no root reached.
+		}
+		return $rows;
+	}
+
+	/**
+	 * Operations that make the menu match the submitted rows (in display order).
+	 *
+	 * @param list<array<string, mixed>> $existing  Tree::rows() of the menu.
+	 * @param array<mixed>               $submitted Rows: id (0 = new), level, title, type, url, object_id.
+	 * @return array{rows: list<array<string, mixed>>, delete: list<int>, errors: list<string>} Rows carry keep_title: true when the label wasn't edited.
+	 */
+	public static function plan( array $existing, array $submitted ): array {
+		$known = array();
+		foreach ( $existing as $row ) {
+			$known[ (int) $row['id'] ] = $row;
+		}
+		$rows       = array();
+		$errors     = array();
+		$kept       = array();
+		$last_at    = array(); // Level => ref of the latest row at that level.
+		$prev_level = -1;
+		$new        = 0;
+
+		foreach ( $submitted as $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$id    = (int) ( $row['id'] ?? 0 );
+			$title = self::title( $row['title'] ?? '' );
+			if ( $id && ! isset( $known[ $id ] ) ) {
+				continue; // Not an item of this menu.
+			}
+			// A label left as shown keeps its stored value exactly (markup and all).
+			$keep = $id && is_scalar( $row['title'] ?? null ) && trim( (string) $row['title'] ) === trim( html_entity_decode( (string) $known[ $id ]['title'], ENT_QUOTES, 'UTF-8' ) );
+
+			if ( $id ) {
+				$base = $known[ $id ];
+				$type = (string) $base['type'];
+				$url  = (string) $base['url'];
+				$obj  = (int) $base['object_id'];
+			} else {
+				$type = 'page' === ( $row['type'] ?? '' ) ? 'page' : 'custom';
+				$obj  = 'page' === $type ? (int) ( $row['object_id'] ?? 0 ) : 0;
+				$url  = 'custom' === $type ? self::cleanUrl( (string) ( $row['url'] ?? '' ) ) : '';
+				if ( 'page' === $type && ! $obj ) {
+					continue;
+				}
+				if ( 'custom' === $type ) {
+					if ( '' === $title ) {
+						$errors[] = __( 'A link needs a label.', 'favr-sites' );
+						continue;
+					}
+					if ( '' === $url ) {
+						/* translators: %s: link label. */
+						$errors[] = sprintf( __( '“%s” has an address we can’t use.', 'favr-sites' ), $title );
+						continue;
+					}
+				}
+			}
+
+			$allowed = $id && (int) $known[ $id ]['level'] > 1 ? (int) $known[ $id ]['level'] : 1;
+			$level   = max( 0, min( (int) ( $row['level'] ?? 0 ), $allowed, $prev_level + 1 ) );
+			$ref     = $id ? (string) $id : 'new:' . ( ++$new );
+
+			$rows[]            = array(
+				'ref'        => $ref,
+				'id'         => $id,
+				'level'      => $level,
+				'parent_ref' => $level > 0 ? (string) ( $last_at[ $level - 1 ] ?? '' ) : '',
+				'position'   => count( $rows ) + 1,
+				'title'      => $title,
+				'keep_title' => $keep,
+				'url'        => $url,
+				'type'       => $type,
+				'object_id'  => $obj,
+			);
+			$last_at[ $level ] = $ref;
+			$prev_level        = $level;
+			if ( $id ) {
+				$kept[] = $id;
+			}
+		}
+
+		return array(
+			'rows'   => $rows,
+			'delete' => array_values( array_diff( array_keys( $known ), $kept ) ),
+			'errors' => $errors,
+		);
+	}
+
+	/**
+	 * A link address Editors may use: http(s), mailto, tel, or a site path starting with "/".
+	 *
+	 * @param string $url Raw.
+	 */
+	public static function cleanUrl( string $url ): string {
+		$url = trim( $url );
+		if ( '' === $url ) {
+			return '';
+		}
+		if ( str_starts_with( $url, '/' ) ) {
+			return ! str_starts_with( $url, '//' ) && preg_match( '#^/[^\s"\'<>\\\\]*$#', $url ) ? $url : '';
+		}
+		$scheme = strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) );
+		if ( ! in_array( $scheme, self::SCHEMES, true ) ) {
+			return '';
+		}
+		if ( 'tel' === $scheme ) {
+			$number = (string) preg_replace( '/[^\d+]/', '', substr( $url, 4 ) );
+			return preg_match( '/\d{3}/', $number ) ? 'tel:' . $number : '';
+		}
+		return (string) esc_url_raw( $url, self::SCHEMES );
+	}
+
+	/**
+	 * Published pages that aren't in any menu yet.
+	 *
+	 * @param list<array{id: int, title: string}> $pages        Pages.
+	 * @param list<int>                           $ids_in_menus Page ids used by menu items.
+	 * @return list<array{id: int, title: string}>
+	 */
+	public static function unplacedPages( array $pages, array $ids_in_menus ): array {
+		return array_values( array_filter( $pages, static fn( array $page ): bool => ! in_array( (int) $page['id'], $ids_in_menus, true ) ) );
+	}
+
+	/**
+	 * Item kind.
+	 *
+	 * @param string $type Nav item type.
+	 * @param string $kind Nav item object (post type or taxonomy).
+	 */
+	private static function type( string $type, string $kind ): string {
+		if ( 'post_type' === $type && 'page' === $kind ) {
+			return 'page';
+		}
+		return 'custom' === $type ? 'custom' : 'other';
+	}
+
+	/**
+	 * Plain-text title.
+	 *
+	 * @param mixed $title Raw.
+	 */
+	private static function title( $title ): string {
+		return is_scalar( $title ) ? (string) sanitize_text_field( (string) $title ) : '';
+	}
+}

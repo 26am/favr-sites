@@ -40,6 +40,8 @@ final class Plugin {
 
 		if ( is_admin() ) {
 			( new Admin\SettingsPage() )->hook();
+			( new Menus\Slots() )->hook();
+			( new Menus\Screen() )->hook();
 			( new Dashboard\Takeover() )->hook();
 			( new Editors\ListTables() )->hook();
 		}

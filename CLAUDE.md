@@ -41,12 +41,19 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   `ListTables`, `Menu` (allow-list + "News"; hooked on the front end too for the admin bar
   labels), `AdminBar` (Favr help menu, account menu, short "New", no Elementor dropdown). Opening a page in Elementor stamps it as an Elementor
   page immediately, so never "test" a locked page by loading `action=elementor` on a real site.
-- `ElementorEditor` + `assets/elementor/editor.js` (the plugin's only JS): re-registers Elementor
+- `ElementorEditor` + `assets/elementor/editor.js`: re-registers Elementor
   app-bar items by id with `overwrite: true` (ids/groups from Elementor's editor-app-bar package) and
   dequeues `e-editor-notifications`. Check the ids when Elementor updates.
 - `Profile\ProfilePage` + `templates/profile.php`: Editors' profile.php takeover (GET and the
   `action=update` POST, which it saves via `personal_options_update` + `edit_user()`); core's
   `newuseremail`/`dismiss` GET links are left to core.
+- `Menus\*`: `Tree` (pure: nav items → depth-first rows with levels; submitted rows → a plan of
+  updates/creates/deletes with the one-dropdown-level rule, foreign ids ignored, `cleanUrl`),
+  `Slots` (Header/Footer → menu term ids; Settings → Favr; fresh-site defaults), `Usage`
+  ("Shown in"), `Screen` (`admin.php?page=favr-menus`, cap `edit_pages`; saves via
+  `admin-post.php?action=favr_sites_save_menu`, re-passing each existing item's full data because
+  `wp_update_nav_menu_item()` resets anything omitted). `assets/menus/menus.js` (jQuery UI
+  Sortable) mirrors `Tree`'s rules; keep `cleanUrl` in sync with `Tree::cleanUrl`.
 - `Comments\Off`: comments off for everyone; no data touched.
 - `Brand\ColorScheme`: the "Favr" admin colour scheme (default for Editors with no saved choice).
   Edit `assets/admin-colors/favr/colors.scss`, then rebuild `colors.css` with
@@ -58,4 +65,4 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
 ## Conventions
 
 - Match the siblings: WPCS formatting, camelCase methods, PSR-4 classes in `src/`.
-- Keep it simple: no JS beyond the Elementor editor tweak, no caching layer, no new tables. Add unit tests for pure logic.
+- Keep it simple: JS only for the Elementor editor tweak and the Menus screen, no caching layer, no new tables. Add unit tests for pure logic.

@@ -27,6 +27,12 @@ final class Icons {
 		'help'     => '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17h.01"/>',
 		'arrow'    => '<path d="M5 12h14M13 6l6 6-6 6"/>',
 		'trash'    => '<path d="M4 7h16M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/>',
+		'up'       => '<path d="M6 15l6-6 6 6"/>',
+		'down'     => '<path d="M6 9l6 6 6-6"/>',
+		'in'       => '<path d="M9 5v8a3 3 0 0 0 3 3h7"/><path d="M15 12l4 4-4 4"/>',
+		'out'      => '<path d="M15 19v-8a3 3 0 0 0-3-3H5"/><path d="M9 4L5 8l4 4"/>',
+		'grip'     => '<path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01"/>',
+		'menu'     => '<path d="M4 7h16M4 12h16M4 17h10"/>',
 	);
 
 	/**

@@ -10,9 +10,10 @@ declare(strict_types=1);
 namespace FavrSites\Admin;
 
 use FavrSites\Help\Links;
+use FavrSites\Menus\Slots;
 
 /**
- * Administrators set the help links shown on the Favr dashboard.
+ * Administrators set the help links shown on the Favr dashboard and connect the Header and Footer menus.
  */
 final class SettingsPage {
 
@@ -40,6 +41,15 @@ final class SettingsPage {
 				'default'           => array(),
 			)
 		);
+		register_setting(
+			self::PAGE,
+			Slots::OPTION,
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => static fn( $input ): array => Slots::sanitize( $input, Slots::menus() ),
+				'default'           => array(),
+			)
+		);
 	}
 
 	/**
@@ -61,6 +71,8 @@ final class SettingsPage {
 	public function render(): void {
 		$saved  = get_option( Links::OPTION, array() );
 		$saved  = is_array( $saved ) ? $saved : array();
+		$menus  = wp_get_nav_menus();
+		$slots  = Slots::current();
 		$fields = array(
 			'help_url'      => array( __( 'Help centre URL', 'favr-sites' ), 'url' ),
 			'support_email' => array( __( 'Support email', 'favr-sites' ), 'email' ),
@@ -82,6 +94,23 @@ final class SettingsPage {
 								<?php if ( defined( 'FAVR_SITES_' . strtoupper( $key ) ) ) : ?>
 									<p class="description"><?php esc_html_e( 'Set in wp-config.php; this field is ignored.', 'favr-sites' ); ?></p>
 								<?php endif; ?>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</table>
+				<h2><?php esc_html_e( 'Menus', 'favr-sites' ); ?></h2>
+				<p><?php esc_html_e( 'Which menus editors manage on the Favr Menus screen.', 'favr-sites' ); ?></p>
+				<table class="form-table" role="presentation">
+					<?php foreach ( Slots::SLOTS as $slot ) : ?>
+						<tr>
+							<th scope="row"><label for="favr-sites-menu-<?php echo esc_attr( $slot ); ?>"><?php echo esc_html( Slots::label( $slot ) ); ?></label></th>
+							<td>
+								<select id="favr-sites-menu-<?php echo esc_attr( $slot ); ?>" name="<?php echo esc_attr( Slots::OPTION . '[' . $slot . ']' ); ?>">
+									<option value="0"><?php esc_html_e( '— Not connected —', 'favr-sites' ); ?></option>
+									<?php foreach ( $menus as $menu ) : ?>
+										<option value="<?php echo esc_attr( (string) $menu->term_id ); ?>" <?php selected( $slots[ $slot ], (int) $menu->term_id ); ?>><?php echo esc_html( $menu->name ); ?></option>
+									<?php endforeach; ?>
+								</select>
 							</td>
 						</tr>
 					<?php endforeach; ?>
