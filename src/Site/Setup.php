@@ -22,12 +22,16 @@ final class Setup {
 		add_action( 'admin_init', array( $this, 'maybeRun' ), 20 ); // After Slots::ensureDefaults (10).
 	}
 
-	/** Administrators only, never during AJAX. */
+	/** Administrators only, never during AJAX; a failure is logged, never shown as a broken wp-admin. */
 	public function maybeRun(): void {
 		if ( wp_doing_ajax() || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
-		self::run();
+		try {
+			self::run();
+		} catch ( \Throwable $e ) {
+			error_log( 'Favr Sites: site foundations check failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- must not break wp-admin.
+		}
 	}
 
 	/** Plan and apply. */
@@ -111,9 +115,10 @@ final class Setup {
 		$pages = array();
 		foreach ( $rows as $row ) {
 			$pages[ (int) $row->ID ] = array(
-				'status' => (string) $row->post_status,
-				'title'  => (string) $row->post_title,
-				'slug'   => (string) $row->post_name,
+				'status'    => (string) $row->post_status,
+				'title'     => (string) $row->post_title,
+				'slug'      => (string) $row->post_name,
+				'elementor' => 'builder' === get_post_meta( (int) $row->ID, '_elementor_edit_mode', true ),
 			);
 		}
 

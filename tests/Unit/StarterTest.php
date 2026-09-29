@@ -51,4 +51,10 @@ final class StarterTest extends TestCase {
 		$this->assertSame( $ids, array_unique( $ids ) );
 		$this->assertCount( 1, self::widgets( Starter::home( 'GOAABA', '' ) ) ); // No empty tagline.
 	}
+
+	public function test_an_already_escaped_tagline_is_not_escaped_twice(): void {
+		// WordPress stores blogdescription HTML-escaped.
+		$widgets = self::widgets( Starter::home( 'GOAABA', 'Business &amp; Community' ) );
+		$this->assertStringContainsString( '>Business &amp; Community<', $widgets[1]['settings']['editor'] );
+	}
 }

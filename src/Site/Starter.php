@@ -87,7 +87,7 @@ final class Starter {
 	 * Site name and tagline.
 	 *
 	 * @param string $site_name Site name.
-	 * @param string $tagline   Tagline ('' = none).
+	 * @param string $tagline   Tagline as WordPress stores it (already HTML-escaped; '' = none).
 	 * @return list<array<string, mixed>>
 	 */
 	public static function home( string $site_name, string $tagline ): array {
@@ -103,7 +103,7 @@ final class Starter {
 			),
 		);
 		if ( '' !== $tagline ) {
-			$widgets[] = self::widget( 'fvp0003', 'text-editor', array( 'editor' => '<p style="text-align:center">' . htmlspecialchars( $tagline, ENT_QUOTES, 'UTF-8' ) . '</p>' ) );
+			$widgets[] = self::widget( 'fvp0003', 'text-editor', array( 'editor' => '<p style="text-align:center">' . htmlspecialchars( $tagline, ENT_QUOTES, 'UTF-8', false ) . '</p>' ) );
 		}
 		return array(
 			self::container(

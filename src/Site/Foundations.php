@@ -27,11 +27,12 @@ final class Foundations {
 	 * @return array{home: array{id: int, publish: bool}, news: array{id: int, publish: bool}, header: ?array{id: int, restore: bool, conditions: bool}, footer: ?array{id: int, restore: bool, conditions: bool}}
 	 */
 	public static function plan( array $state ): array {
-		$pages = (array) $state['pages'];
-		$home  = self::page( (int) $state['page_on_front'], $pages, 'home', 0 );
-		$plan  = array(
+		$pages        = (array) $state['pages'];
+		$static_front = 'page' === $state['show_on_front'];
+		$home         = self::page( (int) $state['page_on_front'], $pages, 'home', 0, $static_front );
+		$plan         = array(
 			'home'   => $home,
-			'news'   => self::page( (int) $state['page_for_posts'], $pages, 'news', $home['id'] ),
+			'news'   => self::page( (int) $state['page_for_posts'], $pages, 'news', $home['id'], $static_front ),
 			'header' => null,
 			'footer' => null,
 		);
@@ -68,24 +69,31 @@ final class Foundations {
 
 	/**
 	 * The current page if usable, else a published page named like the role, else 0 (create).
+	 * Usable: published, or a draft/pending page while the site shows a static front page (it was
+	 * live, so it's republished). Private or scheduled pages are never made public, and in
+	 * latest-posts mode the old Reading ids are stale unless the page is already published.
 	 *
-	 * @param int                               $current Current Reading setting.
-	 * @param array<int, array<string, string>> $pages   Known pages.
-	 * @param string                            $name    "home" or "news".
-	 * @param int                               $not     A page it can't be (Home, for News).
+	 * @param int                              $current Current Reading setting.
+	 * @param array<int, array<string, mixed>> $pages   Known pages.
+	 * @param string                           $name    "home" or "news".
+	 * @param int                              $not     A page it can't be (Home, for News).
+	 * @param bool                             $static_front  The site shows a static front page.
 	 * @return array{id: int, publish: bool}
 	 */
-	private static function page( int $current, array $pages, string $name, int $not ): array {
-		if ( $current && $current !== $not && isset( $pages[ $current ] ) && 'trash' !== $pages[ $current ]['status'] ) {
+	private static function page( int $current, array $pages, string $name, int $not, bool $static_front ): array {
+		$status = (string) ( $pages[ $current ]['status'] ?? '' );
+		if ( $current && $current !== $not && ( 'publish' === $status || ( $static_front && in_array( $status, array( 'draft', 'pending' ), true ) ) ) ) {
 			return array(
 				'id'      => $current,
-				'publish' => 'publish' !== $pages[ $current ]['status'],
+				'publish' => 'publish' !== $status,
 			);
 		}
 		$best = 0;
 		foreach ( $pages as $id => $page ) {
 			$named = strtolower( trim( (string) $page['title'] ) ) === $name || $name === $page['slug'];
-			if ( $named && 'publish' === $page['status'] && (int) $id !== $not && (int) $id > $best ) {
+			// A designed Elementor "News" page would vanish behind the posts index; make a new one.
+			$designed = 'news' === $name && ! empty( $page['elementor'] );
+			if ( $named && ! $designed && 'publish' === $page['status'] && (int) $id !== $not && (int) $id > $best ) {
 				$best = (int) $id;
 			}
 		}

@@ -35,4 +35,9 @@ final class ElementorEditorTest extends TestCase {
 		$this->assertSame( array( 'label' => 'Back to Header & Footer', 'href' => 'https://x.test/wp-admin/admin.php?page=favr-menus' ), ElementorEditor::back( 'header' ) );
 		$this->assertSame( 'Back to Pages', ElementorEditor::back( 'home' )['label'] );
 	}
+
+	public function test_only_display_conditions_are_hidden_so_editors_can_still_save_drafts(): void {
+		// Elementor's "Save Draft" on a published document only autosaves; it never unpublishes.
+		$this->assertSame( array( 'document-display-conditions' ), ElementorEditor::HIDE );
+	}
 }

@@ -40,9 +40,9 @@
 		return { title: config.help.label, href: config.help.href, target: '_blank', icon: icons.HelpIcon };
 	} : hidden );
 
-	// Favr keeps the Header and Footer published and site-wide: no drafts, no display conditions.
+	// Display conditions are Favr's (the Header and Footer stay site-wide).
 	( config.hide || [] ).forEach( function ( id ) {
-		replace( bar.documentOptionsMenu, 'registerAction', id, 'document-save-draft' === id ? 'save' : 'default', hidden );
+		replace( bar.documentOptionsMenu, 'registerAction', id, 'default', hidden );
 	} );
 
 	// Exit says where it goes.

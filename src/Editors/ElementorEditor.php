@@ -44,6 +44,12 @@ final class ElementorEditor {
 	}
 
 	/**
+	 * Publish-menu items Editors don't get: display conditions stay Favr's (Editors can't save
+	 * them anyway). "Save Draft" stays: on a published document Elementor only autosaves.
+	 */
+	public const HIDE = array( 'document-display-conditions' );
+
+	/**
 	 * Where Exit goes: the Header & Footer screen for those templates, else the Pages list.
 	 *
 	 * @param string|null $role Protect role of the document being edited.
@@ -86,8 +92,7 @@ final class ElementorEditor {
 			array(
 				'help' => self::helpLink( Links::all() ),
 				'back' => self::back( Protect::role( isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0, Protect::ids() ) ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				// Favr keeps the Header and Footer published and site-wide.
-				'hide' => array( 'document-save-draft', 'document-display-conditions' ),
+				'hide' => self::HIDE,
 			)
 		);
 	}
