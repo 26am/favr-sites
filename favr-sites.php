@@ -3,7 +3,7 @@
  * Plugin Name:       Favr Sites
  * Plugin URI:        https://github.com/26am/favr-sites
  * Description:       The Favr experience on every client site, starting with a Favr dashboard for site editors.
- * Version:           0.6.0
+ * Version:           0.7.0
  * Requires at least: 6.7
  * Requires PHP:      8.1
  * Author:            Favr Sites
@@ -16,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'FAVR_SITES_VERSION', '0.6.0' );
+define( 'FAVR_SITES_VERSION', '0.7.0' );
 define( 'FAVR_SITES_FILE', __FILE__ );
 define( 'FAVR_SITES_PATH', plugin_dir_path( __FILE__ ) );
 define( 'FAVR_SITES_URL', plugin_dir_url( __FILE__ ) );
