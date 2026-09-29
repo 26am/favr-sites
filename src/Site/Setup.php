@@ -207,7 +207,7 @@ final class Setup {
 		$site     = get_bloginfo( 'name' );
 		$elements = 'footer' === $role
 			? Starter::footer( self::menuSlug( 'footer' ), $site, self::yearTag( $site ), (int) wp_date( 'Y' ) )
-			: Starter::header( (bool) get_theme_mod( 'custom_logo' ), self::menuSlug( 'header' ) );
+			: Starter::header( (bool) get_theme_mod( 'custom_logo' ), self::menuSlug( 'header' ), self::tag( 'site-title' ), self::tag( 'site-url' ) );
 		$document->save( array( 'elements' => $elements ) );
 		return (int) $document->get_main_id();
 	}
@@ -229,12 +229,7 @@ final class Setup {
 	 * @param string $site Site name.
 	 */
 	private static function yearTag( string $site ): string {
-		$tags = \Elementor\Plugin::$instance->dynamic_tags ?? null;
-		if ( ! $tags || ! method_exists( $tags, 'tag_data_to_tag_text' ) ) {
-			return '';
-		}
-		return (string) $tags->tag_data_to_tag_text(
-			substr( md5( 'favr-year' ), 0, 7 ),
+		return self::tag(
 			'current-date-time',
 			array(
 				'date_format'   => 'custom',
@@ -243,6 +238,20 @@ final class Setup {
 				'after'         => ' ' . $site,
 			)
 		);
+	}
+
+	/**
+	 * An Elementor dynamic tag as stored in a setting ('' when tags aren't available).
+	 *
+	 * @param string               $name     Tag name.
+	 * @param array<string, mixed> $settings Tag settings.
+	 */
+	private static function tag( string $name, array $settings = array() ): string {
+		$tags = \Elementor\Plugin::$instance->dynamic_tags ?? null;
+		if ( ! $tags || ! method_exists( $tags, 'tag_data_to_tag_text' ) ) {
+			return '';
+		}
+		return (string) $tags->tag_data_to_tag_text( substr( md5( 'favr-' . $name ), 0, 7 ), $name, $settings );
 	}
 
 	/**

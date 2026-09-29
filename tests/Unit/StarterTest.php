@@ -27,6 +27,12 @@ final class StarterTest extends TestCase {
 		$this->assertArrayNotHasKey( 'menu', $without[1]['settings'] );
 	}
 
+	public function test_site_title_carries_its_tags_so_the_editor_shows_the_real_name(): void {
+		$title = self::widgets( Starter::header( false, 'header', '[elementor-tag id="a" name="site-title" settings="%7B%7D"]', '[elementor-tag id="b" name="site-url" settings="%7B%7D"]' ) )[0];
+		$this->assertStringContainsString( 'site-title', $title['settings']['__dynamic__']['title'] );
+		$this->assertStringContainsString( 'site-url', $title['settings']['__dynamic__']['link'] );
+	}
+
 	public function test_footer_is_the_footer_menu_and_a_copyright_line(): void {
 		$widgets = self::widgets( Starter::footer( 'footer', 'GOAABA', '[elementor-tag id="x" name="current-date-time" settings="%7B%7D"]', 2026 ) );
 		$this->assertSame( array( 'nav-menu', 'heading' ), array_column( $widgets, 'widgetType' ) );

@@ -18,12 +18,24 @@ final class Starter {
 	/**
 	 * Site logo (or title) on the left, the Header menu on the right.
 	 *
-	 * @param bool   $has_logo A custom logo is set.
-	 * @param string $menu     Header menu slug ('' = Elementor's first menu).
+	 * @param bool   $has_logo  A custom logo is set.
+	 * @param string $menu      Header menu slug ('' = Elementor's first menu).
+	 * @param string $title_tag Site-title tag text, so the editor shows the name too ('' = none).
+	 * @param string $link_tag  Site-URL tag text for the title's link ('' = none).
 	 * @return list<array<string, mixed>>
 	 */
-	public static function header( bool $has_logo, string $menu ): array {
-		$brand = $has_logo ? self::widget( 'fvh0002', 'theme-site-logo', array( 'align' => 'left' ) ) : self::widget( 'fvh0002', 'theme-site-title', array( 'header_size' => 'p' ) );
+	public static function header( bool $has_logo, string $menu, string $title_tag = '', string $link_tag = '' ): array {
+		$title = array( 'header_size' => 'p' );
+		$tags  = array_filter(
+			array(
+				'title' => $title_tag,
+				'link'  => $link_tag,
+			)
+		);
+		if ( $tags ) {
+			$title['__dynamic__'] = $tags;
+		}
+		$brand = $has_logo ? self::widget( 'fvh0002', 'theme-site-logo', array( 'align' => 'left' ) ) : self::widget( 'fvh0002', 'theme-site-title', $title );
 		return array(
 			self::container(
 				'fvh0001',
