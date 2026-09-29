@@ -42,6 +42,7 @@ final class Plugin {
 			( new Admin\SettingsPage() )->hook();
 			( new Menus\Slots() )->hook();
 			( new Menus\Screen() )->hook();
+			( new Site\Setup() )->hook();
 			( new Dashboard\Takeover() )->hook();
 			( new Editors\ListTables() )->hook();
 		}
