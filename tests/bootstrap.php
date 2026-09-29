@@ -22,8 +22,11 @@ if ( ! class_exists( 'WP_User' ) ) {
 	class WP_User {
 		/** @var int */
 		public $ID;
-		public function __construct( int $id = 0 ) {
-			$this->ID = $id;
+		/** @var list<string> */
+		public $roles;
+		public function __construct( int $id = 0, array $roles = array() ) {
+			$this->ID    = $id;
+			$this->roles = $roles;
 		}
 		public function exists(): bool {
 			return $this->ID > 0;

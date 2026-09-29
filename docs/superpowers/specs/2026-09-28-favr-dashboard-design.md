@@ -18,10 +18,10 @@ to click. No stock or third-party widgets, no plugin nags, no WordPress jargon.
 | Question | Decision |
 |---|---|
 | Plugin name | **Favr Sites**, slug `favr-sites`, namespace `FavrSites\`, prefix `favr_sites_`. (`favr/core` stays the bundled library.) |
-| Who sees it | Users who can reach wp-admin but lack `manage_options` (Editors and below). Administrators keep the stock dashboard. |
+| Who sees it | Users with the Editor role (the role Favr clients get). Everyone else, Administrators included, keeps the stock dashboard. (Changed 2026-09-28 from "Editors and below".) |
 | Takeover | Render on the existing `wp-admin/index.php` before WordPress sets up dashboard widgets. Same URL; no redirect. |
 | Content | Needs your attention, Quick actions, Plugin summaries, Recent activity, Help. |
-| Help | Links to a Favr help site that doesn't exist yet: URLs live in one setting with fleet defaults. |
+| Help | Links to a Favr help site that doesn't exist yet: URLs live in one setting with fleet defaults (care@favr.site, 407-889-9987). |
 | Branding | Favr-branded. The client's logo and site name appear in the header for orientation only. |
 | Brand assets | None yet. Favr Sites defines a restrained palette and type pair as tokens in one file. |
 
@@ -37,8 +37,8 @@ Units (`src/`):
 
 - `Plugin`: boots the units on `plugins_loaded`.
 - `Dashboard\Audience`: pure decision "does this user get the Favr dashboard?". True when the user
-  is logged in, can `read`, lacks `manage_options`, and the `favr_sites_dashboard_enabled` filter
-  (default true, receives the `WP_User`) agrees.
+  is logged in, has the `editor` role, lacks `manage_options`, and the `favr_sites_dashboard_enabled`
+  filter (receives the default and the `WP_User`) agrees.
 - `Dashboard\Takeover`: on `load-index.php`, if `Audience` says yes: registers the screen's assets,
   removes `admin_notices`/`all_admin_notices`/`network_admin_notices` callbacks for this request,
   hides Screen Options and Help tabs, then includes `admin-header.php`, renders `Screen`, includes

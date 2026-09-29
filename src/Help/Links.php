@@ -16,11 +16,11 @@ final class Links {
 
 	public const OPTION = 'favr_sites_help';
 
-	/** Fleet defaults (filled in once the Favr help site and support inbox exist). */
+	/** Fleet defaults. The help centre URL is added once the Favr help site exists. */
 	public const DEFAULTS = array(
 		'help_url'      => '',
-		'support_email' => '',
-		'support_phone' => '',
+		'support_email' => 'care@favr.site',
+		'support_phone' => '407-889-9987',
 		'booking_url'   => '',
 	);
 

@@ -22,6 +22,13 @@ final class LinksTest extends TestCase {
 		$this->assertSame( '407 555 0100', $links['support_phone'] );
 	}
 
+	public function test_fleet_defaults_are_favr_care(): void {
+		Functions\when( 'get_option' )->justReturn( array() );
+		$links = Links::all();
+		$this->assertSame( 'care@favr.site', $links['support_email'] );
+		$this->assertSame( '407-889-9987', $links['support_phone'] );
+	}
+
 	public function test_garbage_is_cleaned(): void {
 		$this->assertSame( '', Links::clean( 'help_url', 'javascript:alert(1)' ) );
 		$this->assertSame( '', Links::clean( 'support_email', 'not an email' ) );

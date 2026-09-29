@@ -3,7 +3,7 @@
 ## What this is
 
 **Favr Sites** (namespace `FavrSites\`, prefix `favr_sites_`) is the plugin that owns the Favr
-experience on every client site. v1 replaces the wp-admin dashboard for Editors and below with a
+experience on every client site. v1 replaces the wp-admin dashboard for users with the Editor role with a
 Favr home screen. PHP 8.1+, WP 6.7+, no runtime dependencies, no JS build step. Design:
 `docs/superpowers/specs/2026-09-28-favr-dashboard-design.md`.
 
@@ -23,7 +23,7 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
 
 ## Architecture
 
-- `Dashboard\Audience`: who gets the Favr screen (can `read`, lacks `manage_options`, then the
+- `Dashboard\Audience`: who gets the Favr screen (the `editor` role, lacks `manage_options`, then the
   `favr_sites_dashboard_enabled` filter).
 - `Dashboard\Takeover`: on `load-index.php` it draws the admin frame, renders `Screen` and exits,
   so `wp_dashboard_setup()` never runs and no widget is built. It also strips notices and the

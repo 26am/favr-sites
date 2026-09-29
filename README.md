@@ -1,7 +1,7 @@
 # Favr Sites
 
 The Favr experience on every Favr client site. Version 0.1 replaces the WordPress dashboard for
-site editors (Editor role and below) with a Favr home screen:
+site editors (users with the Editor role) with a Favr home screen:
 
 - **Header** with the client's logo and site name, a greeting, and "View site".
 - **Needs your attention**: pending approvals from Favr Directory, Members and Events, only when
@@ -10,13 +10,13 @@ site editors (Editor role and below) with a Favr home screen:
 - **Cards** from each Favr plugin (Directory, Members, Events).
 - **Recent activity** across content the user can edit, and **Help** links.
 
-Administrators keep the stock WordPress dashboard. No stock or third-party dashboard widgets and no
+Everyone else, Administrators included, keeps the stock WordPress dashboard. No stock or third-party dashboard widgets and no
 plugin notices appear on the Favr screen.
 
 ## Help links
 
 Settings → Favr (Administrators). Values resolve as: `wp-config.php` constant → site setting →
-fleet default. Empty links are hidden.
+fleet default (care@favr.site, 407-889-9987). Empty links are hidden.
 
 ```php
 define( 'FAVR_SITES_HELP_URL', 'https://help.example.com/' );
