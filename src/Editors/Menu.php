@@ -21,6 +21,7 @@ final class Menu {
 		'index.php',
 		'edit.php?post_type=page',
 		'edit.php',
+		'favr-menus',
 		'upload.php',
 		'favr-approvals',
 		'edit.php?post_type=favr_business',

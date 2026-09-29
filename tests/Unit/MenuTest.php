@@ -8,9 +8,9 @@ use FavrSites\Editors\Menu;
 final class MenuTest extends TestCase {
 
 	public function test_keeps_known_entries_in_favr_order_and_removes_the_rest(): void {
-		$slugs = array( 'index.php', 'separator1', 'edit.php', 'upload.php', 'edit.php?post_type=page', 'favr-approvals', 'edit-comments.php', 'edit.php?post_type=elementor_library', 'edit.php?post_type=favr_business', 'edit.php?post_type=favr_event', 'edit.php?post_type=favr_member', 'elementor', 'separator2', 'profile.php', 'tools.php', 'wpseo_workouts' );
+		$slugs = array( 'index.php', 'separator1', 'favr-menus', 'edit.php', 'upload.php', 'edit.php?post_type=page', 'favr-approvals', 'edit-comments.php', 'edit.php?post_type=elementor_library', 'edit.php?post_type=favr_business', 'edit.php?post_type=favr_event', 'edit.php?post_type=favr_member', 'elementor', 'separator2', 'profile.php', 'tools.php', 'wpseo_workouts' );
 		$out   = Menu::arrange( $slugs );
-		$this->assertSame( array( 'index.php', 'edit.php?post_type=page', 'edit.php', 'upload.php', 'favr-approvals', 'edit.php?post_type=favr_business', 'edit.php?post_type=favr_event', 'edit.php?post_type=favr_member', 'profile.php' ), $out['keep'] );
+		$this->assertSame( array( 'index.php', 'edit.php?post_type=page', 'edit.php', 'favr-menus', 'upload.php', 'favr-approvals', 'edit.php?post_type=favr_business', 'edit.php?post_type=favr_event', 'edit.php?post_type=favr_member', 'profile.php' ), $out['keep'] );
 		$this->assertSame( array( 'separator1', 'edit-comments.php', 'edit.php?post_type=elementor_library', 'elementor', 'separator2', 'tools.php', 'wpseo_workouts' ), $out['remove'] );
 	}
 
