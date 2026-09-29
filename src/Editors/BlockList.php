@@ -53,7 +53,19 @@ final class BlockList {
 		$settings['enableOpenverseMediaCategory']         = false;
 		$settings['__experimentalBlockPatterns']          = array();
 		$settings['__experimentalBlockPatternCategories'] = array();
+		// WP 6.7+ reads these instead; the rest of the library comes over REST (see noPatterns()).
+		$settings['__experimentalAdditionalBlockPatterns']          = array();
+		$settings['__experimentalAdditionalBlockPatternCategories'] = array();
 		return $settings;
+	}
+
+	/**
+	 * Is this a REST route the editor uses to load patterns?
+	 *
+	 * @param string $route Route.
+	 */
+	public static function isPatternRoute( string $route ): bool {
+		return str_starts_with( $route, '/wp/v2/block-patterns/' ) || str_starts_with( $route, '/wp/v2/pattern-directory/' );
 	}
 
 	/** Hooks. */
@@ -61,6 +73,22 @@ final class BlockList {
 		add_filter( 'allowed_block_types_all', array( $this, 'allowed' ), PHP_INT_MAX, 2 );
 		add_filter( 'block_editor_settings_all', array( $this, 'settings' ), PHP_INT_MAX, 2 );
 		add_filter( 'should_load_remote_block_patterns', array( $this, 'remotePatterns' ) );
+		add_filter( 'rest_pre_dispatch', array( $this, 'noPatterns' ), 10, 3 );
+	}
+
+	/**
+	 * Editors get an empty pattern library (they only use the block editor for News).
+	 *
+	 * @param mixed            $result  Short-circuit result.
+	 * @param \WP_REST_Server  $server  Server.
+	 * @param \WP_REST_Request $request Request.
+	 * @return mixed
+	 */
+	public function noPatterns( $result, $server, $request ) {
+		if ( null !== $result || ! is_object( $request ) || ! method_exists( $request, 'get_route' ) || ! self::isPatternRoute( (string) $request->get_route() ) || ! Audience::current() ) {
+			return $result;
+		}
+		return new \WP_REST_Response( array(), 200 );
 	}
 
 	/**

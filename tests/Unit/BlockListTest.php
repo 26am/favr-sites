@@ -29,5 +29,16 @@ final class BlockListTest extends TestCase {
 		$this->assertSame( array(), $out['__experimentalBlockPatterns'] );
 		$this->assertSame( array(), $out['__experimentalBlockPatternCategories'] );
 		$this->assertSame( 'me', $out['keep'] );
+		// WP 6.7+ reads the "Additional" keys, and fetches the rest over REST.
+		$this->assertSame( array(), $out['__experimentalAdditionalBlockPatterns'] );
+		$this->assertSame( array(), $out['__experimentalAdditionalBlockPatternCategories'] );
+	}
+
+	public function test_pattern_rest_routes_are_recognised(): void {
+		$this->assertTrue( BlockList::isPatternRoute( '/wp/v2/block-patterns/patterns' ) );
+		$this->assertTrue( BlockList::isPatternRoute( '/wp/v2/block-patterns/categories' ) );
+		$this->assertTrue( BlockList::isPatternRoute( '/wp/v2/pattern-directory/patterns' ) );
+		$this->assertFalse( BlockList::isPatternRoute( '/wp/v2/posts' ) );
+		$this->assertFalse( BlockList::isPatternRoute( '/wp/v2/blocks' ) );
 	}
 }
