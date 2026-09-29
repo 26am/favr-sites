@@ -18,7 +18,9 @@ dropdown level, and nothing on the page designs changes.
 |---|---|
 | Where | A Favr "Menus" screen (`admin.php?page=favr-menus`), capability `edit_pages`. Editor menu order becomes Dashboard, Pages, News, Menus, Media, Approvals, Directory, Events, Members, Profile. |
 | What it edits | The site's real WordPress menus (the ones Elementor's Nav Menu widgets and theme locations display), so the site updates on save. |
-| Which menus | All nav menus. Menus that are shown somewhere come first with "Shown in: {template/page title}" (Elementor Nav Menu widgets referencing the menu slug in published Elementor data, plus theme locations). Others say "Not shown on the site yet". |
+| Which menus | Exactly two slots, **Header** and **Footer** (Favr sites have these two by default). Each slot is connected to a real menu in Settings → Favr (Administrators): a select per slot listing the site's menus plus "Create a new menu". Defaults: a menu with slug `header` / `footer` if one exists; on a fresh site Favr Sites creates "Header" and "Footer" menus the first time an Administrator loads wp-admin with a slot unset and no candidate. Existing sites are connected by hand (GOAABA: Primary Navigation → Header, Footer Explore → Footer). Option `favr_sites_menus` = `{header: term_id, footer: term_id}`. |
+| Unconnected slot | Editors see "Your {header/footer} menu isn't set up yet. Favr will connect it." (no editor). |
+| Shown in | Each slot shows where its menu appears: "Shown in: {template/page title}" (Elementor Nav Menu widgets referencing the menu slug in published Elementor data, plus theme locations), or "Not shown on the site yet". |
 | Menus themselves | Editors can't create, rename or delete menus (Favr sets them up). |
 | Items | Reorder (drag, or Move up/down buttons), rename, remove, one dropdown level (Make dropdown item / Move out). Add a page (search over published pages) or a link (label + address). |
 | Depth | Editors get top level + one dropdown level. Existing deeper items are kept, shown with "Too deep for the menu; move it out a level", and never changed silently. |
@@ -40,9 +42,10 @@ dropdown level, and nothing on the page designs changes.
     `esc_url_raw` (http/https/mailto/tel, or relative starting with `/`); `other` rows (categories,
     archives, anything not page/custom) keep their type/object and only change title/order/level.
   - `unplacedPages( list<page> $pages, list<int> $page_ids_in_menus ): list<page>`.
+- `Menus\Slots`: `SLOTS = ['header','footer']`; `resolve( array $option, list<WP_Term> $menus ): array{header: ?int, footer: ?int}` (pure: saved id if it still exists, else slug match, else null); `ensureDefaults()` on `admin_init` for `manage_options` users only: creates missing "Header"/"Footer" menus when a slot resolves to null *and* the site has no menus at all (fresh sites), then saves the option. Settings → Favr gains the two selects.
 - `Menus\Usage`: `where( WP_Term $menu ): list<string>` via one query for published
   `_elementor_data` containing `"menu":"{slug}"` (excluding revisions) + `get_nav_menu_locations()`.
-- `Menus\Screen`: registers the page; renders `templates/menus.php` (server-rendered list so it
+- `Menus\Screen`: registers the page; renders the two slots (Header, Footer) via `templates/menus.php` (server-rendered list so it
   works before JS loads); handles the save (`admin-post.php?action=favr_sites_save_menu`, nonce
   `favr_sites_save_menu_{menu_id}`, `current_user_can( 'edit_pages' )`), applying `Tree::plan()`
   with `wp_update_nav_menu_item()` / `wp_delete_post()` on the menu's items only, then redirecting
@@ -67,11 +70,16 @@ Unit: `Tree::rows` (levels, ordering, orphans), `Tree::plan` (reorder, rename, c
 delete, depth clamp, deeper-item preservation, foreign ids ignored, URL/title sanitizing, `other`
 rows preserved), `unplacedPages`.
 
-Real check on sermonator-test as the Editor: create two test menus (one placed in an Elementor Nav
-Menu widget on the demo page), reorder/rename/add/remove/nest, save, confirm the front end reflects
+Real check on sermonator-test as the Editor: fresh-site defaults create Header/Footer menus (the local site has none);
+place the Header menu in an Elementor Nav Menu widget on the demo page, reorder/rename/add/remove/nest, save, confirm the front end reflects
 it; keyboard-only reorder; a pre-seeded 3-level item shows the warning and survives a save.
 Screenshots.
 
 ## Out of scope
 
-Creating/deleting menus, mega menus, menu item icons/classes/targets, Appearance → Menus access.
+Creating/deleting menus by Editors, more than two slots, mega menus, menu item icons/classes/targets,
+Appearance → Menus access.
+
+Next (separate spec): global Header and Footer Elementor theme templates, always on, editable by
+Editors but not deletable, unpublishable or duplicable (a `PageLock`-style capability rule for
+`elementor_library` header/footer documents).
