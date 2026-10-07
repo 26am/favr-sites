@@ -78,6 +78,16 @@ final class Screen {
 		add_filter( 'admin_body_class', static fn( string $classes ): string => $classes . ' favr-dash-screen favr-banner-screen' );
 		add_filter( 'admin_footer_text', '__return_empty_string', PHP_INT_MAX );
 		add_filter( 'update_footer', '__return_empty_string', PHP_INT_MAX );
+
+		// Plugin notices don't belong on a Favr screen (the banner has its own notices).
+		add_action(
+			'in_admin_header',
+			static function (): void {
+				remove_all_actions( 'admin_notices' );
+				remove_all_actions( 'all_admin_notices' );
+			},
+			PHP_INT_MAX
+		);
 	}
 
 	/** Page. */

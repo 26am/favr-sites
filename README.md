@@ -26,7 +26,8 @@ For the Editor role (Administrators keep stock WordPress):
   list, quote, image, gallery, embed, button, separator, table, file), no pattern library, Openverse or
   code editor. Elementor is off for posts.
 - **Lists:** only View and a small bin icon under titles; no Comments or Yoast columns.
-- **Menu:** Dashboard, Pages, News, Header & Footer, Media, Approvals, Directory, Events, Members, Profile.
+- **Menu:** Dashboard, Pages, News, Header & Footer, Alert banner, Media, Approvals, Directory, Events, Members,
+  Documents, People, Sponsors, Profile (the last three come from Favr Content).
   Everything else is hidden (allow-list). "Posts" is called "News".
 - **Admin bar** (wp-admin and the public site): the WordPress logo menu becomes a Favr help menu
   (help centre, email and phone from the help links); the account menu shows the first name,
@@ -52,6 +53,14 @@ For the Editor role (Administrators keep stock WordPress):
   locations). Saving edits the real WordPress menu, keeping each item's own settings (new tab,
   CSS classes, description), and clears Elementor's cache. Items that were already nested deeper
   than one level are kept and flagged. Editors can't create, rename or delete menus.
+
+- **Alert banner** (0.9): one message across the top of every page, from a Favr screen. Plain text
+  with an optional link, a Standard (site colour) or Urgent (red) style, optional show and hide
+  times in the site's time zone, and a close button visitors' browsers remember until the banner
+  is saved again. Printed on `wp_body_open` (in the footer, then moved to the top, on a theme that
+  never fires it); the browser re-checks the times and the dismissal, so cached pages stay
+  correct. Not shown in wp-admin, feeds or the Elementor editor. Saving fires
+  `litespeed_purge_all` and `favr_sites_banner_saved` (hook other page caches there).
 
 For everyone: **comments are off** (no forms, REST route, pingbacks, menu or admin-bar bubble).
 Existing comments are kept, so deactivating Favr Sites brings them back.
