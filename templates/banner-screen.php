@@ -7,6 +7,8 @@
  * @var array<string, mixed> $view View model from FavrSites\Banner\Screen::render().
  */
 
+use FavrSites\Banner\Display;
+
 defined( 'ABSPATH' ) || exit;
 
 $favr_banner = $view['banner'];
@@ -30,6 +32,11 @@ $favr_banner = $view['banner'];
 
 	<section class="favr-dash__card favr-banner-admin__card">
 		<p class="favr-banner-admin__status" data-state="<?php echo esc_attr( $view['state'] ); ?>"><?php echo esc_html( $view['status'] ); ?></p>
+		<?php if ( '' !== $favr_banner->message() ) : ?>
+			<div class="favr-banner-admin__preview">
+				<?php echo Display::markup( $favr_banner, 'live', $view['colors'], false, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the template escapes. ?>
+			</div>
+		<?php endif; ?>
 	</section>
 
 	<form class="favr-dash__card favr-banner-admin__card favr-banner-admin__form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">

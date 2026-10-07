@@ -73,6 +73,7 @@ final class Screen {
 			$file = 'assets/dashboard/' . $name . '.css';
 			wp_enqueue_style( 'favr-sites-' . $name, FAVR_SITES_URL . $file, 'dashboard' === $name ? array( 'favr-sites-tokens' ) : array(), self::version( $file ) );
 		}
+		wp_enqueue_style( 'favr-sites-banner', FAVR_SITES_URL . 'assets/banner/banner.css', array(), self::version( 'assets/banner/banner.css' ) ); // The preview.
 		wp_enqueue_style( 'favr-sites-banner-screen', FAVR_SITES_URL . 'assets/banner/screen.css', array( 'favr-sites-tokens' ), self::version( 'assets/banner/screen.css' ) );
 		add_filter( 'admin_body_class', static fn( string $classes ): string => $classes . ' favr-dash-screen favr-banner-screen' );
 		add_filter( 'admin_footer_text', '__return_empty_string', PHP_INT_MAX );
@@ -92,6 +93,7 @@ final class Screen {
 			'state'    => $banner->state( $now, $zone ),
 			'status'   => self::status( $banner, $now, $zone, static fn( int $timestamp ): string => (string) wp_date( 'j M Y, g:i a', $timestamp ) ),
 			'zone'     => wp_timezone_string(),
+			'colors'   => Display::colors( $banner->style(), Display::kitColor() ),
 			'saved'    => isset( $_GET['saved'] ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display-only flag.
 			'warnings' => is_array( $warnings ) ? $warnings : array(),
 			'action'   => self::SAVE,

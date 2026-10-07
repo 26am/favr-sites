@@ -38,6 +38,7 @@ final class Plugin {
 		( new Editors\ElementorEditor() )->hook();
 		( new Profile\ProfilePage() )->hook();
 		( new Editors\Menu() )->hook(); // Also on the front end: the admin bar uses the "News" labels.
+		( new Banner\Display() )->hook();
 
 		if ( is_admin() ) {
 			( new Admin\SettingsPage() )->hook();
