@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace FavrSites\Banner;
 
+use FavrSites\Dashboard\Audience;
 use FavrSites\Menus\Tree;
 
 /**
@@ -79,15 +80,18 @@ final class Screen {
 		add_filter( 'admin_footer_text', '__return_empty_string', PHP_INT_MAX );
 		add_filter( 'update_footer', '__return_empty_string', PHP_INT_MAX );
 
-		// Plugin notices don't belong on a Favr screen (the banner has its own notices).
-		add_action(
-			'in_admin_header',
-			static function (): void {
-				remove_all_actions( 'admin_notices' );
-				remove_all_actions( 'all_admin_notices' );
-			},
-			PHP_INT_MAX
-		);
+		// For Editors, plugin notices don't belong on a Favr screen (the banner has its own).
+		// Administrators keep theirs, as on the Favr dashboard and profile.
+		if ( Audience::current() ) {
+			add_action(
+				'in_admin_header',
+				static function (): void {
+					remove_all_actions( 'admin_notices' );
+					remove_all_actions( 'all_admin_notices' );
+				},
+				PHP_INT_MAX
+			);
+		}
 	}
 
 	/** Page. */
