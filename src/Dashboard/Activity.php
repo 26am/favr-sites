@@ -15,7 +15,7 @@ namespace FavrSites\Dashboard;
  */
 final class Activity {
 
-	private const TYPES = array( 'page', 'post', 'favr_business', 'favr_event', 'favr_member' );
+	private const TYPES = array( 'page', 'post', 'favr_business', 'favr_event', 'favr_member', 'favr_document', 'favr_person', 'favr_sponsor' );
 
 	/**
 	 * Keep types the user may edit.

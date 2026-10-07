@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace FavrSites\Dashboard;
 
+use FavrSites\Banner\Screen as BannerScreen;
+use FavrSites\Banner\Store;
 use FavrSites\Editors\Routing;
 use FavrSites\Help\Links;
 use FavrSites\Site\Protect;
@@ -104,6 +106,15 @@ final class Screen {
 				);
 			}
 		}
+		$zone      = wp_timezone();
+		$actions[] = array(
+			'id'         => 'banner',
+			'label'      => 'live' === Store::get()->state( new \DateTimeImmutable( 'now', $zone ), $zone ) ? __( 'Alert banner (on)', 'favr-sites' ) : __( 'Alert banner', 'favr-sites' ),
+			'url'        => admin_url( 'admin.php?page=' . BannerScreen::PAGE ),
+			'capability' => 'edit_pages',
+			'icon'       => 'bell',
+			'priority'   => 22,
+		);
 		return $actions;
 	}
 }

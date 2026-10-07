@@ -33,6 +33,7 @@ final class Icons {
 		'out'      => '<path d="M15 19v-8a3 3 0 0 0-3-3H5"/><path d="M9 4L5 8l4 4"/>',
 		'grip'     => '<path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01"/>',
 		'menu'     => '<path d="M4 7h16M4 12h16M4 17h10"/>',
+		'bell'     => '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
 	);
 
 	/**

@@ -22,11 +22,15 @@ final class Menu {
 		'edit.php?post_type=page',
 		'edit.php',
 		'favr-menus',
+		'favr-banner',
 		'upload.php',
 		'favr-approvals',
 		'edit.php?post_type=favr_business',
 		'edit.php?post_type=favr_event',
 		'edit.php?post_type=favr_member',
+		'edit.php?post_type=favr_document',
+		'edit.php?post_type=favr_person',
+		'edit.php?post_type=favr_sponsor',
 		'profile.php',
 	);
 
