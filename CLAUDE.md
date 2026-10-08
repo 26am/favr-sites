@@ -60,6 +60,11 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   after `Slots::ensureDefaults`; Elementor document API + Pro's conditions manager), `Protect`
   (Editors: no delete, always published, no `_elementor_conditions` writes). Keep `settled()`
   exact: a settled site must never be written to on each Administrator page load.
+- `Banner\*` (0.9): `Banner` (pure value: `clean()` a submitted form, `state()` off/pending/live,
+  `window()`, `version()`), `Colors`, `Store` (option `favr_sites_banner`, autoloaded), `Screen`
+  (`admin.php?page=favr-banner`, cap `edit_pages`), `Display` (`wp_body_open`, footer fallback,
+  inline `assets/banner/banner.js`). The stored times are local strings; keep `banner.js`'s
+  window check in step with `Banner::state()`.
 - `Comments\Off`: comments off for everyone; no data touched.
 - `Brand\ColorScheme`: the "Favr" admin colour scheme (default for Editors with no saved choice).
   Edit `assets/admin-colors/favr/colors.scss`, then rebuild `colors.css` with
@@ -71,4 +76,4 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
 ## Conventions
 
 - Match the siblings: WPCS formatting, camelCase methods, PSR-4 classes in `src/`.
-- Keep it simple: JS only for the Elementor editor tweak and the Menus screen, no caching layer, no new tables. Add unit tests for pure logic.
+- Keep it simple: JS only for the Elementor editor tweak, the Menus screen and the banner's close button, no caching layer, no new tables. Add unit tests for pure logic.

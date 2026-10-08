@@ -1,0 +1,13 @@
+.favr-banner { background: var(--favr-banner-bg, #2E2230); color: var(--favr-banner-fg, #fff); font-size: 15px; font-weight: 500; line-height: 1.4; }
+.favr-banner[hidden] { display: none; }
+.favr-banner__inner { display: flex; align-items: flex-start; gap: 12px; max-width: 1200px; margin: 0 auto; padding: 10px 16px; }
+.favr-banner__text { flex: 1; margin: 0; text-align: center; color: inherit; }
+.favr-banner__link { color: inherit; text-decoration: underline; font-weight: 700; margin-left: 6px; white-space: nowrap; }
+.favr-banner .favr-banner__link, .favr-banner .favr-banner__link:hover, .favr-banner .favr-banner__link:focus { color: inherit; }
+.favr-banner__link:hover, .favr-banner__link:focus { text-decoration-thickness: 2px; }
+/* Two classes deep on purpose: themes style every button (Hello Elementor adds a border, padding and a colour). */
+.favr-banner .favr-banner__close { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 28px; min-width: 0; height: 28px; margin: 0; padding: 0; border: 0; border-radius: 4px; box-shadow: none; background: transparent; color: inherit; font-size: 22px; font-weight: 400; line-height: 1; text-transform: none; cursor: pointer; }
+.favr-banner .favr-banner__close:hover, .favr-banner .favr-banner__close:focus { background: rgba(127, 127, 127, 0.25); color: inherit; }
+.favr-banner .favr-banner__close:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.favr-banner .favr-banner__close[hidden] { display: none; }
+@media (max-width: 600px) { .favr-banner__text { text-align: left; } .favr-banner__link { white-space: normal; } }
