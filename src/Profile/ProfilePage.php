@@ -96,12 +96,26 @@ final class ProfilePage {
 	}
 
 	/**
+	 * Pure: does the toolbar show? Always for Editors on the public site, but never forced back
+	 * inside Elementor's editor preview, where Elementor turns it off: there it sits on top of
+	 * the page's header.
+	 *
+	 * @param bool $show            What WordPress (and anything else) decided.
+	 * @param bool $is_editor       In the Favr audience.
+	 * @param bool $builder_preview This request is the page inside Elementor's editor.
+	 */
+	public static function showsToolbar( bool $show, bool $is_editor, bool $builder_preview ): bool {
+		return $is_editor && ! $builder_preview ? true : $show;
+	}
+
+	/**
 	 * The toolbar always shows for Editors on the public site.
 	 *
 	 * @param bool $show Show.
 	 */
 	public function toolbar( $show ): bool {
-		return is_user_logged_in() && Audience::current() ? true : (bool) $show;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reading which kind of request this is.
+		return self::showsToolbar( (bool) $show, is_user_logged_in() && Audience::current(), isset( $_GET['elementor-preview'] ) );
 	}
 
 	/**
