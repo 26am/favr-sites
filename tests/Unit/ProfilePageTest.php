@@ -45,4 +45,20 @@ final class ProfilePageTest extends TestCase {
 		);
 		$this->assertSame( array( true, false ), array_column( ProfilePage::schemes( $colors, 'gone' ), 'current' ) );
 	}
+
+	public function test_editors_always_get_the_toolbar_on_the_public_site(): void {
+		$this->assertTrue( ProfilePage::showsToolbar( false, true, false ) );
+		$this->assertTrue( ProfilePage::showsToolbar( true, true, false ) );
+	}
+
+	public function test_the_toolbar_stays_out_of_the_elementor_editor_preview(): void {
+		// Elementor turns the toolbar off inside its preview frame; forcing it back covers the page header.
+		$this->assertFalse( ProfilePage::showsToolbar( false, true, true ) );
+	}
+
+	public function test_everybody_else_keeps_their_own_toolbar_choice(): void {
+		$this->assertFalse( ProfilePage::showsToolbar( false, false, false ) );
+		$this->assertTrue( ProfilePage::showsToolbar( true, false, false ) );
+		$this->assertTrue( ProfilePage::showsToolbar( true, false, true ) );
+	}
 }

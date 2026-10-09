@@ -41,7 +41,7 @@ For the Editor role (Administrators keep stock WordPress):
 
 - **Your profile** (0.6): Editors get a short Favr profile page: name, email (WordPress's confirm-by-email
   step still applies), password, photo via Gravatar, and a one-row colour-scheme picker (50px swatches).
-  Nickname and display name follow First/Last name. Pinned for Editors: toolbar always on, Media
+  Nickname and display name follow First/Last name. Pinned for Editors: toolbar always on (except inside Elementor's editor preview, where it would sit on top of the page's header), Media
   infinite scrolling on, application passwords off, Elementor AI off. Saving uses WordPress's own
   profile update.
 
