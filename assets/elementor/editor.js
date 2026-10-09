@@ -45,6 +45,43 @@
 		replace( bar.documentOptionsMenu, 'registerAction', id, 'default', hidden );
 	} );
 
+	// Tools and utilities Editors never need (the design system, page settings, the Finder).
+	( config.hideTools || [] ).forEach( function ( id ) {
+		replace( bar.toolsMenu, 'registerToggleAction', id, 'default', hidden );
+	} );
+	( config.hideUtilities || [] ).forEach( function ( id ) {
+		replace( bar.utilitiesMenu, 'registerAction', id, 'default', hidden );
+	} );
+
+	// Widgets from hidden groups stay out of the panel and its search (editor.css hides the groups).
+	function calmPanel() {
+		var editor = window.elementor;
+		var hide = config.hideCategories || [];
+		if ( ! editor || ! editor.widgetsCache || ! hide.length ) {
+			return;
+		}
+		Object.keys( editor.widgetsCache ).forEach( function ( name ) {
+			var groups = editor.widgetsCache[ name ].categories || [];
+			var all = groups.length && groups.every( function ( group ) {
+				return -1 !== hide.indexOf( group );
+			} );
+			if ( all ) {
+				editor.widgetsCache[ name ].show_in_panel = false;
+			}
+		} );
+	}
+	function watchPanel() {
+		calmPanel();
+		if ( window.elementor && 'function' === typeof window.elementor.on ) {
+			window.elementor.on( 'document:loaded', calmPanel );
+		}
+	}
+	if ( window.elementor && window.elementor.widgetsCache ) {
+		watchPanel();
+	} else if ( window.jQuery ) {
+		window.jQuery( window ).on( 'elementor:init', watchPanel );
+	}
+
 	// Exit says where it goes.
 	if ( config.back ) {
 		replace( bar.mainMenu, 'registerLink', 'exit-to-wordpress', 'exits', function () {

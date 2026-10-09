@@ -1,0 +1,49 @@
+/*
+ * Favr Sites: a calmer Elementor editor in Favr's colours, for site Editors (loaded only for them).
+ * The hidden widget groups and their order come from ElementorEditor::panelCss().
+ * Selectors use Elementor's ids and MUI's own class names; if Elementor changes them, its default look shows.
+ */
+
+/* One list of widgets: no Components or Globals tabs. */
+#elementor-panel-elements-navigation {
+	display: none !important;
+}
+
+/* Another plugin's AI assistant button (EMCP Tools). */
+#emcp-ai-fab {
+	display: none !important;
+}
+
+/* The top bar in Favr's colours. */
+#elementor-editor-wrapper-v2 header.MuiAppBar-root {
+	background-color: #3a2738;
+	box-shadow: inset 0 -3px 0 #e3a044;
+}
+#elementor-editor-wrapper-v2 header .MuiButton-containedPrimary:not(.Mui-disabled) {
+	background-color: #a9472a;
+	color: #fff;
+}
+#elementor-editor-wrapper-v2 header .MuiButton-containedPrimary:not(.Mui-disabled):hover {
+	background-color: #8e3a21;
+}
+
+/* The menu button carries the Favr mark. */
+#elementor-editor-wrapper-v2 header button.MuiToggleButton-sizeLarge[aria-haspopup="true"] {
+	position: relative;
+}
+#elementor-editor-wrapper-v2 header button.MuiToggleButton-sizeLarge[aria-haspopup="true"] > svg {
+	visibility: hidden;
+}
+#elementor-editor-wrapper-v2 header button.MuiToggleButton-sizeLarge[aria-haspopup="true"]::before {
+	content: "f";
+	position: absolute;
+	inset: 0;
+	width: 30px;
+	height: 30px;
+	margin: auto;
+	border-radius: 50%;
+	background: #a9472a;
+	color: #fff;
+	font: 700 20px/30px Georgia, "Times New Roman", serif;
+	text-align: center;
+}

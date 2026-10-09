@@ -25,7 +25,14 @@ For the Editor role (Administrators keep stock WordPress):
 - **News (posts) open only in the block editor**, with a short block list (paragraph, heading,
   list, quote, image, gallery, embed, button, separator, table, file), no pattern library, Openverse or
   code editor. Elementor is off for posts.
+- **A calmer Elementor editor** (0.9.1), in Favr's colours with the Favr mark: Favr's own widgets
+  come first in the panel; Elementor's "atomic" elements, AI widget builder (and its "install
+  Angie" prompt), Components and Globals tabs, single-post, shop and other-theme widget groups
+  are gone, from search too; so are the Design System, Page Settings and Finder buttons.
+  Everyday widgets (Layout, Basic, General, Pro, Site) stay.
 - **Lists:** only View and a small bin icon under titles; no Comments or Yoast columns.
+- **No WordPress credit** ("Thank you for creating with WordPress", the version) under an
+  Editor's screens.
 - **Menu:** Dashboard, Pages, News, Header & Footer, Alert banner, Media, Approvals, Directory, Events, Members,
   Documents, People, Sponsors, Profile (the last three come from Favr Content).
   Everything else is hidden (allow-list). "Posts" is called "News".
@@ -72,6 +79,7 @@ If Elementor isn't active, the page rules switch off and pages use the block edi
 - **Favr admin colour scheme** (Profile → Admin Color Scheme), from the Favr brand palette:
   aubergine menus and admin bar, rust highlights, links and buttons, gold notification bubbles and
   a cream page. It's the default for Editors who have never picked a scheme; everyone can choose it.
+  Whoever uses it keeps those colours on the toolbar on the public site too (0.9.1).
   Source: `assets/admin-colors/favr/colors.scss` (built on WordPress's own scheme sources);
   rebuild with `npx --yes sass@1 --no-source-map --style=compressed assets/admin-colors/favr/colors.scss assets/admin-colors/favr/colors.css`.
 - **Favr screens** (dashboard, admin-bar logo) use the brand tokens in `assets/dashboard/tokens.css`

@@ -41,6 +41,9 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   `ListTables`, `Menu` (allow-list + "News"; hooked on the front end too for the admin bar
   labels), `AdminBar` (Favr help menu, account menu, short "New", no Elementor dropdown). Opening a page in Elementor stamps it as an Elementor
   page immediately, so never "test" a locked page by loading `action=elementor` on a real site.
+- `ElementorEditor` also drops Elementor's `editor-widget-creation` package and the Angie auto-guide for
+  Editors (PHP filters), hides widget groups (`HIDE_CATEGORIES`, CSS from `panelCss()`; `editor.js` sets
+  `show_in_panel` so search agrees) and colours the top bar (`assets/elementor/editor.css`).
 - `ElementorEditor` + `assets/elementor/editor.js`: re-registers Elementor
   app-bar items by id with `overwrite: true` (ids/groups from Elementor's editor-app-bar package) and
   dequeues `e-editor-notifications`. Check the ids when Elementor updates.
@@ -67,6 +70,8 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   window check in step with `Banner::state()`.
 - `Comments\Off`: comments off for everyone; no data touched.
 - `Brand\ColorScheme`: the "Favr" admin colour scheme (default for Editors with no saved choice).
+  `assets/admin-colors/favr/toolbar.css` holds the scheme's `#wpadminbar` rules for the public site,
+  where WordPress loads no scheme; it is copied from `colors.css` (a test fails if they drift).
   Edit `assets/admin-colors/favr/colors.scss`, then rebuild `colors.css` with
   `npx --yes sass@1 --no-source-map --style=compressed assets/admin-colors/favr/colors.scss assets/admin-colors/favr/colors.css`
   and commit both (no build step on client sites).
