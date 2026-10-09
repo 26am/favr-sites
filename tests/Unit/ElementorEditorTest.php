@@ -40,4 +40,37 @@ final class ElementorEditorTest extends TestCase {
 		// Elementor's "Save Draft" on a published document only autosaves; it never unpublishes.
 		$this->assertSame( array( 'document-display-conditions' ), ElementorEditor::HIDE );
 	}
+
+	public function test_editors_do_not_get_the_design_system_page_settings_or_finder_buttons(): void {
+		$this->assertContains( 'open-design-system-toolbar', ElementorEditor::HIDE_TOOLS );
+		$this->assertContains( 'document-settings-button', ElementorEditor::HIDE_TOOLS );
+		$this->assertContains( 'toggle-finder', ElementorEditor::HIDE_UTILITIES );
+	}
+
+	public function test_a_widget_is_offered_unless_every_group_it_is_in_is_hidden(): void {
+		$hidden = ElementorEditor::HIDE_CATEGORIES;
+		$this->assertFalse( ElementorEditor::showsWidget( array( 'v4-elements' ), $hidden ) );
+		$this->assertFalse( ElementorEditor::showsWidget( array( 'link-in-bio' ), $hidden ) );
+		$this->assertTrue( ElementorEditor::showsWidget( array( 'basic' ), $hidden ) );
+		$this->assertTrue( ElementorEditor::showsWidget( array( 'favr' ), $hidden ) );
+		$this->assertTrue( ElementorEditor::showsWidget( array( 'general', 'link-in-bio' ), $hidden ) );
+		$this->assertTrue( ElementorEditor::showsWidget( array(), $hidden ) );
+	}
+
+	public function test_the_favr_widgets_come_first_and_the_everyday_ones_stay(): void {
+		$this->assertSame( 'favr', ElementorEditor::FIRST_CATEGORY );
+		foreach ( array( 'favr', 'layout', 'basic', 'general', 'pro-elements', 'theme-elements' ) as $kept ) {
+			$this->assertNotContains( $kept, ElementorEditor::HIDE_CATEGORIES );
+		}
+	}
+
+	public function test_editors_are_not_offered_elementors_ai_widget_builder_or_its_install_prompt(): void {
+		$packages = array( 'editor', 'editor-app-bar', 'editor-widget-creation', 'editor-panels' );
+		$this->assertSame( array( 'editor', 'editor-app-bar', 'editor-panels' ), ElementorEditor::packagesFor( $packages, true ) );
+		$this->assertSame( $packages, ElementorEditor::packagesFor( $packages, false ) );
+
+		$settings = array( 'angie' => array( 'autoShow' => true, 'other' => 1 ), 'kept' => 'yes' );
+		$this->assertSame( array( 'angie' => array( 'other' => 1 ), 'kept' => 'yes' ), ElementorEditor::settingsFor( $settings, true ) );
+		$this->assertSame( $settings, ElementorEditor::settingsFor( $settings, false ) );
+	}
 }

@@ -48,6 +48,7 @@ final class Plugin {
 			( new Site\Setup() )->hook();
 			( new Dashboard\Takeover() )->hook();
 			( new Editors\ListTables() )->hook();
+			( new Editors\AdminFooter() )->hook();
 		}
 	}
 }
