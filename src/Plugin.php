@@ -47,7 +47,9 @@ final class Plugin {
 			( new Banner\Screen() )->hook();
 			( new Site\Setup() )->hook();
 			( new Dashboard\Takeover() )->hook();
+			( new Editors\Words() )->hook();
 			( new Editors\ListTables() )->hook();
+			( new Editors\Terms() )->hook();
 			( new Editors\Chrome() )->hook();
 			( new Editors\Wayfinding() )->hook();
 			( new Editors\AdminFooter() )->hook();
