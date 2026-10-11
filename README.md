@@ -8,7 +8,8 @@ site editors (users with the Editor role) with a Favr home screen:
   something is waiting.
 - **Quick actions**: Add news post, Edit pages, plus whatever the installed Favr plugins add.
 - **Cards** from each Favr plugin (Directory, Members, Events).
-- **Recent activity** across content the user can edit, and **Help** links.
+- **Recent activity** across content the user can edit (a draft that was never saved a second
+  time shows when it was added), and **Help** links.
 
 Everyone else, Administrators included, keeps the stock WordPress dashboard. No stock or third-party dashboard widgets and no
 plugin notices appear on the Favr screen.
@@ -30,11 +31,13 @@ For the Editor role (Administrators keep stock WordPress):
   Angie" prompt), Components and Globals tabs, single-post, shop and other-theme widget groups
   are gone, from search too; so are the Design System, Page Settings and Finder buttons.
   Everyday widgets (Layout, Basic, General, Pro, Site) stay.
-- **Lists:** only View and a small bin icon under titles; no Comments, Yoast or Rank Math
+- **Lists:** only View and a small bin icon under titles; no Author, Comments, Yoast or Rank Math
   columns. Dates read "Oct 8, 2026", with a word above them only when the item is not published
-  ("Scheduled", "Last modified"); the Media Library's list uses the same dates. Favr's own lists
+  ("Scheduled", "Last modified"); the Media Library's list uses the same dates and keeps its
+  Author column (who uploaded the file). Favr's own lists
   (Members, Directory, Events, Documents, People, Sponsors) have no month filter; News, Pages and
-  Media keep theirs.
+  Media keep theirs. On a phone every row can be opened to see its other columns, also a row with
+  nothing to click under its title (a draft page managed by Favr).
 - **No WordPress credit** ("Thank you for creating with WordPress", the version) under an
   Editor's screens.
 - **Menu:** Dashboard and Approvals, then two groups with a small heading each. **Website**:
@@ -45,6 +48,16 @@ For the Editor role (Administrators keep stock WordPress):
 - **Words:** "Posts" is called "News", and labels are in sentence case: "All pages / Add page",
   "Library / Add media", "All categories / Add category", "Header & footer". The Media screens'
   own title, button and search say the same ("Media library", "Add media", "Search media").
+- **WordPress's own words in sentence case** (wp-admin, English sites): "Save draft", "Preview
+  changes", "Collapse menu", "Quick edit", "Delete permanently", "Front page", and in the media
+  window "Media library", "Attachment details", "Alt text", "Image caption", "Link to", "Edit
+  selection". About a hundred phrases Editors meet, kept in one dictionary (`Editors\Words`). "Trash"
+  keeps its capital, and so do names. The block editor's own interface, the public site and
+  Administrators' screens are not touched.
+- **Categories and levels** (every taxonomy): no Slug column and no Slug field in the add form,
+  in Quick Edit or on the edit screen. A new one still gets its slug from its name; renaming one
+  keeps the slug, so links to it keep working. WordPress's explanations under the fields are
+  gone; "Parent" and "Description" each keep one short line.
 - **Edit screens** (classic ones; not the block editor or Elementor): a "← All events" link above
   the title goes back to the list ("← All categories" on a category). Editors have no Screen
   Options, no Help tab and no Author, Slug, Attributes, Custom Fields, Discussion, Comments,
@@ -53,7 +66,9 @@ For the Editor role (Administrators keep stock WordPress):
   under the title can still be edited.
 - **Admin bar** (wp-admin and the public site): the WordPress logo menu becomes a Favr help menu
   (help center, email and phone from the help links); the account menu shows the first name,
-  "Site editor", "Your profile" and "Log out"; "New" lists only News post, Page and Media; Elementor's
+  "Site editor", "Your profile" and "Log out"; "New" lists everything the Editor can add, in the
+  order of the dashboard's quick actions (Event, News post, Member, Directory listing, Document,
+  then Page, Person, Sponsor, Media), and clicking "New" itself adds the first; Elementor's
   "Edit with Elementor" dropdown is hidden (WordPress's Edit link already opens pages in Elementor).
 - **Elementor editor** (0.5): the main menu keeps User Preferences and Keyboard Shortcuts; Site
   Settings, Theme Builder and "Connect my account" are hidden; Help becomes "Favr help" (or "Email
@@ -65,7 +80,9 @@ For the Editor role (Administrators keep stock WordPress):
   step still applies), password and photo via Gravatar. There is no colour scheme to pick (Editors
   always get Favr's), and saving leaves the scheme stored for the user as it was.
   Nickname and display name follow First/Last name. Pinned for Editors: toolbar always on (except inside Elementor's editor preview, where it would sit on top of the page's header), Media
-  infinite scrolling on, application passwords off, Elementor AI off. Saving uses WordPress's own
+  infinite scrolling on, application passwords off, Elementor AI off (no "Generate with Elementor
+  AI" or "Edit with Elementor AI" in the Media Library, on an attachment or in the media window;
+  it holds for every Editor, also one who never saved this page). Saving uses WordPress's own
   profile update.
 
 - **Header & footer** (0.7 as Menus; renamed in 0.8): a Favr screen for the site's **Header** and **Footer** menus instead of

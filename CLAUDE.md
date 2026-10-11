@@ -36,24 +36,57 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   ids follow). A new sibling action or card needs its id added there to get a fixed place.
 - `Dashboard\Attention` reads the existing `favr_approvals_providers` contract (favr/core inbox).
 - `Dashboard\Activity`: 10 most recent changes across editable post types; nothing is stored.
+  `changed()` picks the first real date (a draft made by one insert has `0000-00-00` GMT dates).
 - `Help\Links`: constant (`FAVR_SITES_HELP_URL`, …) → `favr_sites_help` option → default.
 - `Editors\*` (Editor role only, via `Audience::current()`): `PageLock` (map_meta_cap denies
   edit/delete/publish incl. `edit_page`/`delete_page`, which Elementor checks, on pages not built
   with Elementor and on News posts built with Elementor), `Routing` (pages → Elementor, no Elementor on posts), `BlockList`,
-  `ListTables` (row actions, no SEO columns, "Oct 8, 2026" dates with a status word only when
-  not published, no month filter on Favr post types), `Menu`, `Chrome`, `Wayfinding`,
-  `AdminBar` (Favr help menu, account menu, short "New", no Elementor dropdown). Opening a page in Elementor stamps it as an Elementor
+  `ListTables` (row actions, no Author, Comments or SEO columns, "Oct 8, 2026" dates with a status
+  word only when not published, no month filter on Favr post types), `Menu`, `Words`, `Terms`,
+  `Chrome`, `Wayfinding`, `AdminBar` (Favr help menu, account menu, "New" in Favr's order, no
+  Elementor dropdown). Opening a page in Elementor stamps it as an Elementor
   page immediately, so never "test" a locked page by loading `action=elementor` on a real site.
+- `Editors\ListTables::rowActions()` never returns nothing: WordPress prints the "Show more
+  details" toggle (the only way to open a row's folded columns on a phone) inside `row_actions()`,
+  and only when there is an action. A draft an Editor may not edit (the Privacy Policy page: no
+  Preview without `edit_post`, no Trash under `PageLock`) keeps the empty `favr-no-actions` entry.
+- `Editors\AdminBar`: "New" is rebuilt from `NEW_ORDER` (the post types behind
+  `Dashboard\Items::ACTION_ORDER`, then Page, Person, Sponsor, Media): every node WordPress put
+  there is removed, then one is added per post type that exists and the user may `create_posts`
+  in, titled by its `name_admin_bar` label through `Words::sentence()`. The "New" link itself
+  opens the first entry. A new Favr post type needs adding to `NEW_ORDER`.
+- `Editors\Words` (wp-admin, Editors, English locales only): WordPress's Title Case in sentence
+  case. `MAP` (`PHRASES` + `SENTENCES`) is one dictionary, phrase in WordPress's code => what an
+  Editor reads, used by both `gettext` and `gettext_with_context` (the same words in every
+  context) for the `default` domain only. Each filter is one comparison and one `isset`; keep it that way, it runs for every phrase
+  on every request. Hooked at the very start of `init` (`PHP_INT_MIN`): post type labels, the
+  media window's strings (`wp_enqueue_media()`) and the visual editor's (`wp_mce_translation`)
+  are all translated in PHP after that. `SCRIPTS` holds the few phrases `post.js`, `common.js`
+  and the colour picker translate in the browser; they are handed over as script translations
+  (`pre_load_script_translations`), which only works because an English site has no JSON files.
+  Rules a test enforces: every entry changes capitals only unless it is listed in `REWORDED`,
+  "Trash" keeps its capital, nothing an Editor reads has a capital after the first word except
+  names and abbreviations. Before adding a phrase check nothing compares it (WordPress 7.1 only
+  tests that `publish`/`save` were submitted, never their label). To find what is still Title
+  Case, read the screens as an Editor; the block editor's own interface is out of scope.
+- `Editors\Terms` (every taxonomy's `edit-tags.php` and `term.php`): no Slug column, the Slug
+  field hidden (`css()`, inline on the `favr-sites-skin` handle; Quick Edit needs `:has()`), and
+  WordPress's helper paragraphs replaced (`help()`). The label and column filters are named after
+  the taxonomy, so they are added from `register_taxonomy_args` as each one is registered; the
+  column filter must also run in `admin-ajax.php`, where Quick Edit and the add form get their
+  rows. The field is hidden, not removed: WordPress still receives the old slug on an edit and
+  makes one from the name on a new term. The category screen prints its own sentence under
+  "Parent category" instead of the label; that one is in `Words::MAP`.
 - `Editors\Menu`: allow-list in `TOP` + `GROUPS` (website, organization, account). `arrange()`
   (pure) returns the kept slugs with a `separator-favr-{group}` before each group that has an
   entry. The separators are put into `$menu` inside the `menu_order` filter (`withSeparators()`),
   not on `admin_menu`: only then has WordPress dropped the entries the user may not open, so an
   empty group gets no heading. The headings' words are inline CSS on the `favr-sites-skin` handle
   (`headingCss()`, escaped by `cssString()`); `assets/skin/base.css` draws them. Also the
-  sentence-case words: submenu labels (`relabel()`), post type and taxonomy labels for News, Pages,
-  Media, News categories and tags (`LABELS`; these filters run on the front end too, for the
-  toolbar), and WordPress's hard-coded Media screen words via `gettext` on those two screens only
-  (`mediaWords()`).
+  sentence-case words: submenu labels (`relabel()`) and post type and taxonomy labels for News,
+  Pages, Media, News categories and tags (`LABELS`; these filters run on the front end too, for
+  the toolbar). Words that are not labels (the Media screens' title, button and search) are in
+  `Editors\Words`.
 - `Editors\Chrome`: no Screen Options, no Help tabs, and `BOXES` removed from classic edit
   screens (never `postexcerpt`: Favr Events' summary). Two consequences it handles: saved Screen
   Options choices stop applying (`hidden_meta_boxes`, `hidden_columns`, `screen_layout_*`), and it
@@ -71,7 +104,9 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   `action=update` POST, which it saves via `personal_options_update` + `edit_user()`); core's
   `newuseremail`/`dismiss` GET links are left to core. No colour scheme picker; `save()` posts the
   stored `admin_color` back (`keptScheme()`), because `edit_user()` writes "fresh" when the field
-  is missing.
+  is missing. Elementor AI is off for Editors through `get_user_option_elementor_enable_ai`
+  (Elementor reads that user option once, in its AI module's constructor on `init`, and treats
+  "never set" as on); nothing is written, so it holds for an Editor who never saved the page.
 - `Menus\*`: `Tree` (pure: nav items → depth-first rows with levels; submitted rows → a plan of
   updates/creates/deletes with the one-dropdown-level rule, foreign ids ignored, `cleanUrl`),
   `Slots` (Header/Footer → menu term ids; Settings → Favr; fresh-site defaults), `Usage`
