@@ -91,26 +91,6 @@ $favr_email  = is_array( $view['new_email'] ) ? (string) ( $view['new_email']['n
 			<span class="favr-profile__hint"><?php esc_html_e( 'Leave both blank to keep your current password.', 'favr-sites' ); ?></span>
 		</section>
 
-		<?php if ( $view['schemes'] ) : ?>
-			<section class="favr-dash__card" aria-labelledby="favr-profile-colours">
-				<h2 id="favr-profile-colours"><?php esc_html_e( 'Colour scheme', 'favr-sites' ); ?></h2>
-				<fieldset class="favr-swatches">
-					<legend class="screen-reader-text"><?php esc_html_e( 'Colour scheme', 'favr-sites' ); ?></legend>
-					<?php foreach ( $view['schemes'] as $favr_scheme ) : ?>
-						<?php
-						$favr_colors = $favr_scheme['colors'] + array_fill( 0, 4, '#ccc' );
-						$favr_style  = sprintf( '--c1:%s;--c2:%s;--c3:%s;--c4:%s', $favr_colors[0], $favr_colors[1], $favr_colors[2], $favr_colors[3] );
-						?>
-						<label class="favr-swatch" title="<?php echo esc_attr( $favr_scheme['name'] ); ?>">
-							<input type="radio" name="admin_color" value="<?php echo esc_attr( $favr_scheme['slug'] ); ?>" <?php checked( $favr_scheme['current'] ); ?>>
-							<span class="favr-swatch__dot" style="<?php echo esc_attr( $favr_style ); ?>" aria-hidden="true"></span>
-							<span class="favr-swatch__name"><?php echo esc_html( $favr_scheme['name'] ); ?></span>
-						</label>
-					<?php endforeach; ?>
-				</fieldset>
-			</section>
-		<?php endif; ?>
-
 		<p class="favr-profile__actions">
 			<button type="submit" class="favr-profile__save"><?php esc_html_e( 'Save changes', 'favr-sites' ); ?></button>
 		</p>

@@ -25,25 +25,22 @@ final class ProfilePageTest extends TestCase {
 		);
 	}
 
-	public function test_schemes_put_favr_first_and_mark_the_current_one(): void {
-		$colors = array(
-			'fresh'  => (object) array( 'name' => 'Default', 'colors' => array( '#1d2327', '#2c3338', '#2271b1', '#72aee6' ) ),
-			'light'  => (object) array( 'name' => 'Light', 'colors' => array( '#e5e5e5', '#999', '#d64e07', '#04a4cc' ) ),
-			'favr'   => (object) array( 'name' => 'Favr', 'colors' => array( '#3a2738', '#a9472a', '#e3a044', '#fbf6ef' ) ),
-			'broken' => 'not an object',
-		);
-		$out    = ProfilePage::schemes( $colors, 'light' );
-		$this->assertSame( array( 'favr', 'fresh', 'light' ), array_column( $out, 'slug' ) );
-		$this->assertSame( array( false, false, true ), array_column( $out, 'current' ) );
-		$this->assertCount( 4, $out[0]['colors'] );
+	public function test_saving_the_profile_keeps_the_stored_colour_scheme(): void {
+		// The page has no picker, and WordPress would write its default when the field is missing.
+		$this->assertSame( 'midnight', ProfilePage::keptScheme( 'midnight' ) );
+		$this->assertSame( 'favr', ProfilePage::keptScheme( 'favr' ) );
 	}
 
-	public function test_an_unknown_current_scheme_selects_favr(): void {
-		$colors = array(
-			'favr'  => (object) array( 'name' => 'Favr', 'colors' => array( '#3a2738', '#a9472a', '#e3a044', '#fbf6ef' ) ),
-			'fresh' => (object) array( 'name' => 'Default', 'colors' => array( '#1d2327', '#2c3338', '#2271b1', '#72aee6' ) ),
-		);
-		$this->assertSame( array( true, false ), array_column( ProfilePage::schemes( $colors, 'gone' ), 'current' ) );
+	public function test_a_user_without_a_stored_scheme_gets_what_wordpress_would_store(): void {
+		$this->assertSame( 'fresh', ProfilePage::keptScheme( '' ) );
+		$this->assertSame( 'fresh', ProfilePage::keptScheme( false ) );
+		$this->assertSame( 'fresh', ProfilePage::keptScheme( array( 'midnight' ) ) );
+	}
+
+	public function test_the_profile_page_has_no_scheme_picker(): void {
+		$template = (string) file_get_contents( dirname( __DIR__, 2 ) . '/templates/profile.php' );
+		$this->assertStringNotContainsString( 'admin_color', $template );
+		$this->assertStringNotContainsString( 'favr-swatch', $template );
 	}
 
 	public function test_editors_always_get_the_toolbar_on_the_public_site(): void {

@@ -9,16 +9,17 @@ declare(strict_types=1);
 
 namespace FavrSites\Profile;
 
-use FavrSites\Brand\ColorScheme;
 use FavrSites\Dashboard\Audience;
 
 /**
- * Replaces wp-admin/profile.php for Editors with a short Favr page: name, email, password, photo
- * and a compact colour-scheme picker. Saving goes through WordPress's own profile update
- * (personal_options_update + edit_user), so email confirmation and password checks are core's.
+ * Replaces wp-admin/profile.php for Editors with a short Favr page: name, email, password and
+ * photo. Saving goes through WordPress's own profile update (personal_options_update + edit_user),
+ * so email confirmation and password checks are core's.
  *
  * Settings Editors no longer see are pinned: toolbar on, Media infinite scrolling on, application
  * passwords off, Elementor AI off (it stays off until Favr's AI controls), comment shortcuts off.
+ * There is no colour scheme to pick: Editors always get Favr's (Brand\ColorScheme), and saving
+ * the page leaves the scheme stored for the user as it was.
  */
 final class ProfilePage {
 
@@ -48,33 +49,14 @@ final class ProfilePage {
 	}
 
 	/**
-	 * Colour schemes for the picker: Favr first, then WordPress's order; one marked current.
+	 * The colour scheme to hand back to WordPress when the profile is saved: the one already
+	 * stored. The page posts no scheme, and WordPress writes its default ("fresh") over the stored
+	 * one when the field is missing, so the stored value is put in its place.
 	 *
-	 * @param array<string, mixed> $registered $GLOBALS['_wp_admin_css_colors'].
-	 * @param string               $current    The user's scheme.
-	 * @return list<array{slug: string, name: string, colors: list<string>, current: bool}>
+	 * @param mixed $stored The user's raw `admin_color` meta.
 	 */
-	public static function schemes( array $registered, string $current ): array {
-		$out = array();
-		foreach ( $registered as $slug => $scheme ) {
-			if ( ! is_object( $scheme ) || empty( $scheme->colors ) ) {
-				continue;
-			}
-			$out[ (string) $slug ] = array(
-				'slug'    => (string) $slug,
-				'name'    => (string) ( $scheme->name ?? $slug ),
-				'colors'  => array_values( array_slice( (array) $scheme->colors, 0, 4 ) ),
-				'current' => false,
-			);
-		}
-		if ( isset( $out[ ColorScheme::SLUG ] ) ) {
-			$out = array( ColorScheme::SLUG => $out[ ColorScheme::SLUG ] ) + $out;
-		}
-		$selected = isset( $out[ $current ] ) ? $current : ( isset( $out[ ColorScheme::SLUG ] ) ? ColorScheme::SLUG : (string) array_key_first( $out ) );
-		if ( isset( $out[ $selected ] ) ) {
-			$out[ $selected ]['current'] = true;
-		}
-		return array_values( $out );
+	public static function keptScheme( $stored ): string {
+		return is_string( $stored ) && '' !== $stored ? $stored : 'fresh';
 	}
 
 	/** Hooks. */
@@ -166,14 +148,12 @@ final class ProfilePage {
 		$GLOBALS['title']       = __( 'Your profile', 'favr-sites' ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$GLOBALS['parent_file'] = 'profile.php'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
-		global $_wp_admin_css_colors;
 		$user = get_userdata( $user->ID ); // Fresh after a failed save.
 		$view = array(
 			'user'      => $user,
 			'errors'    => $errors,
 			'updated'   => isset( $_GET['updated'] ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			'new_email' => get_user_meta( $user->ID, '_new_email', true ),
-			'schemes'   => self::schemes( is_array( $_wp_admin_css_colors ) ? $_wp_admin_css_colors : array(), (string) get_user_option( 'admin_color', $user->ID ) ),
 		);
 
 		require_once ABSPATH . 'wp-admin/admin-header.php';
@@ -194,7 +174,7 @@ final class ProfilePage {
 			wp_die( esc_html__( 'Sorry, you are not allowed to edit this user.', 'favr-sites' ) );
 		}
 
-		// Fields this page doesn't show: names are derived, the toolbar stays on.
+		// Fields this page doesn't show: names are derived, the toolbar stays on, the colour scheme stays as stored.
 		$names                    = self::names(
 			(string) wp_unslash( $_POST['first_name'] ?? '' ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized by edit_user().
 			(string) wp_unslash( $_POST['last_name'] ?? '' ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized by edit_user().
@@ -204,6 +184,7 @@ final class ProfilePage {
 		$_POST['display_name']    = $names['display_name'];
 		$_POST['nickname']        = $names['nickname'];
 		$_POST['admin_bar_front'] = '1';
+		$_POST['admin_color']     = self::keptScheme( get_user_meta( $user->ID, 'admin_color', true ) );
 
 		/** This action is documented in wp-admin/user-edit.php */
 		do_action( 'personal_options_update', $user->ID ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hook.
