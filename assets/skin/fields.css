@@ -109,6 +109,22 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab.has-content .favr-tab__d
 	background: var(--favr-ok);
 }
 
+/* While the tabs are a column (windows wider than 1240px), they stay beside the fields: the
+   list sticks under the toolbar, level with the Publish box (edit.css), however long the section
+   is. The list is then only as tall as its tabs, so the panel itself paints the rest of the sand
+   column and its hairline. In a short window (under 600px) nothing sticks. */
+@media (min-width: 1241px) and (min-height: 600px) {
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-panel:not(:has(> .favr-tabs > .favr-tab:only-child)) {
+		background: linear-gradient(to right, var(--favr-sand) 207px, var(--favr-line) 207px, var(--favr-line) 208px, var(--favr-surface) 208px);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tabs {
+		position: sticky;
+		top: 48px;
+		align-self: start;
+	}
+}
+
 /* ---------- 3. A section and its rows of fields ---------- */
 
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-pane {
@@ -147,6 +163,18 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-grid > .favr-w-half {
 
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-grid > .favr-w-third {
 	width: max(calc(33.333% - 13.34px), min(100%, calc((460px - 100%) * 999)));
+}
+
+/* A picture beside a field (a listing's logo, a person's photo, a sponsor's logo) is one kind of
+   row on every screen, whatever widths the plugin gave the two: the picture keeps a column just
+   wider than its tile, and the field beside it takes the rest of the row, to the edge the rows
+   below reach. In a narrow section the two stack like any other pair. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-grid > .favr-field--image:not(.favr-w-full):has(+ .favr-field.favr-w-half) {
+	width: max(200px, min(100%, calc((460px - 100%) * 999)));
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-grid > .favr-field--image:not(.favr-w-full) + .favr-field.favr-w-half {
+	width: max(calc(100% - 220.01px), min(100%, calc((460px - 100%) * 999)));
 }
 
 /* ---------- 4. One field: label, input, help, counter ---------- */
@@ -216,11 +244,11 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-field .favr-counter.is-low {
 	font-weight: 600;
 }
 
-/* Where the browser can, and the field is wide enough for both, the counter shares its line
-   with the help text: help at the leading edge, counter at the trailing edge. In a narrower
-   field the counter keeps the line under the input and the help text takes the next one. (The
-   row runs backwards so that the counter, which comes first in the markup, sits at the trailing
-   edge either way.) */
+/* Where the browser can, the counter shares its line with the help text: help at the leading
+   edge, counter at the trailing edge, under a half-width field as under a full-width one. Only
+   in a field too narrow for both (a third of a row) the counter keeps the line under the input
+   and the help text takes the next one. (The row runs backwards so that the counter, which
+   comes first in the markup, sits at the trailing edge either way.) */
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-field:has(> .favr-field__input > .favr-counter) {
 	display: flex;
 	flex-flow: row-reverse wrap;
@@ -244,7 +272,7 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-field:has(> .favr-field__inp
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-field:has(> .favr-field__input > .favr-counter) > .favr-field__help {
-	flex: 1 1 240px;
+	flex: 1 1 150px;
 }
 
 /* A field the browser refused on save. */
@@ -1287,10 +1315,11 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file p.favr-doc-file__no
 		padding: 12px;
 	}
 
+	/* The same pill as the category tabs and Visual / Code on a phone (edit.css). */
 	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab {
-		min-height: 38px;
-		padding: 0 13px;
-		font-size: 14px;
+		min-height: 36px;
+		padding: 0 14px;
+		font-size: 13.5px;
 	}
 
 	body.favr-skin:where(:not(.favr-dash-screen)) .favr-pane {
@@ -1343,6 +1372,13 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file p.favr-doc-file__no
 	body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__remove {
 		width: 32px;
 		height: 32px;
+	}
+
+	/* "Replace" and "Remove" under a picture are as tall as the small buttons. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-image__actions .button-link {
+		display: inline-flex;
+		align-items: center;
+		min-height: 36px;
 	}
 
 	body.favr-skin:where(:not(.favr-dash-screen)) .favr-health__todo .button-link {

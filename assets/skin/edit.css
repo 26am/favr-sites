@@ -3,7 +3,7 @@
  * (term.php) and the attachment edit screen, for Editors.
  *
  * Buttons, fields, cards and notices come from base.css. This sheet owns the title field, the
- * permalink line, the chrome of every box (header, collapse toggle, padding), the insides of
+ * permalink line, the chrome of every box (header, padding), the insides of
  * the WordPress boxes (Publish, categories, tags, featured image, excerpt), the WordPress
  * editor wherever it sits, and the term and attachment forms. fields.css owns the inside of
  * favr/core's field panel (.favr-panel) and the inside of the plugins' own boxes.
@@ -43,12 +43,13 @@ body.favr-skin:where(:not(.favr-dash-screen)) #titlediv #title:focus {
 	outline-offset: 0;
 }
 
-/* "Add title": WordPress lays a label over the empty field; line it up with the text. */
+/* "Add title": WordPress lays a label over the empty field; line it up with the text. The colour
+   is the placeholder colour of base.css: lighter than a typed title, 4.5:1 or better on white. */
 body.favr-skin:where(:not(.favr-dash-screen)) #titlediv #title-prompt-text {
 	top: 0;
 	left: 0;
 	padding: 0 17px;
-	color: #8d7f88;
+	color: color-mix(in srgb, var(--favr-muted) 85%, var(--favr-field));
 	font-size: 22px;
 	font-weight: 600;
 	line-height: 52px;
@@ -141,7 +142,14 @@ body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box .cancel:focus-visib
 
 /* ---------- 3. Box chrome (every box, WordPress's and the plugins') ---------- */
 
-/* Header: a Fraunces title over a hairline. base.css draws the card itself. */
+/* Header: a Fraunces title over a hairline. base.css draws the card itself. The title is only a
+   title: assets/skin/edit-screen.js switches off folding and dragging, so the pointer does not
+   promise either (WordPress shows the "move" cross here). */
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox-header,
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .hndle {
+	cursor: default;
+}
+
 body.favr-skin:where(:not(.favr-dash-screen)) .postbox-header {
 	border-bottom-color: var(--favr-line);
 }
@@ -154,7 +162,6 @@ body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .postbox-header .hndle 
 	font-size: 16.5px;
 	font-weight: 500;
 	line-height: 1.25;
-	cursor: pointer;
 }
 
 /* Wide boxes under the main column line their title up with their roomier body. */
@@ -162,62 +169,18 @@ body.favr-skin:where(:not(.favr-dash-screen)) #poststuff :where(#normal-sortable
 	padding: 12px 22px;
 }
 
-/* No move-up / move-down arrows: Editors do not rearrange the screen. */
-body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handle-order-higher,
-body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handle-order-lower,
-body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handle-actions .wp-tooltip:has(> .handle-order-higher),
-body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handle-actions .wp-tooltip:has(> .handle-order-lower) {
+/* No fold-away chevron and no move-up / move-down arrows: Editors do not rearrange the screen,
+   and a folded Publish box hides "Update". The whole group goes, so it is no Tab stop either. */
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handle-actions,
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv {
 	display: none;
 }
 
-/* The collapse toggle stays, quietly: a muted chevron that turns accent on hover and focus. */
-body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv {
-	width: 32px;
-	height: 32px;
-	margin: 0 8px 0 0;
-	border-radius: 8px;
-	color: var(--favr-muted);
-}
-
-body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv .toggle-indicator {
-	color: inherit;
-}
-
-body.favr-skin:where(:not(.favr-dash-screen)) .meta-box-sortables .postbox .handlediv .toggle-indicator::before {
-	top: 0;
-	width: 20px;
-	border-radius: 0;
-	content: "\f343";
-	content: "\f343" / "";
-	text-indent: 0;
-}
-
-body.favr-skin:where(:not(.favr-dash-screen)) .meta-box-sortables .postbox.closed .handlediv .toggle-indicator::before {
-	content: "\f347";
-	content: "\f347" / "";
-}
-
-body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv:hover,
-body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv:focus {
-	border-radius: 8px;
-	color: var(--favr-accent);
-	outline: 0;
-	box-shadow: none;
-}
-
-body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv:focus-visible {
-	outline: 2px solid var(--favr-accent);
-	outline-offset: -2px;
-}
-
-/* The toggle's hint ("Show or hide panel"). */
-body.favr-skin:where(:not(.favr-dash-screen)) .postbox .wp-tooltip.wp-is-tooltip .wp-tooltip__bubble {
-	border-color: var(--favr-aubergine);
-	border-radius: 6px;
-	background: var(--favr-aubergine);
-	color: var(--favr-paper);
-	font-family: var(--favr-font-sans);
-	font-size: 12.5px;
+/* With no chevron a folded box could never be opened again, so a box left folded (before the
+   script runs, or by another plugin) shows its content all the same. WordPress hides it with
+   !important. */
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox.closed .inside {
+	display: block !important;
 }
 
 /* Body padding: side boxes 14px 16px, wide boxes 20px 22px. */
@@ -243,22 +206,30 @@ body.favr-skin:where(:not(.favr-dash-screen)) :where(.postbox .inside > :last-ch
 	margin-bottom: 0;
 }
 
-/* Where a dragged box will land. */
-body.favr-skin:where(:not(.favr-dash-screen)) .meta-box-sortables .sortable-placeholder {
-	border-color: var(--favr-field-line);
-	border-radius: var(--favr-radius);
-}
-
-body.favr-skin.is-dragging-metaboxes:where(:not(.favr-dash-screen)) .metabox-holder .postbox-container .meta-box-sortables {
-	border-radius: var(--favr-radius);
-}
-
 /* ---------- 4. Publish box ---------- */
 
-/* Top row: "Save draft" and "Preview" as quiet buttons. The space above them belongs to the
-   buttons, so the row takes no room on types that have neither. */
+/* Top row: "Save draft" and "Preview" as quiet buttons, one at each end. The space above them
+   belongs to the buttons, so the row takes no room on types that have neither. */
 body.favr-skin:where(:not(.favr-dash-screen)) #minor-publishing-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 8px;
+	justify-content: space-between;
 	padding: 0 16px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #minor-publishing-actions .clear {
+	display: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #minor-publishing-actions #save-action {
+	position: relative;
+	display: flex;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #minor-publishing-actions #preview-action {
+	display: flex;
+	margin-left: auto;
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) #minor-publishing-actions .button {
@@ -266,8 +237,13 @@ body.favr-skin:where(:not(.favr-dash-screen)) #minor-publishing-actions .button 
 	margin-bottom: 0;
 }
 
+/* The "saving" spinner hangs beside its button without taking room in the row, so the longer
+   "Save as pending" still shares the row with "Preview". */
 body.favr-skin:where(:not(.favr-dash-screen)) #minor-publishing-actions .spinner {
-	margin-top: 22px;
+	position: absolute;
+	top: 22px;
+	left: 100%;
+	margin: 0 0 0 6px;
 }
 
 /* Buttons that are links ("Preview", "OK") keep the pill shape while focused; base.css's link
@@ -316,6 +292,12 @@ body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-comment-statu
 
 /* Status, visibility, date and revisions: label and value on the left, the link in a column
    on the right. */
+/* No "Revisions: Browse" for Editors: it leads to WordPress's compare screen, and the
+   Revisions box is already gone (decision D5). */
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section.misc-pub-revisions {
+	display: none;
+}
+
 body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section:where(.misc-pub-post-status, .misc-pub-visibility, .misc-pub-curtime, .misc-pub-revisions) {
 	display: flex;
 	flex-wrap: wrap;
@@ -530,13 +512,20 @@ body.favr-skin:where(:not(.favr-dash-screen)) #post-body ul.category-tabs li.tab
 	color: var(--favr-ink);
 }
 
-/* The checklist sits in a well. */
+/* The checklist sits in a well. It shows twelve rows and a half before it scrolls: the half row
+   says there is more. So do the two soft shadows: each is covered by a paper-coloured patch that
+   travels with the list, so a shadow only shows at an edge the list continues past. */
 body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv div.tabs-panel {
-	max-height: 216px;
+	max-height: 337px;
 	padding: 8px 12px;
 	border: 1px solid var(--favr-line);
 	border-radius: var(--favr-radius-sm);
-	background: var(--favr-paper);
+	background:
+		linear-gradient(var(--favr-paper) 40%, transparent) top / 100% 28px no-repeat local,
+		linear-gradient(transparent, var(--favr-paper) 60%) bottom / 100% 28px no-repeat local,
+		linear-gradient(rgba(46, 34, 48, 0.14), transparent) top / 100% 10px no-repeat scroll,
+		linear-gradient(transparent, rgba(46, 34, 48, 0.14)) bottom / 100% 10px no-repeat scroll,
+		var(--favr-paper);
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv div.tabs-panel:focus {
@@ -1316,6 +1305,7 @@ body.favr-skin:where(:not(.favr-dash-screen)) #wp-link .submitbox {
 /* The form is one card; labels sit above their fields, as in the field panel. */
 body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) {
 	box-sizing: border-box;
+	max-width: 880px;
 	margin-top: 4px;
 	padding: 8px 22px 20px;
 	border: 1px solid var(--favr-line);
@@ -1373,8 +1363,10 @@ body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-ta
 	line-height: 1.45;
 }
 
-/* Actions under a hairline: "Update" filled on the left, "Delete" as danger text on the right. */
+/* Actions under a hairline, laid out as in the Publish box: "Delete" as danger text on the
+   left, the one filled button, at the same size as there, on the right. */
 body.favr-skin.term-php:where(:not(.favr-dash-screen)) .edit-tag-actions {
+	flex-direction: row-reverse;
 	gap: 12px;
 	margin-top: 20px;
 	padding-top: 16px;
@@ -1385,8 +1377,15 @@ body.favr-skin.term-php:where(:not(.favr-dash-screen)) .edit-tag-actions .button
 	margin: 0;
 }
 
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) .edit-tag-actions .button-primary {
+	min-height: 40px;
+	padding: 0 22px;
+	font-size: 15px;
+	line-height: 38px;
+}
+
 body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#delete-link) {
-	margin-left: auto;
+	margin-right: auto;
 }
 
 body.favr-skin.term-php:where(:not(.favr-dash-screen)) #delete-link a.delete {
@@ -1405,15 +1404,54 @@ body.favr-skin.term-php:where(:not(.favr-dash-screen)) #delete-link a.delete:foc
 
 /* ---------- 11. Attachment edit ---------- */
 
-/* The picture: rounded, on a hairline frame. */
+/* A file's "permalink" is an address nobody visits and nobody can change here. */
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) #edit-slug-box {
+	display: none;
+}
+
+/* The picture and the fields under it are one card, as on every record screen. WordPress prints
+   them as two blocks: the first is the card's top half, the second its bottom half (each clipped
+   on the joining edge, so neither shadow falls on the other). A file with no picture (a PDF) has
+   only the second block, which is then the whole card. */
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_holder,
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details {
+	box-sizing: border-box;
+	margin: 16px 0 0;
+	padding: 20px 22px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+}
+
 body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_holder {
-	margin-top: 16px;
+	padding-bottom: 0;
+	border-bottom: 0;
+	border-radius: var(--favr-radius) var(--favr-radius) 0 0;
+	clip-path: inset(-40px -40px 0 -40px);
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_holder + .wp_attachment_details {
+	margin-top: 0;
+	padding-top: 12px;
+	border-top: 0;
+	border-radius: 0 0 var(--favr-radius) var(--favr-radius);
+	clip-path: inset(0 -40px -40px -40px);
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details > :first-child {
+	margin-top: 0;
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details > :last-child {
+	margin-bottom: 0;
 }
 
 body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_image p {
 	margin: 0 0 12px;
 }
 
+/* The picture itself: rounded, on a hairline frame, in a well. */
 body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_image img.thumbnail {
 	box-sizing: border-box;
 	max-width: 100%;
@@ -1421,7 +1459,7 @@ body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachmen
 	padding: 8px;
 	border: 1px solid var(--favr-line);
 	border-radius: var(--favr-radius-sm);
-	background: var(--favr-surface);
+	background: var(--favr-paper);
 }
 
 body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details label,
@@ -1469,7 +1507,160 @@ body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .copy-to-clip
 	font-weight: 600;
 }
 
-/* ---------- 12. Small screens ---------- */
+/* ---------- 12. "Update" stays in view ---------- */
+
+/* Wherever the side column sits beside the form (WordPress: from 851px), the two columns are a
+   grid instead of floats. That makes the side column as tall as the form, so the Publish box can
+   stick under the toolbar for the whole length of the page while the other side boxes scroll on
+   beneath it. Its z-index is the lowest that works: the menu's fly-outs, the editor's lists and
+   the media window all open far above it. In a window too short to hold the box (under 600px)
+   nothing sticks and everything scrolls as WordPress has it. The ids are bare here because
+   WordPress lays these columns out with rules of two ids. */
+@media (min-width: 851px) and (min-height: 600px) {
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #poststuff #post-body.columns-2 {
+		display: grid;
+		grid-template-rows: auto 1fr;
+		grid-template-columns: minmax(0, 1fr) 280px;
+		column-gap: 20px;
+		margin-right: 0;
+		margin-left: 0;
+	}
+
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 > #post-body-content,
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 > #postbox-container-2 {
+		grid-column: 1;
+		float: none;
+		width: auto;
+	}
+
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 > #post-body-content {
+		grid-row: 1;
+	}
+
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 > #postbox-container-2 {
+		grid-row: 2;
+	}
+
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 > #postbox-container-1 {
+		display: flex;
+		flex-direction: column;
+		grid-row: 1 / span 2;
+		grid-column: 2;
+		float: none;
+		width: auto;
+		margin-right: 0;
+		margin-left: 0;
+	}
+
+	/* WordPress's own script pins the whole side column with an inline style while a long text
+	   is scrolled, which would take "Update" off the screen: the column stays in the flow. */
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 #side-sortables {
+		position: relative !important;
+		top: auto !important;
+		bottom: auto !important;
+		flex: 1 0 auto;
+	}
+
+	/* The pinned box is never taller than the window. When its rows would push "Update" off the
+	   screen (a date being edited in a low window, a media file's long list of details), the
+	   rows scroll inside the box and the action bar under them stays where it is. */
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 #submitdiv {
+		position: sticky;
+		top: 48px;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		max-height: calc(100vh - 64px);
+	}
+
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 #submitdiv > .inside,
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 #submitdiv .submitbox {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+	}
+
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 #submitdiv #minor-publishing {
+		min-height: 0;
+		overflow-y: auto;
+	}
+
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 #submitdiv #major-publishing-actions {
+		flex: none;
+	}
+
+	/* A field reached with the Tab key is scrolled clear of the pinned box, not left under it. */
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 #side-sortables > .postbox:not(#submitdiv) :is(a, button, input, select, textarea, summary, [tabindex]) {
+		scroll-margin-top: 360px;
+	}
+
+	/* The strip between the toolbar and the pinned box is paper, so the boxes scrolling away
+	   beneath do not show above it; it is a little wider than the box, to cover their shadows. */
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 #submitdiv::before {
+		position: absolute;
+		top: -17px;
+		right: -16px;
+		left: -10px;
+		height: 17px;
+		background: var(--favr-paper);
+		content: "";
+	}
+}
+
+/* The media screen keeps one column up to 1200px (WordPress's choice): there the Save box sits
+   under the fields again and nothing is pinned. */
+@media (min-width: 851px) and (max-width: 1200px) {
+	body.favr-skin.post-type-attachment:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #poststuff #post-body.columns-2,
+	body.favr-skin.post-type-attachment:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 > #postbox-container-1 {
+		display: block;
+	}
+
+	body.favr-skin.post-type-attachment:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 #submitdiv {
+		position: relative;
+		top: auto;
+		max-height: none;
+	}
+
+	body.favr-skin.post-type-attachment:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #post-body.columns-2 #submitdiv::before {
+		content: none;
+	}
+}
+
+/* Where the Publish box sits under the form (one column: a phone, a tablet held upright), its
+   action bar stays at the bottom of the screen instead: saving is one tap away however long the
+   form above it is. */
+@media (max-width: 850px) {
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #major-publishing-actions {
+		position: fixed;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 1001;
+		padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+		border-radius: 0;
+	}
+
+	/* Room under the page for the bar (only where there is one: not in the block editor). */
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #wpbody-content:has(#major-publishing-actions) {
+		padding-bottom: 96px;
+	}
+
+	/* A thumb-sized "Move to Trash" (WordPress hides it on a new item; that stays). */
+	body.favr-skin:not(.post-new-php):where(:not(.favr-dash-screen)) .submitbox .submitdelete {
+		display: inline-flex;
+		align-items: center;
+		min-height: 40px;
+	}
+}
+
+/* A tablet held upright still shows the folded menu: the bar starts beside it. */
+@media (min-width: 783px) and (max-width: 850px) {
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #major-publishing-actions {
+		left: 36px;
+	}
+}
+
+/* ---------- 13. Phones ---------- */
 
 @media (max-width: 782px) {
 	body.favr-skin:where(:not(.favr-dash-screen)) #titlediv #title {
@@ -1481,14 +1672,40 @@ body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .copy-to-clip
 		font-size: 20px;
 	}
 
-	body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .postbox-header .hndle {
-		padding: 12px 16px;
+	/* Fields a thumb types in are 16px, or an iPhone zooms the page when they are tapped: the
+	   address being edited, the date and time, and the Code view of the editor. */
+	body.favr-skin:where(:not(.favr-dash-screen)) #editable-post-name input {
+		min-height: 40px;
+		font-size: 16px;
+		line-height: 38px;
 	}
 
-	body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv {
-		width: 40px;
-		height: 40px;
-		margin: 0 4px 0 0;
+	body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv select,
+	body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #jj,
+	body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #aa,
+	body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #hh,
+	body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #mn {
+		min-height: 40px;
+		font-size: 16px;
+		line-height: 38px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #jj,
+	body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #hh,
+	body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #mn {
+		width: 3em;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #aa {
+		width: 4.4em;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-editor-container textarea.wp-editor-area {
+		font-size: 16px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .postbox-header .hndle {
+		padding: 12px 16px;
 	}
 
 	body.favr-skin:where(:not(.favr-dash-screen)) #poststuff :where(#normal-sortables, #advanced-sortables) .postbox .inside {
@@ -1516,41 +1733,63 @@ body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .copy-to-clip
 	body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section .button,
 	body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv .category-add .button,
 	body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box .cancel,
-	body.favr-skin:where(:not(.favr-dash-screen)) :where(#edit-slug-buttons) .button.button-small {
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(#edit-slug-buttons) .button {
 		min-height: 36px;
 		line-height: 34px;
 	}
 
-	body.favr-skin:where(:not(.favr-dash-screen)) #publishing-action #publish {
-		padding: 0 22px;
-		font-size: 15px;
+	/* The Publish box's rows are 36px apart, and each row's "Edit" link fills its row top to
+	   bottom, so it is as tall as the small buttons without moving the text beside it. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section {
+		padding-top: 8px;
+		padding-bottom: 8px;
 	}
 
-	/* The action bar stays at the bottom of the screen on a phone: saving is one tap away
-	   however long the form above the Publish box is. */
-	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #major-publishing-actions {
-		position: fixed;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		z-index: 1001;
-		padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
-		border-radius: 0;
+	body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-post-status::before,
+	body.favr-skin:where(:not(.favr-dash-screen)) #post-body #visibility::before,
+	body.favr-skin:where(:not(.favr-dash-screen)) .curtime #timestamp::before,
+	body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-uploadedby::before,
+	body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-uploadedto::before,
+	body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-revisions::before,
+	body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-response-to::before,
+	body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-comment-status::before {
+		top: 8px;
 	}
 
-	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #wpbody-content {
-		padding-bottom: 96px;
+	body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section > :where(.edit-post-status, .edit-visibility, .edit-timestamp, .misc-pub-revisions > a) {
+		margin-top: -8px;
+		margin-bottom: -8px;
+		padding: 8px 0;
 	}
 
-	/* A thumb-sized "Move to Trash" (WordPress hides it on a new item; that stays). */
-	body.favr-skin:not(.post-new-php):where(:not(.favr-dash-screen)) .submitbox .submitdelete {
+	body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section .button-cancel {
 		display: inline-flex;
 		align-items: center;
+		min-height: 36px;
+	}
+
+	/* "Update" is the same 40px as every other main button on a phone. */
+	body.favr-skin:where(:not(.favr-dash-screen)) #publishing-action #publish {
+		height: 40px;
 		min-height: 40px;
+		padding: 0 22px;
+		font-size: 15px;
+		line-height: 38px;
+	}
+
+	/* The menu slides in over the page: the bar steps aside instead of covering its last items. */
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) .wp-responsive-open #major-publishing-actions {
+		display: none;
 	}
 
 	body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) {
 		padding: 4px 16px 16px;
+	}
+
+	body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_holder,
+	body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details {
+		padding-right: 16px;
+		padding-left: 16px;
 	}
 }
 
