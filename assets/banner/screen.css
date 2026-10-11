@@ -1,22 +1,9 @@
-/* Favr Sites — Alert banner screen. Brand tokens come from assets/dashboard/tokens.css. */
+/* Favr Sites — Alert banner screen. Brand tokens come from assets/dashboard/tokens.css; the
+   page frame, the page title (h1) and the cards are dashboard.css's. */
 .favr-banner-admin {
 	max-width: 760px;
 	font-family: var(--favr-font-sans);
 	color: var(--favr-ink);
-}
-
-.favr-banner-admin__head {
-	margin: 8px 0 20px;
-}
-
-.favr-banner-admin__title {
-	margin: 0;
-	padding: 0;
-	color: var(--favr-ink);
-	font-family: var(--favr-font-display);
-	font-size: 34px;
-	font-weight: 500;
-	line-height: 1.15;
 }
 
 .favr-banner-admin__sub {
@@ -25,10 +12,12 @@
 	font-size: 15px;
 }
 
+/* A notice: the bar and colours of the notice on every other screen (assets/skin/base.css). */
 .favr-banner-admin__notice {
-	margin: 0 0 16px;
 	padding: 12px 16px;
+	border-left: 4px solid var(--favr-aubergine);
 	border-radius: var(--favr-radius-sm);
+	background: var(--favr-sand);
 	font-weight: 600;
 }
 
@@ -37,17 +26,15 @@
 }
 
 .favr-banner-admin__notice.is-success {
-	background: #e7f2ea;
-	color: #1f5a33;
+	border-left-color: var(--favr-ok);
+	background: var(--favr-ok-soft);
+	color: var(--favr-ok);
 }
 
 .favr-banner-admin__notice.is-error {
-	background: #fbe9e6;
-	color: #8a2415;
-}
-
-.favr-banner-admin__card {
-	margin: 0 0 16px;
+	border-left-color: var(--favr-danger);
+	background: var(--favr-danger-soft);
+	color: var(--favr-danger);
 }
 
 .favr-banner-admin__status {
@@ -59,17 +46,18 @@
 	font-weight: 600;
 }
 
+/* The dot: off, live or waiting for its start time. */
 .favr-banner-admin__status::before {
 	content: "";
 	flex: none;
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	background: #8c8f94;
+	background: #b8a99c;
 }
 
 .favr-banner-admin__status[data-state="live"]::before {
-	background: #1a7f37;
+	background: var(--favr-ok);
 }
 
 .favr-banner-admin__status[data-state="pending"]::before {
@@ -77,14 +65,16 @@
 }
 
 .favr-banner-admin__preview {
-	margin-top: 14px;
 	overflow: hidden;
 	border: 1px solid var(--favr-line);
-	border-radius: 8px;
+	border-radius: var(--favr-radius-sm);
 }
 
+/* One column that can shrink: without it the two-up rows below set the form's width and it
+   pushed out of the card on a phone. */
 .favr-banner-admin__form {
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	gap: 16px;
 }
 
@@ -111,32 +101,52 @@
 	font-weight: 600;
 }
 
-.favr-banner-admin__field input[type="text"],
-.favr-banner-admin__field input[type="datetime-local"],
-.favr-banner-admin__field textarea {
+/* Fields: the values of the field on every other screen (assets/skin/base.css section 6). */
+.favr-banner-admin .favr-banner-admin__field input[type="text"],
+.favr-banner-admin .favr-banner-admin__field input[type="datetime-local"],
+.favr-banner-admin .favr-banner-admin__field textarea {
 	width: 100%;
 	max-width: 560px;
 	min-height: 40px;
 	margin: 0;
-	padding: 8px 12px;
-	border: 1px solid var(--favr-line);
+	border: 1px solid var(--favr-field-line);
 	border-radius: var(--favr-radius-sm);
-	background: #fff;
+	background-color: var(--favr-field);
 	color: var(--favr-ink);
-	font-size: 15px;
+	font-family: var(--favr-font-sans);
+	font-size: 14.5px;
+	box-shadow: none;
 }
 
-.favr-banner-admin__field input:focus,
-.favr-banner-admin__field textarea:focus {
+.favr-banner-admin .favr-banner-admin__field input[type="text"],
+.favr-banner-admin .favr-banner-admin__field input[type="datetime-local"] {
+	padding: 0 12px;
+	line-height: 38px;
+}
+
+.favr-banner-admin .favr-banner-admin__field textarea {
+	padding: 9px 12px;
+	line-height: 1.5;
+}
+
+.favr-banner-admin .favr-banner-admin__field input[type="text"]:focus,
+.favr-banner-admin .favr-banner-admin__field input[type="datetime-local"]:focus,
+.favr-banner-admin .favr-banner-admin__field textarea:focus {
 	border-color: var(--favr-accent);
-	box-shadow: 0 0 0 1px var(--favr-accent);
-	outline: none;
+	outline: 2px solid var(--favr-accent-soft);
+	outline-offset: 0;
+	box-shadow: none;
+}
+
+.favr-banner-admin__field ::placeholder {
+	color: #8d7f88;
+	opacity: 1;
 }
 
 .favr-banner-admin__help {
 	margin: 0;
 	color: var(--favr-muted);
-	font-size: 13px;
+	font-size: 13.5px;
 }
 
 .favr-banner-admin__check {
@@ -146,8 +156,24 @@
 	font-size: 15px;
 }
 
-.favr-banner-admin__check input {
+/* Tick boxes and radios: the border and focus of the ones on every other screen. The fill is
+   named too, so an Administrator on another colour scheme gets the same rust. */
+.favr-banner-admin .favr-banner-admin__check input {
 	margin: 0;
+	border-color: #b8a99c;
+	box-shadow: none;
+}
+
+.favr-banner-admin .favr-banner-admin__check input:checked {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent);
+}
+
+.favr-banner-admin .favr-banner-admin__check input:focus {
+	border-color: var(--favr-accent);
+	outline: 2px solid var(--favr-accent-soft);
+	outline-offset: 1px;
+	box-shadow: none;
 }
 
 .favr-banner-admin__actions {
@@ -157,20 +183,24 @@
 	margin-top: 4px;
 }
 
+/* Save: the large filled button, as Publish and Update are on an edit screen. */
 .favr-banner-admin__save {
-	min-height: 44px;
-	padding: 0 24px;
-	border: 0;
+	min-height: 40px;
+	padding: 0 22px;
+	border: 1px solid var(--favr-accent);
 	border-radius: 999px;
 	background: var(--favr-accent);
 	color: var(--favr-paper);
 	font-family: inherit;
 	font-size: 15px;
 	font-weight: 600;
+	line-height: 1;
 	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .favr-banner-admin__save:hover {
+	border-color: var(--favr-accent-strong);
 	background: var(--favr-accent-strong);
 }
 
@@ -182,4 +212,19 @@
 .favr-banner-admin__actions a {
 	color: var(--favr-accent);
 	font-weight: 600;
+}
+
+@media (max-width: 782px) {
+	/* 16px on phones: iOS Safari zooms the whole page when a smaller field takes the focus. */
+	.favr-banner-admin .favr-banner-admin__field input[type="text"],
+	.favr-banner-admin .favr-banner-admin__field input[type="datetime-local"],
+	.favr-banner-admin .favr-banner-admin__field textarea {
+		font-size: 16px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.favr-banner-admin__save {
+		transition: none;
+	}
 }

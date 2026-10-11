@@ -40,6 +40,21 @@ body.favr-dash-screen,
 	box-shadow: none;
 }
 
+/* The page title of a Favr screen (Header & footer, Alert banner, Your profile): the title
+   assets/skin/base.css gives every other screen, value for value. `:not()` adds the weight it
+   needs to out-rank WordPress's `.wrap h1` and leaves the dashboard's own h1, which is for
+   screen readers, alone; there the greeting below stands in for the title. */
+.favr-dash h1:not(.screen-reader-text) {
+	margin: 0;
+	padding: 0;
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 34px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	line-height: 1.15;
+}
+
 :where(.favr-dash) h2 {
 	margin: 0;
 	color: var(--favr-ink);
@@ -359,6 +374,7 @@ a.favr-dash__stat:hover strong {
 		margin: 16px 12px 32px 0;
 	}
 
+	.favr-dash h1:not(.screen-reader-text),
 	.favr-dash__greeting {
 		font-size: 28px;
 	}
