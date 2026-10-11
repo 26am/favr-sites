@@ -42,6 +42,27 @@ final class Activity {
 	}
 
 	/**
+	 * When an item last changed, as a Unix time: the first real date among the candidates, else
+	 * now. WordPress leaves the GMT dates of a draft at 0000-00-00 until it is saved a second time,
+	 * and "2028 years ago" is not when anything happened.
+	 *
+	 * @param array<mixed> $gmt_dates Dates in GMT ("Y-m-d H:i:s"), best first.
+	 * @param int          $now       The current Unix time.
+	 */
+	public static function changed( array $gmt_dates, int $now ): int {
+		foreach ( $gmt_dates as $date ) {
+			if ( ! is_string( $date ) || '' === $date || str_starts_with( $date, '0000' ) ) {
+				continue;
+			}
+			$stamp = strtotime( $date . ' UTC' );
+			if ( false !== $stamp && $stamp > 0 ) {
+				return $stamp;
+			}
+		}
+		return $now;
+	}
+
+	/**
 	 * Plain-text title with a fallback.
 	 *
 	 * @param string $raw Title.
@@ -90,9 +111,26 @@ final class Activity {
 				'title' => self::title( $post->post_title ),
 				'url'   => (string) get_edit_post_link( $post->ID, 'raw' ),
 				/* translators: %s: human time difference, e.g. "2 hours". */
-				'ago'   => sprintf( __( '%s ago', 'favr-sites' ), human_time_diff( (int) strtotime( $post->post_modified_gmt . ' UTC' ) ) ),
+				'ago'   => sprintf( __( '%s ago', 'favr-sites' ), human_time_diff( self::changed( self::gmtDates( $post ), time() ) ) ),
 			);
 		}
 		return $out;
+	}
+
+	/**
+	 * The dates an item can be said to have changed at, in GMT, best first: last modified, then
+	 * created, each as stored in GMT and as worked out from the site's own time.
+	 *
+	 * @param \WP_Post $post The item.
+	 * @return list<string>
+	 */
+	private static function gmtDates( \WP_Post $post ): array {
+		$dates = array();
+		foreach ( array( 'post_modified', 'post_date' ) as $field ) {
+			$dates[] = (string) $post->{$field . '_gmt'};
+			$local   = (string) $post->$field;
+			$dates[] = '' === $local || str_starts_with( $local, '0000' ) ? '' : (string) get_gmt_from_date( $local );
+		}
+		return $dates;
 	}
 }
