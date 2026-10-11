@@ -22,6 +22,12 @@ final class PageLock {
 	// Core checks edit_post/delete_post; Elementor checks the post type's own meta caps (edit_page…).
 	private const CAPS = array( 'edit_post', 'edit_page', 'delete_post', 'delete_page', 'publish_post' );
 
+	/** Why a locked page cannot be opened: what the "Managed by Favr" pill says when pointed at. */
+	public const WHY = 'This page is built by Favr. Ask Favr to change it.';
+
+	/** Class of a locked item's row in a list (Editors\ListTables draws its title quieter, with a lock). */
+	public const ROW_CLASS = 'favr-locked';
+
 	/**
 	 * Locked for Editors?
 	 *
@@ -48,6 +54,7 @@ final class PageLock {
 	public function hook(): void {
 		add_filter( 'map_meta_cap', array( $this, 'caps' ), 10, 4 );
 		add_filter( 'display_post_states', array( $this, 'states' ), 10, 2 );
+		add_filter( 'post_class', array( $this, 'rowClass' ), 10, 3 );
 	}
 
 	/**
@@ -72,7 +79,8 @@ final class PageLock {
 	}
 
 	/**
-	 * "Managed by Favr" in the Pages list, for Editors.
+	 * "Managed by Favr" in the Pages list, for Editors. The pill says why when it is pointed at;
+	 * a screen reader gets the same sentence after the words.
 	 *
 	 * @param array<string, string> $states States.
 	 * @param \WP_Post              $post   Post.
@@ -80,9 +88,31 @@ final class PageLock {
 	 */
 	public function states( $states, $post ) {
 		if ( $post instanceof \WP_Post && self::lockedPost( $post ) && Audience::current() ) {
-			$states['favr_managed'] = __( 'Managed by Favr', 'favr-sites' );
+			// phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- WHY is one literal sentence.
+			$why                    = esc_attr__( self::WHY, 'favr-sites' );
+			$states['favr_managed'] = '<span class="favr-managed" title="' . $why . '">' . esc_html__( 'Managed by Favr', 'favr-sites' ) . '<span class="screen-reader-text">. ' . $why . '</span></span>';
 		}
 		return $states;
+	}
+
+	/**
+	 * Mark a locked item's row in wp-admin lists, for Editors: its title is not a link, and should
+	 * not look like the titles that are.
+	 *
+	 * @param mixed $classes   The row's classes.
+	 * @param mixed $css_class Classes the caller asked for.
+	 * @param mixed $post_id   The item.
+	 * @return mixed
+	 */
+	public function rowClass( $classes, $css_class, $post_id ) {
+		if ( ! is_array( $classes ) || ! is_admin() || ! Audience::current() ) {
+			return $classes;
+		}
+		$post = get_post( $post_id );
+		if ( $post instanceof \WP_Post && self::lockedPost( $post ) ) {
+			$classes[] = self::ROW_CLASS;
+		}
+		return $classes;
 	}
 
 	/**

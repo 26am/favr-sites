@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace FavrSites\Tests\Unit;
 
+use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
+use FavrSites\Dashboard\Audience;
 use FavrSites\Editors\Words;
 
 final class WordsTest extends TestCase {
@@ -14,6 +16,13 @@ final class WordsTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		Functions\when( 'wp_json_encode' )->alias( 'json_encode' );
+		Functions\when( '_n' )->alias( static fn( string $one, string $many, int $count ): string => 1 === $count ? $one : $many );
+		Audience::flush();
+	}
+
+	protected function tearDown(): void {
+		Audience::flush();
+		parent::tearDown();
 	}
 
 	public function test_wordpress_title_case_reads_in_sentence_case(): void {
@@ -21,7 +30,7 @@ final class WordsTest extends TestCase {
 		$this->assertSame( 'Collapse menu', Words::plain( 'Collapse Menu', 'Collapse Menu', 'default' ) );
 		$this->assertSame( 'Preview changes', Words::plain( 'Preview Changes', 'Preview Changes', 'default' ) );
 		$this->assertSame( 'Delete permanently', Words::plain( 'Delete Permanently', 'Delete Permanently', 'default' ) );
-		$this->assertSame( 'Attachment details', Words::plain( 'Attachment Details', 'Attachment Details', 'default' ) );
+		$this->assertSame( 'Display settings', Words::plain( 'Display Settings', 'Display Settings', 'default' ) );
 		$this->assertSame( 'Quick&nbsp;edit', Words::plain( 'Quick&nbsp;Edit', 'Quick&nbsp;Edit', 'default' ) );
 	}
 
@@ -133,6 +142,162 @@ final class WordsTest extends TestCase {
 		$this->assertSame( 'Favr member', Words::sentence( 'Favr Member' ) );
 		$this->assertSame( 'Move to Trash', Words::sentence( 'Move To Trash' ) );
 		$this->assertSame( '', Words::sentence( '  ' ) );
+	}
+
+	public function test_the_file_panel_speaks_of_files_not_attachments(): void {
+		$this->assertSame( 'File details', Words::plain( 'Attachment Details', 'Attachment Details', 'default' ) );
+		$this->assertSame( 'File details', Words::plain( 'Attachment details', 'Attachment details', 'default' ) );
+		$this->assertSame( 'How it appears', Words::plain( 'Attachment Display Settings', 'Attachment Display Settings', 'default' ) );
+		$this->assertSame( 'Its own page', Words::plain( 'Attachment Page', 'Attachment Page', 'default' ) );
+		$this->assertSame( 'Link to its own page', Words::plain( 'Link to Attachment Page', 'Link to Attachment Page', 'default' ) );
+		$this->assertSame( 'File URL', Words::plain( 'File URL:', 'File URL:', 'default' ), 'The only label with a colon loses it.' );
+		foreach ( Words::MAP as $phrase => $words ) {
+			$this->assertStringNotContainsStringIgnoringCase( 'attachment', $words, $phrase );
+		}
+	}
+
+	public function test_wordpress_words_for_a_category_do_not_reach_the_editor(): void {
+		$this->assertSame( 'Enter a name first.', Words::plain( 'x', 'A name is required for this term.', 'default' ) );
+		$note = Words::plain( 'x', Words::CATEGORY_DELETE_NOTE, 'default' );
+		$this->assertSame( 'Deleting a category does not delete its news posts: they move to %s, which cannot be deleted.', $note );
+		$this->assertStringContainsString( 'Association News', sprintf( $note, '<strong>Association News</strong>' ) );
+	}
+
+	public function test_the_publish_box_uses_the_twelve_hour_clock(): void {
+		$this->assertSame( 'g:i a', Words::inContext( 'H:i', 'H:i', 'publish box time format', 'default' ) );
+		$this->assertSame( 'H:i', Words::inContext( 'H:i', 'H:i', 'some other clock', 'default' ), 'Only the Publish box.' );
+		$this->assertSame( 'H:i', Words::inContext( 'H:i', 'H:i', 'publish box time format', 'some-plugin' ) );
+		$this->assertSame( 'H:i', Words::plain( 'H:i', 'H:i', 'default' ) );
+	}
+
+	public function test_the_month_menu_of_the_publish_box_shows_the_month_without_its_number(): void {
+		$this->assertSame( '%2$s', Words::plain( '%1$s-%2$s', '%1$s-%2$s', 'default' ) );
+		$this->assertSame( 'Oct', sprintf( Words::plain( '%1$s-%2$s', '%1$s-%2$s', 'default' ), '10', 'Oct' ) );
+		$this->assertSame( '%1$s-%2$s', Words::plain( '%1$s-%2$s', '%1$s-%2$s', 'some-plugin' ) );
+	}
+
+	public function test_the_picker_windows_of_the_news_editor_and_elementor_are_titled_in_sentence_case(): void {
+		$news = json_decode( (string) Words::scriptData( 'wp-media-utils' ), true );
+		$this->assertSame( array( 'Select or upload media' ), $news['locale_data']['messages']['Select or Upload Media'] );
+		$elementor = json_decode( (string) Words::scriptData( 'elementor-editor', 'elementor' ), true );
+		$this->assertSame( array( 'Insert media' ), $elementor['locale_data']['messages']['Insert Media'] );
+		$this->assertNull( Words::scriptData( 'elementor-editor' ), 'Not one of WordPress\'s own scripts.' );
+		$this->assertNull( Words::scriptData( 'post', 'elementor' ) );
+		$this->assertSame( Words::scriptData( 'elementor-editor', 'elementor' ), Words::scriptTranslations( null, 'elementor-editor', 'elementor' ) );
+		$this->assertSame( 'kept', Words::scriptTranslations( 'kept', 'elementor-editor', 'elementor' ) );
+		foreach ( Words::PLUGIN_SCRIPTS as $handles ) {
+			foreach ( $handles as $phrases ) {
+				foreach ( $phrases as $phrase => $words ) {
+					$this->assertTrue( $this->isSentenceCase( $words ), $phrase );
+					$this->assertSame( strtolower( $phrase ), strtolower( $words ), $phrase );
+				}
+			}
+		}
+	}
+
+	public function test_news_posts_are_called_news_posts_after_a_bulk_action(): void {
+		$one = Words::newsMessages( array( 'trashed' => 1 ) );
+		$this->assertSame( '%s news post moved to the Trash.', $one['trashed'] );
+		$many = Words::newsMessages(
+			array(
+				'trashed'   => 3,
+				'deleted'   => 2,
+				'untrashed' => 1,
+			)
+		);
+		$this->assertSame( '%s news posts moved to the Trash.', $many['trashed'] );
+		$this->assertSame( '%s news posts permanently deleted.', $many['deleted'] );
+		$this->assertSame( '%s news post restored from the Trash.', $many['untrashed'] );
+		$this->assertSame( array( 'updated', 'locked', 'deleted', 'trashed', 'untrashed' ), array_keys( $many ) );
+	}
+
+	public function test_only_the_news_list_gets_the_news_words(): void {
+		$stock = array( 'post' => array( 'trashed' => '%s post moved to the Trash.' ) );
+		$this->assertSame( '%s news post moved to the Trash.', Words::bulkMessages( $stock, array( 'trashed' => 1 ), 'post' )['post']['trashed'] );
+		$this->assertSame( $stock, Words::bulkMessages( $stock, array( 'trashed' => 1 ), 'favr_sponsor' ), 'A type without words of its own falls back on these.' );
+		$this->assertSame( 'broken', Words::bulkMessages( 'broken', array(), 'post' ) );
+	}
+
+	public function test_a_file_details_date_is_the_short_one(): void {
+		Functions\when( 'mysql2date' )->alias( static fn( string $format, string $date ): string => gmdate( $format, (int) strtotime( $date ) ) );
+		$file = new class( array( 'ID' => 143, 'post_type' => 'attachment' ) ) extends \WP_Post {
+			/** @var string */
+			public $post_date = '2026-10-08 23:02:00';
+		};
+		$out  = Words::attachmentDate( array( 'dateFormatted' => 'October 8, 2026' ), $file );
+		$this->assertSame( 'Oct 8, 2026', $out['dateFormatted'] );
+		$this->assertSame( 'broken', Words::attachmentDate( 'broken', $file ) );
+	}
+
+	public function test_nothing_is_reworded_for_somebody_who_is_not_an_editor(): void {
+		Functions\when( 'wp_get_current_user' )->justReturn( new \WP_User( 1, array( 'administrator' ) ) );
+		Functions\when( 'user_can' )->justReturn( true );
+		Functions\when( 'determine_locale' )->justReturn( 'en_US' );
+		Filters\expectAdded( 'gettext' )->never();
+		Filters\expectAdded( 'gettext_with_context' )->never();
+		Filters\expectAdded( 'pre_load_script_translations' )->never();
+		Filters\expectAdded( 'bulk_post_updated_messages' )->never();
+		Filters\expectAdded( 'media_library_show_audio_playlist' )->never();
+		( new Words() )->start();
+		$this->assertFalse( has_filter( 'gettext' ) );
+		$this->assertFalse( has_filter( 'wp_prepare_attachment_for_js' ) );
+	}
+
+	public function test_an_editor_reading_english_gets_the_dictionary(): void {
+		Functions\when( 'wp_get_current_user' )->justReturn( new \WP_User( 456, array( 'editor' ) ) );
+		Functions\when( 'user_can' )->justReturn( false );
+		Functions\when( 'determine_locale' )->justReturn( 'en_US' );
+		Filters\expectAdded( 'gettext' )->once();
+		Filters\expectAdded( 'gettext_with_context' )->once();
+		Filters\expectAdded( 'media_library_show_audio_playlist' )->once()->with( '__return_null' );
+		Filters\expectAdded( 'media_library_show_video_playlist' )->once()->with( '__return_null' );
+		( new Words() )->start();
+		$this->assertSame( 10, has_filter( 'gettext', array( Words::class, 'plain' ) ) );
+		$this->assertTrue( has_filter( 'bulk_post_updated_messages' ) );
+		$this->assertSame( 10, has_filter( 'wp_prepare_attachment_for_js', array( Words::class, 'attachmentDate' ) ) );
+	}
+
+	public function test_an_editor_reading_german_keeps_the_translators_words(): void {
+		Functions\when( 'wp_get_current_user' )->justReturn( new \WP_User( 456, array( 'editor' ) ) );
+		Functions\when( 'user_can' )->justReturn( false );
+		Functions\when( 'determine_locale' )->justReturn( 'de_DE' );
+		Filters\expectAdded( 'gettext' )->never();
+		// The playlist entries are not words: they go whatever the language.
+		Filters\expectAdded( 'media_library_show_audio_playlist' )->once();
+		( new Words() )->start();
+		$this->assertFalse( has_filter( 'gettext' ) );
+		$this->assertTrue( has_filter( 'media_library_show_video_playlist' ) );
+	}
+
+	public function test_a_file_details_type_is_the_short_one_of_the_edit_screen(): void {
+		$stock = '<div class="filename"><strong>File name:</strong> {{ data.filename }}</div>' . "\n"
+			. '				<div class="file-type"><strong>File type:</strong> {{ data.mime }}</div>' . "\n"
+			. '<source type="{{ data.mime }}" src="{{ data.url }}" />';
+		$mine  = Words::shortFileType( $stock );
+		$this->assertStringContainsString( '<div class="file-type"><strong>File type:</strong> {{ data.filename && data.filename.indexOf(\'.\') > 0 ? data.filename.split(\'.\').pop().toUpperCase() : data.mime }}</div>', $mine );
+		$this->assertStringContainsString( '<source type="{{ data.mime }}" src="{{ data.url }}" />', $mine, 'The player still gets the real type.' );
+		$this->assertStringContainsString( '{{ data.filename }}</div>', $mine );
+		$this->assertSame( 'nothing to change', Words::shortFileType( 'nothing to change' ) );
+	}
+
+	public function test_the_publish_box_keeps_the_twelve_hour_clock_after_its_date_is_edited(): void {
+		// WordPress's script rewrites the line with the hour as typed ("at 15:02") until the item is saved.
+		$js = Words::publishClockScript();
+		$this->assertStringContainsString( "getElementById('timestamp')", $js );
+		$this->assertStringContainsString( 'MutationObserver', $js );
+		$this->assertStringContainsString( "' am'", $js );
+		$this->assertStringContainsString( "' pm'", $js );
+		$this->assertStringNotContainsString( '<', $js, 'Nothing that could close the script element.' );
+	}
+
+	public function test_an_event_or_a_member_somebody_else_has_open_is_not_called_a_post(): void {
+		$this->assertSame( '%s is editing this right now. Do you want to take over?', Words::plain( 'x', '%s is currently editing this post. Do you want to take over?', 'default' ) );
+		$this->assertSame( '%s is editing this right now.', Words::plain( 'x', '%s is currently editing this post.', 'default' ) );
+		$this->assertSame( 'Saving is off: %s is editing this right now.', Words::plain( 'x', 'Saving is disabled: %s is currently editing this post.', 'default' ) );
+		$this->assertSame( 'Sorry, you are not allowed to edit this item.', Words::plain( 'x', 'Sorry, you are not allowed to edit this post.', 'default' ) );
+		foreach ( Words::MAP as $phrase => $words ) {
+			$this->assertSame( substr_count( $phrase, '%s' ), substr_count( $words, '%s' ), $phrase );
+		}
 	}
 
 	/** No word after the first starts with a capital, unless it is a name or an abbreviation. */

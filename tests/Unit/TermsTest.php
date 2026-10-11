@@ -3,10 +3,28 @@ declare(strict_types=1);
 
 namespace FavrSites\Tests\Unit;
 
+use Brain\Monkey\Filters;
+use Brain\Monkey\Functions;
+use FavrSites\Dashboard\Audience;
 use FavrSites\Editors\Terms;
 use FavrSites\Editors\Words;
 
 final class TermsTest extends TestCase {
+
+	protected function setUp(): void {
+		parent::setUp();
+		Audience::flush();
+	}
+
+	protected function tearDown(): void {
+		Audience::flush();
+		parent::tearDown();
+	}
+
+	private function seenBy( string $role ): void {
+		Functions\when( 'wp_get_current_user' )->justReturn( new \WP_User( 'editor' === $role ? 456 : 1, array( $role ) ) );
+		Functions\when( 'user_can' )->justReturn( 'editor' !== $role );
+	}
 
 	public function test_the_table_has_no_slug_column(): void {
 		$columns = array(
@@ -29,6 +47,24 @@ final class TermsTest extends TestCase {
 			'posts'         => 'Members',
 		);
 		$this->assertSame( array( 'cb', 'name', 'favr_order', 'favr_pay_dues', 'posts' ), array_keys( Terms::columns( $columns, true ) ) );
+	}
+
+	/**
+	 * Membership levels are shared by members and directory listings, so WordPress's Count adds
+	 * the two (Professional 44 on a site with 22 such members) and matches neither list.
+	 */
+	public function test_a_taxonomy_shared_by_two_record_types_has_no_count_column(): void {
+		$columns = array(
+			'cb'         => '',
+			'name'       => 'Name',
+			'favr_order' => 'Order',
+			'slug'       => 'Slug',
+			'posts'      => 'Count',
+		);
+		$this->assertSame( array( 'cb', 'name', 'favr_order' ), array_keys( Terms::columns( $columns, true, true ) ) );
+		$this->assertSame( $columns, Terms::columns( $columns, false, true ), 'An Administrator keeps it.' );
+		$this->assertTrue( Terms::isShared( 'favr_member_level' ) );
+		$this->assertFalse( Terms::isShared( 'category' ) );
 	}
 
 	public function test_everybody_else_keeps_the_slug_column(): void {
@@ -107,5 +143,94 @@ final class TermsTest extends TestCase {
 		$this->assertFalse( Terms::isTermScreen( 'edit' ) );
 		$this->assertFalse( Terms::isTermScreen( 'post' ) );
 		$this->assertFalse( Terms::isTermScreen( '' ) );
+	}
+
+	public function test_the_confirmations_use_the_word_for_the_thing(): void {
+		$this->assertSame(
+			array(
+				0 => '',
+				1 => 'Category added.',
+				2 => 'Category deleted.',
+				3 => 'Category updated.',
+				4 => 'Category not added.',
+				5 => 'Category not updated.',
+				6 => 'Categories deleted.',
+			),
+			Terms::messages( 'Category', 'Categories' )
+		);
+		$level = Terms::messages( 'Membership Level', 'Membership Levels' );
+		$this->assertSame( 'Membership level added.', $level[1] );
+		$this->assertSame( 'Membership level updated.', $level[3] );
+		$this->assertSame( 'Membership levels deleted.', $level[6] );
+		$this->assertSame( 'Group deleted.', Terms::messages( 'Group', 'Groups' )[2] );
+	}
+
+	public function test_no_confirmation_says_item_or_term(): void {
+		foreach ( Terms::messages( 'Level', 'Levels' ) as $message ) {
+			$this->assertStringNotContainsStringIgnoringCase( 'item', $message );
+			$this->assertStringNotContainsStringIgnoringCase( 'term', $message );
+		}
+	}
+
+	public function test_a_name_used_twice_is_refused_in_the_things_own_word(): void {
+		$this->assertSame( 'Another category already has that name.', Terms::duplicate( 'Category' ) );
+		$this->assertSame( 'Another membership level already has that name.', Terms::duplicate( 'Membership Level' ) );
+		$this->assertSame( 'Another CPA firm type already has that name.', Terms::duplicate( 'CPA Firm Type' ) );
+		$this->assertStringNotContainsString( 'term', Terms::duplicate( 'Group' ) );
+	}
+
+	public function test_only_wordpress_two_sentences_about_a_taken_name_are_reworded(): void {
+		$this->assertSame( 'Another level already has that name.', Terms::taken( 'x', 'A term with the name provided already exists with this parent.', 'default', 'Level' ) );
+		$this->assertSame( 'Another level already has that name.', Terms::taken( 'x', 'A term with the name provided already exists in this taxonomy.', 'default', 'Level' ) );
+		$this->assertSame( 'x', Terms::taken( 'x', 'A term with the name provided already exists in this taxonomy.', 'some-plugin', 'Level' ) );
+		$this->assertSame( 'Publish', Terms::taken( 'Publish', 'Publish', 'default', 'Level' ) );
+	}
+
+	public function test_a_level_has_no_parent_field_and_a_category_keeps_it(): void {
+		$this->assertContains( 'favr_member_level', Terms::FLAT );
+		$this->assertStringContainsString( '.term-parent-wrap', Terms::css( true ) );
+		$this->assertStringNotContainsString( '.term-parent-wrap', Terms::css( false ) );
+		$this->assertStringNotContainsString( '.term-parent-wrap', Terms::css() );
+	}
+
+	public function test_the_second_way_back_under_a_confirmation_is_hidden(): void {
+		$this->assertStringContainsString( '#message p:has(>a[href*="edit-tags.php"])', Terms::css() );
+	}
+
+	public function test_somebody_who_is_not_an_editor_keeps_wordpress_term_screens(): void {
+		$this->seenBy( 'administrator' );
+		Functions\expect( 'wp_add_inline_style' )->never();
+		Functions\when( 'get_current_screen' )->justReturn( null );
+		Filters\expectAdded( 'gettext' )->never();
+		$terms    = new Terms();
+		$messages = array( '_item' => array( 1 => 'Item added.' ) );
+		$this->assertSame( $messages, $terms->termMessages( $messages ) );
+		$this->assertSame( 'Mixers', $terms->naming( 'Mixers', 'favr_event_cat' ) );
+		$terms->styles();
+	}
+
+	public function test_an_editor_gets_the_words_of_every_taxonomy_on_show(): void {
+		$this->seenBy( 'editor' );
+		Functions\when( 'get_taxonomies' )->justReturn(
+			array(
+				'favr_event_cat'    => (object) array(
+					'labels' => (object) array(
+						'singular_name' => 'Category',
+						'name'          => 'Event categories',
+					),
+				),
+				'favr_member_level' => (object) array(
+					'labels' => (object) array(
+						'singular_name' => 'Membership level',
+						'name'          => 'Membership levels',
+					),
+				),
+			)
+		);
+		$messages = ( new Terms() )->termMessages( array( '_item' => array( 1 => 'Item added.' ) ) );
+		$this->assertSame( 'Category added.', $messages['favr_event_cat'][1] );
+		$this->assertSame( 'Membership level updated.', $messages['favr_member_level'][3] );
+		$this->assertSame( 'Event categories deleted.', $messages['favr_event_cat'][6] );
+		$this->assertSame( 'Item added.', $messages['_item'][1] );
 	}
 }
