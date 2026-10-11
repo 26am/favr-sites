@@ -33,7 +33,7 @@ final class AdminBar {
 		if ( '' !== ( $links['help_url'] ?? '' ) ) {
 			$items[] = array(
 				'id'    => 'favr-help',
-				'title' => esc_html__( 'Help centre', 'favr-sites' ),
+				'title' => esc_html__( 'Help center', 'favr-sites' ),
 				'href'  => $links['help_url'],
 			);
 		}

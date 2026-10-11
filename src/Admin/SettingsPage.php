@@ -74,7 +74,7 @@ final class SettingsPage {
 		$menus  = wp_get_nav_menus();
 		$slots  = Slots::current();
 		$fields = array(
-			'help_url'      => array( __( 'Help centre URL', 'favr-sites' ), 'url' ),
+			'help_url'      => array( __( 'Help center URL', 'favr-sites' ), 'url' ),
 			'support_email' => array( __( 'Support email', 'favr-sites' ), 'email' ),
 			'support_phone' => array( __( 'Support phone', 'favr-sites' ), 'text' ),
 			'booking_url'   => array( __( 'Book a call URL', 'favr-sites' ), 'url' ),

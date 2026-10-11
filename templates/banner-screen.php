@@ -69,7 +69,7 @@ $favr_banner = $view['banner'];
 			<legend class="favr-banner-admin__label"><?php esc_html_e( 'Style', 'favr-sites' ); ?></legend>
 			<label class="favr-banner-admin__check">
 				<input type="radio" name="banner[style]" value="standard" <?php checked( $favr_banner->style(), 'standard' ); ?>>
-				<span><?php esc_html_e( 'Standard (your site’s main colour)', 'favr-sites' ); ?></span>
+				<span><?php esc_html_e( 'Standard (your site’s main color)', 'favr-sites' ); ?></span>
 			</label>
 			<label class="favr-banner-admin__check">
 				<input type="radio" name="banner[style]" value="urgent" <?php checked( $favr_banner->style(), 'urgent' ); ?>>

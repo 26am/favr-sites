@@ -134,7 +134,7 @@ $favr_link  = static function ( string $url, string $inner, string $css_class = 
 			<?php if ( array_filter( $favr_help ) ) : ?>
 				<ul class="favr-dash__help-links">
 					<?php if ( '' !== $favr_help['help_url'] ) : ?>
-						<li><a href="<?php echo esc_url( $favr_help['help_url'] ); ?>"><?php echo Icons::svg( 'help' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?><?php esc_html_e( 'Help centre', 'favr-sites' ); ?></a></li>
+						<li><a href="<?php echo esc_url( $favr_help['help_url'] ); ?>"><?php echo Icons::svg( 'help' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?><?php esc_html_e( 'Help center', 'favr-sites' ); ?></a></li>
 					<?php endif; ?>
 					<?php if ( '' !== $favr_help['support_email'] ) : ?>
 						<li><a href="<?php echo esc_url( 'mailto:' . $favr_help['support_email'] ); ?>"><?php echo Icons::svg( 'mail' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?><?php echo esc_html( $favr_help['support_email'] ); ?></a></li>
