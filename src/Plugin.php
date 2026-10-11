@@ -37,7 +37,7 @@ final class Plugin {
 		( new Brand\ColorScheme() )->hook();
 		( new Editors\ElementorEditor() )->hook();
 		( new Profile\ProfilePage() )->hook();
-		( new Editors\Menu() )->hook(); // Also on the front end: the admin bar uses the "News" labels.
+		( new Editors\Menu() )->hook(); // Also on the front end: the admin bar uses the News, Pages and Media labels.
 		( new Banner\Display() )->hook();
 
 		if ( is_admin() ) {
@@ -48,6 +48,8 @@ final class Plugin {
 			( new Site\Setup() )->hook();
 			( new Dashboard\Takeover() )->hook();
 			( new Editors\ListTables() )->hook();
+			( new Editors\Chrome() )->hook();
+			( new Editors\Wayfinding() )->hook();
 			( new Editors\AdminFooter() )->hook();
 			( new Skin\Skin() )->hook();
 		}
