@@ -153,6 +153,37 @@ final class AdminBarTest extends TestCase {
 		);
 	}
 
+	public function test_the_magnifier_is_named_search_and_says_what_it_finds(): void {
+		Functions\when( 'esc_html' )->alias( static fn( $v ) => htmlspecialchars( (string) $v, ENT_QUOTES ) );
+		$core = '<span class="ab-icon" aria-hidden="true"></span><span class="ab-label"><kbd>⌘K</kbd><span class="screen-reader-text"> Open command palette</span></span>';
+		$this->assertSame(
+			'<span class="ab-icon" aria-hidden="true"></span><span class="ab-label">Search <kbd>⌘K</kbd><span class="screen-reader-text"> Find a member, event or page</span></span>',
+			AdminBar::searchTitle( $core, 'Search', 'Find a member, event or page' )
+		);
+	}
+
+	public function test_the_magnifiers_words_are_escaped_and_its_shortcut_is_kept(): void {
+		Functions\when( 'esc_html' )->alias( static fn( $v ) => htmlspecialchars( (string) $v, ENT_QUOTES ) );
+		$title = AdminBar::searchTitle( '<span class="ab-label"><kbd>Ctrl+K</kbd><span class="screen-reader-text"> Open command palette</span></span>', 'A & B', 'Find <b>this</b> for $1' );
+		$this->assertStringContainsString( 'A &amp; B <kbd>Ctrl+K</kbd>', $title );
+		$this->assertStringContainsString( 'Find &lt;b&gt;this&lt;/b&gt; for $1', $title );
+		$this->assertStringNotContainsString( 'Open command palette', $title );
+	}
+
+	public function test_a_magnifier_wordpress_wrote_differently_is_left_alone(): void {
+		Functions\when( 'esc_html' )->returnArg();
+		$this->assertSame( '<span class="ab-icon"></span>', AdminBar::searchTitle( '<span class="ab-icon"></span>', 'Search', 'Find a member, event or page' ) );
+	}
+
+	public function test_the_toolbar_says_view_site_like_the_dashboard_and_opens_a_new_tab(): void {
+		Functions\when( 'esc_html__' )->returnArg();
+		$node = AdminBar::viewSite();
+		$this->assertSame( 'view-site', $node['id'] );
+		$this->assertStringStartsWith( 'View site', $node['title'] );
+		$this->assertStringContainsString( '<span class="screen-reader-text"> (opens in a new tab)</span>', $node['title'] );
+		$this->assertSame( array( 'target' => '_blank' ), $node['meta'] );
+	}
+
 	public function test_name_prefers_first_name(): void {
 		$this->assertSame( 'Anna', AdminBar::name( 'Anna', 'Anna Lee' ) );
 		$this->assertSame( 'editor mcdondal', AdminBar::name( '', 'editor mcdondal' ) );

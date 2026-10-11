@@ -138,6 +138,39 @@ final class AdminBar {
 	}
 
 	/**
+	 * The magnifier's label in Favr's words: "Search" in front of the keyboard shortcut WordPress
+	 * shows, and what it finds for screen readers. The icon and the shortcut stay as they are.
+	 *
+	 * @param string $title The toolbar entry's HTML, as WordPress wrote it.
+	 * @param string $word  The visible word.
+	 * @param string $label What the search finds.
+	 */
+	public static function searchTitle( string $title, string $word, string $label ): string {
+		$safe  = static fn( string $text ): string => addcslashes( esc_html( $text ), '\\$' );
+		$named = preg_replace(
+			array( '#<kbd>#', '#(<span class="screen-reader-text">)[^<]*(</span>)#' ),
+			array( $safe( $word ) . ' <kbd>', '$1 ' . $safe( $label ) . '$2' ),
+			$title,
+			1
+		);
+		return is_string( $named ) ? $named : $title;
+	}
+
+	/**
+	 * The link to the public site under the site's name: the dashboard's words for it ("View
+	 * site"), in a new tab so the Editor keeps their place.
+	 *
+	 * @return array{id: string, title: string, meta: array{target: string}}
+	 */
+	public static function viewSite(): array {
+		return array(
+			'id'    => 'view-site',
+			'title' => esc_html__( 'View site', 'favr-sites' ) . '<span class="screen-reader-text"> ' . esc_html__( '(opens in a new tab)', 'favr-sites' ) . '</span>',
+			'meta'  => array( 'target' => '_blank' ),
+		);
+	}
+
+	/**
 	 * What to call the user.
 	 *
 	 * @param string $first   First name.
@@ -215,6 +248,21 @@ final class AdminBar {
 			}
 		}
 
+		// The magnifier opens WordPress's palette, which for Editors is the Favr search (Editors\Search).
+		$search = $bar->get_node( 'command-palette' );
+		if ( $search ) {
+			$bar->add_node(
+				array(
+					'id'    => 'command-palette',
+					'title' => self::searchTitle( (string) $search->title, __( 'Search', 'favr-sites' ), __( 'Find a member, event or page', 'favr-sites' ) ),
+				)
+			);
+		}
+
+		if ( isset( $parents['view-site'] ) ) {
+			$bar->add_node( self::viewSite() );
+		}
+
 		// Account menu: their name, "Site editor", "Your profile", "Log out".
 		$user = wp_get_current_user();
 		$name = self::name( (string) $user->first_name, (string) $user->display_name );
@@ -278,7 +326,7 @@ final class AdminBar {
 		return $settings;
 	}
 
-	/** The Favr logo (rust "f" disc + wordmark in Fraunces) in place of the WordPress logo. */
+	/** The Favr logo (rust "f" disc + wordmark in Fraunces) in place of the WordPress logo, and a quieter shortcut beside "Search". */
 	public function css(): void {
 		if ( ! is_admin_bar_showing() || ! Audience::current() ) {
 			return;
@@ -287,6 +335,7 @@ final class AdminBar {
 		$css  = '@font-face{font-family:"Favr Display";src:url(' . $font . ') format("woff2");font-weight:400 700;font-display:swap}'
 			. '#wpadminbar #wp-admin-bar-wp-logo>.ab-item{padding:0 10px}#wpadminbar #wp-admin-bar-wp-logo>.ab-item .ab-icon{display:none}'
 			. '#wpadminbar .favr-ab-logo{display:inline-flex;align-items:center;gap:6px;font:600 16px/32px "Favr Display",Georgia,serif;color:inherit}'
+			. '#wpadminbar #wp-admin-bar-command-palette kbd{margin-left:4px;font:inherit;opacity:.7}'
 			. '#wpadminbar .favr-ab-f{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#a9472a;color:#fbf6ef;font-size:13px;line-height:1}';
 		echo '<style>' . $css . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static CSS; the font URL is escaped above.
 	}

@@ -1,0 +1,206 @@
+/*
+ * Favr skin: the toolbar search (WordPress's command palette, ⌘K / Ctrl+K).
+ *
+ * Loaded for Editors wherever WordPress loads its palette (Editors\Search). The palette is drawn
+ * outside the page, straight under <body>, so every rule hangs on `body.favr-skin`. Brand tokens
+ * come from assets/dashboard/tokens.css.
+ */
+
+/* ---------- 1. The window ---------- */
+
+/* Aubergine veil over the page, as behind the media window. */
+body.favr-skin .commands-command-menu__overlay {
+	background: color-mix(in srgb, var(--favr-ink) 45%, transparent);
+}
+
+/* Paper card, 14px corners. */
+body.favr-skin .commands-command-menu {
+	overflow: hidden;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow), 0 24px 60px color-mix(in srgb, var(--favr-ink) 22%, transparent);
+	color: var(--favr-ink);
+	font-family: var(--favr-font-sans);
+}
+
+/* WordPress paints its own white inside the card: let the paper through. */
+body.favr-skin .commands-command-menu .components-modal__content,
+body.favr-skin .commands-command-menu__container {
+	background: transparent;
+	color: var(--favr-ink);
+	font-family: var(--favr-font-sans);
+}
+
+/* ---------- 2. The field ---------- */
+
+/* The magnifier and the field, with the card's side padding. */
+body.favr-skin .commands-command-menu__header {
+	gap: 10px;
+	padding: 4px 18px;
+}
+
+/* A quiet magnifier. */
+body.favr-skin .commands-command-menu__header-search-icon {
+	fill: var(--favr-muted);
+}
+
+/* What is typed: Favr Sans, ink, a size that reads as the window's title. */
+body.favr-skin .commands-command-menu__container [cmdk-input] {
+	min-height: 48px;
+	padding: 12px 4px;
+	background: transparent;
+	color: var(--favr-ink);
+	font-family: var(--favr-font-sans);
+	font-size: 17px;
+	line-height: 24px;
+}
+
+/* "Find a member, event or page". */
+body.favr-skin .commands-command-menu__container [cmdk-input]::placeholder {
+	color: var(--favr-muted);
+	opacity: 1;
+}
+
+/* ---------- 3. The list ---------- */
+
+/* The line between the field and the list. */
+body.favr-skin .commands-command-menu__container [cmdk-root] > [cmdk-list]:has([cmdk-group-items]:not(:empty)),
+body.favr-skin .commands-command-menu__container [cmdk-root] > [cmdk-list]:has([cmdk-empty]) {
+	border-top-color: var(--favr-line);
+}
+
+/* Room for about nine rows before the list scrolls. */
+body.favr-skin .commands-command-menu__container [cmdk-root] > [cmdk-list] {
+	max-height: min(420px, 70vh - 56px);
+}
+
+/* Air around the rows, so the marked row's rounded corners clear the card's edge. */
+body.favr-skin .commands-command-menu__container [cmdk-root] > [cmdk-list] [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
+	padding: 0 8px 8px;
+}
+
+/* "Results", "Recent": the small caps of the menu's group headings. */
+body.favr-skin .commands-command-menu__container [cmdk-root] > [cmdk-list] [cmdk-group-heading] {
+	padding: 8px 18px 6px;
+	color: var(--favr-muted);
+	font-size: 11.5px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+}
+
+/* A row: body text in ink. */
+body.favr-skin .commands-command-menu__container [cmdk-item] {
+	padding: 1px 0;
+	color: var(--favr-ink);
+	font-size: 15px;
+}
+
+/* Two columns, shared with the field above: the magnifier and the row icons at 18px, what is
+   typed and the row labels at 56px. */
+body.favr-skin .commands-command-menu__container [cmdk-item] > div {
+	gap: 14px;
+	min-height: 40px;
+	padding: 4px 12px 4px 48px;
+	border-radius: var(--favr-radius-sm);
+}
+
+/* A row with an icon starts in the icon column. */
+body.favr-skin .commands-command-menu__container [cmdk-item] > .has-icon {
+	padding-left: 10px;
+}
+
+/* Row icons (the arrow of "Go to") stay quiet. */
+body.favr-skin .commands-command-menu__container [cmdk-item] svg {
+	fill: var(--favr-muted);
+}
+
+/* WordPress's word at the end of its own rows: "View", "Command". */
+body.favr-skin .commands-command-menu__item-category {
+	color: var(--favr-muted);
+	font-size: 13px;
+}
+
+/* The letters that match what was typed. */
+body.favr-skin .commands-command-menu__item mark {
+	color: var(--favr-accent-strong);
+	font-weight: 700;
+}
+
+/* The row the arrow keys or the pointer are on: soft rust, ink text. */
+body.favr-skin .commands-command-menu__container [cmdk-item][aria-selected="true"] > div,
+body.favr-skin .commands-command-menu__container [cmdk-item]:active > div {
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+}
+
+/* Its icon turns rust. */
+body.favr-skin .commands-command-menu__container [cmdk-item][aria-selected="true"] > div svg,
+body.favr-skin .commands-command-menu__container [cmdk-item]:active > div svg {
+	fill: var(--favr-accent-strong);
+}
+
+/* And its last word reads in ink (WordPress makes it white for its blue row). */
+body.favr-skin [aria-selected="true"] .commands-command-menu__item-category,
+body.favr-skin [cmdk-item]:active .commands-command-menu__item-category {
+	color: var(--favr-ink);
+}
+
+/* "No results found." */
+body.favr-skin .commands-command-menu__container [cmdk-empty] {
+	padding: 20px 18px 28px;
+	color: var(--favr-muted);
+	font-size: 15px;
+}
+
+/* ---------- 4. A record's type ---------- */
+
+/* assets/skin/search.js hands each record its type ("Member", "Event") in the place of an icon.
+   It is drawn at the end of the row, where WordPress writes "Edit" on its own rows, as a chip. */
+body.favr-skin .commands-command-menu__item .favr-search-type {
+	flex: 0 0 auto;
+	order: 2;
+	width: auto;
+	height: auto;
+	margin-left: auto;
+	padding: 2px 10px;
+	border-radius: 999px;
+	background: var(--favr-sand);
+	color: var(--favr-muted);
+	font-size: 12.5px;
+	font-weight: 600;
+	line-height: 1.5;
+	white-space: nowrap;
+}
+
+/* The type says more than "Edit": one word at the end of a row is enough. */
+body.favr-skin .commands-command-menu__item:has(.favr-search-type) .commands-command-menu__item-category {
+	display: none;
+}
+
+/* The type sits at the end, so the row has no icon in front: keep its label in the label column. */
+body.favr-skin .commands-command-menu__container [cmdk-item] > .has-icon:has(.favr-search-type) {
+	padding-left: 48px;
+}
+
+/* On the marked row the chip turns to paper, so it still stands out from the row. */
+body.favr-skin [aria-selected="true"] .commands-command-menu__item .favr-search-type,
+body.favr-skin [cmdk-item]:active .commands-command-menu__item .favr-search-type {
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+}
+
+/* ---------- 5. Phones ---------- */
+
+@media (max-width: 600px) {
+
+	/* 16px in the field: iOS zooms the page on anything smaller. */
+	body.favr-skin .commands-command-menu__container [cmdk-input] {
+		font-size: 16px;
+	}
+
+	/* Rows a thumb can hit. */
+	body.favr-skin .commands-command-menu__container [cmdk-item] > div {
+		min-height: 44px;
+	}
+}
