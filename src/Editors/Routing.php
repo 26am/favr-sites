@@ -85,7 +85,7 @@ final class Routing {
 	}
 
 	/**
-	 * Elementor's "Exit" returns to the Pages list (the Header & Footer screen for those templates).
+	 * Elementor's "Exit" returns to the Pages list (the Header & footer screen for those templates).
 	 *
 	 * @param string $url      URL.
 	 * @param mixed  $document Elementor document.

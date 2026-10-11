@@ -45,7 +45,7 @@ $favr_row   = static function ( array $row, bool $invalid ) use ( $favr_tools ):
 ?>
 <div class="wrap favr-dash favr-menus">
 	<header class="favr-menus__head">
-		<h1 class="favr-menus__title"><?php esc_html_e( 'Header & Footer', 'favr-sites' ); ?></h1>
+		<h1 class="favr-menus__title"><?php esc_html_e( 'Header & footer', 'favr-sites' ); ?></h1>
 		<p class="favr-menus__sub"><?php esc_html_e( 'Your site’s header and footer appear on every page. Edit their design in Elementor; manage their menu links here (drag to reorder, or use the arrows). Changes go live when you save.', 'favr-sites' ); ?></p>
 	</header>
 

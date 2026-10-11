@@ -14,7 +14,7 @@ use FavrSites\Site\Protect;
 use FavrSites\Site\Setup;
 
 /**
- * A Favr screen (Header & Footer) instead of Appearance → Menus: reorder, rename, add a page or link, remove,
+ * A Favr screen (Header & footer) instead of Appearance → Menus: reorder, rename, add a page or link, remove,
  * one dropdown level. Edits the real WordPress menus connected to the Header and Footer slots, so
  * Elementor Nav Menu widgets and theme locations update on save.
  */
@@ -32,7 +32,7 @@ final class Screen {
 
 	/** Menu entry. */
 	public function menu(): void {
-		$hook = add_menu_page( __( 'Header & Footer', 'favr-sites' ), __( 'Header & Footer', 'favr-sites' ), 'edit_pages', self::PAGE, array( $this, 'render' ), 'dashicons-menu-alt3', 21 );
+		$hook = add_menu_page( __( 'Header & footer', 'favr-sites' ), __( 'Header & footer', 'favr-sites' ), 'edit_pages', self::PAGE, array( $this, 'render' ), 'dashicons-menu-alt3', 21 );
 		if ( $hook ) {
 			add_action( 'load-' . $hook, array( $this, 'load' ) );
 		}

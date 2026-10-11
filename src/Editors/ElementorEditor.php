@@ -111,7 +111,7 @@ final class ElementorEditor {
 	}
 
 	/**
-	 * Where Exit goes: the Header & Footer screen for those templates, else the Pages list.
+	 * Where Exit goes: the Header & footer screen for those templates, else the Pages list.
 	 *
 	 * @param string|null $role Protect role of the document being edited.
 	 * @return array{label: string, href: string}
@@ -119,7 +119,7 @@ final class ElementorEditor {
 	public static function back( ?string $role ): array {
 		if ( 'header' === $role || 'footer' === $role ) {
 			return array(
-				'label' => __( 'Back to Header & Footer', 'favr-sites' ),
+				'label' => __( 'Back to Header & footer', 'favr-sites' ),
 				'href'  => admin_url( 'admin.php?page=favr-menus' ),
 			);
 		}

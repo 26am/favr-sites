@@ -32,7 +32,7 @@ final class ElementorEditorTest extends TestCase {
 	public function test_exit_returns_to_where_the_editor_came_from(): void {
 		Functions\when( 'admin_url' )->alias( static fn( string $path = '' ): string => 'https://x.test/wp-admin/' . $path );
 		$this->assertSame( array( 'label' => 'Back to Pages', 'href' => 'https://x.test/wp-admin/edit.php?post_type=page' ), ElementorEditor::back( null ) );
-		$this->assertSame( array( 'label' => 'Back to Header & Footer', 'href' => 'https://x.test/wp-admin/admin.php?page=favr-menus' ), ElementorEditor::back( 'header' ) );
+		$this->assertSame( array( 'label' => 'Back to Header & footer', 'href' => 'https://x.test/wp-admin/admin.php?page=favr-menus' ), ElementorEditor::back( 'header' ) );
 		$this->assertSame( 'Back to Pages', ElementorEditor::back( 'home' )['label'] );
 	}
 
