@@ -1,1 +1,1725 @@
-/* Favr skin: media. See base.css for the components and docs/superpowers/specs/2026-10-11-editor-skin-design.md for the rules. */
+/*
+ * Favr skin: media. The Media Library grid and its toolbar, the uploader, attachment details and
+ * the media window that opens from edit screens (and from the block editor).
+ *
+ * See base.css for the components and docs/superpowers/specs/2026-10-11-editor-skin-design.md for
+ * the rules. The list mode table (upload.php?mode=list) belongs to lists.css.
+ *
+ * The media window is attached to <body>, outside #wpbody-content, and this sheet is the only one
+ * besides base.css that loads in the block editor. So sections 8 and 9 repeat base.css's field and
+ * button declarations for the window: the same values, no variants.
+ */
+
+/* ---------- 1. Media Library: the grid's toolbar ---------- */
+
+/* Thumbnails line up with the toolbar's edges (section 2), so their rings and hover shadows draw
+   outside the frame. flow-root keeps the floated thumbnails contained instead of overflow. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .attachments-browser {
+	overflow: visible;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .attachments-browser {
+	display: flow-root;
+}
+
+/* WordPress sets its own system font on the frame and the window. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal {
+	color: var(--favr-ink);
+	font-family: var(--favr-font-sans);
+}
+
+/* The toolbar is a card: view switch, both filters, "Bulk select" and the search on one line. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar.wp-filter {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 16px;
+	align-items: center;
+	justify-content: space-between;
+	height: auto;
+	min-height: 0;
+	margin: 6px 0 20px;
+	padding: 12px 16px;
+	overflow: visible;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+	color: var(--favr-ink);
+	font-size: 14.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar-secondary {
+	display: flex;
+	flex: 0 1 auto;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	float: none;
+	height: auto;
+	min-height: 40px;
+	max-width: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar-primary {
+	display: flex;
+	flex: 1 1 240px;
+	gap: 10px;
+	align-items: center;
+	float: none;
+	height: auto;
+	max-width: 380px;
+	margin: 0;
+}
+
+/* WordPress hides the search while bulk selecting; keep that. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar-mode-select .media-toolbar-primary {
+	display: none;
+}
+
+/* List / grid switch: muted icons, the current view in the accent. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-toolbar.wp-filter .view-switch {
+	display: inline-flex;
+	gap: 2px;
+	margin: 0 6px 0 -6px;
+	padding: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-toolbar.wp-filter .view-switch a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	float: none;
+	width: 36px;
+	height: 36px;
+	border: 0;
+	border-radius: var(--favr-radius-sm);
+	line-height: 1;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-toolbar.wp-filter .view-switch a::before {
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-toolbar.wp-filter .view-switch a:hover::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-toolbar.wp-filter .view-switch a:focus::before {
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-toolbar.wp-filter .view-switch a.current::before {
+	color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-toolbar.wp-filter .view-switch a:focus {
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-toolbar.wp-filter .view-switch a:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 0;
+}
+
+/* The filters and the search are base.css fields; WordPress's toolbar rules make them 32px. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar select {
+	min-height: 40px;
+	margin: 0;
+	padding: 0 32px 0 12px;
+	font-size: 14.5px;
+	line-height: 38px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar input[type="search"] {
+	flex: 1 1 200px;
+	width: auto;
+	min-width: 0;
+	min-height: 40px;
+	margin: 0;
+	padding: 0 12px;
+	font-size: 14.5px;
+	line-height: 38px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .media-search-input-label {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar-secondary > .media-button {
+	height: auto;
+	margin: 0;
+}
+
+/* Bulk select: deleting is destructive, so danger text on the quiet button, never the filled one. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .delete-selected-button {
+	border-color: var(--favr-line);
+	background: var(--favr-surface);
+	color: var(--favr-danger);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .delete-selected-button:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .delete-selected-button:focus {
+	border-color: var(--favr-danger);
+	background: var(--favr-danger-soft);
+	color: var(--favr-danger);
+}
+
+/* While bulk selecting, WordPress pins the toolbar to the top once the page scrolls. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-select .attachments-browser.fixed .media-toolbar {
+	right: 24px;
+	margin-top: 8px;
+}
+
+/* Upload problems on the Media Library show as base.css's error notice. */
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .mode-grid .media-sidebar {
+	margin: 6px 0 16px;
+	padding: 4px 16px;
+	border: 0;
+	border-left: 4px solid var(--favr-danger);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-danger-soft);
+	color: var(--favr-danger);
+	box-shadow: none;
+}
+
+/* ---------- 2. Thumbnails (the grid and the media window) ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .attachments-browser .attachments {
+	margin: 0 -8px;
+	padding: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment {
+	color: var(--favr-ink);
+	transition: transform 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment:hover {
+	transform: translateY(-2px);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment-preview {
+	overflow: hidden;
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-sand);
+	box-shadow: 0 0 0 1px var(--favr-line);
+	transition: box-shadow 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment:hover .attachment-preview {
+	box-shadow: 0 0 0 1px var(--favr-line), var(--favr-shadow);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment .thumbnail::after {
+	box-shadow: none;
+}
+
+/* The name under each thumbnail (WordPress prints the item's label there): two lines at most. The
+   transparent bottom border is the bottom padding, placed where a third line cannot peek through. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment::after,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment .filename {
+	height: 44px;
+	max-height: none;
+	border-bottom: 6px solid transparent;
+	border-radius: 0 0 var(--favr-radius-sm) var(--favr-radius-sm);
+	background-color: var(--favr-surface);
+	box-shadow: inset 0 1px 0 var(--favr-line);
+	color: var(--favr-ink);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 16px;
+	text-align: left;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment::after {
+	padding: 6px 10px 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment .filename {
+	box-sizing: border-box;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment .filename div {
+	padding: 6px 10px 0;
+}
+
+/* Building a gallery: each thumbnail has a caption field under it and a "remove" button on it.
+   WordPress lays the name over the caption field; it goes back onto the thumbnail. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment .describe {
+	margin-top: 6px;
+	padding: 0 10px;
+	border-radius: var(--favr-radius-sm);
+	font-size: 13px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment:has(.describe)::after {
+	bottom: 54px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment-close {
+	top: 6px;
+	right: 6px;
+	border-radius: 999px;
+	background-color: var(--favr-surface);
+	box-shadow: 0 0 0 1px var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment-close:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment-close:focus {
+	background-color: var(--favr-sand);
+	box-shadow: 0 0 0 1px var(--favr-accent);
+}
+
+/* Selected or focused: a 3px accent ring on the thumbnail (WordPress draws an inset shadow on the
+   list item). Keyboard focus adds the soft halo fields have. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .selected.attachment,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .selected.attachment:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment.details,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment.details:focus {
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .selected.attachment .attachment-preview,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment.details .attachment-preview {
+	box-shadow: 0 0 0 3px var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment:focus .attachment-preview {
+	box-shadow: 0 0 0 3px var(--favr-accent), 0 0 0 6px var(--favr-accent-soft);
+}
+
+/* The check on a selected thumbnail: an accent disc; hovering it shows the "deselect" minus. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment .check,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment.details .check,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment.selected .check:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .attachment.selected .check {
+	top: 0;
+	right: 0;
+	width: 24px;
+	height: 24px;
+	border-radius: 999px;
+	background-color: var(--favr-accent);
+	box-shadow: 0 0 0 2px var(--favr-surface);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment .check .media-modal-icon {
+	margin: 4.5px;
+	background-position: -21px 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment .check:hover .media-modal-icon,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment .check:focus .media-modal-icon {
+	background-position: -60px 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment.selected .check:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+/* An item still uploading, and the markers WordPress puts on freshly loaded items. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-progress-bar {
+	background: var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-progress-bar div {
+	background: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .attachment-preview .media-progress-bar {
+	background: var(--favr-surface);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment.new-media {
+	outline-color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .more-loaded .attachment:not(.found-media) {
+	background: transparent;
+}
+
+/* Nothing found, and "Load more" under a long library: quiet, not a second filled button. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .attachments-browser .no-media,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachments-browser .no-media {
+	margin: 0;
+	padding: 72px 16px 24px;
+	color: var(--favr-muted);
+	font-size: 15px;
+	font-style: normal;
+	text-align: center;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .load-more-wrapper .load-more-count {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .load-more-wrapper .load-more.button {
+	border-color: var(--favr-line);
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .load-more-wrapper .load-more.button:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .load-more-wrapper .load-more.button:focus {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .attachments-browser .instructions {
+	color: var(--favr-muted);
+}
+
+/* The strip of chosen items in the window's bottom bar: small thumbnails, no names, no lift. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .media-selection .attachment:hover {
+	transform: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .media-selection .attachment-preview {
+	border-radius: 6px;
+	background: var(--favr-sand);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .media-selection .attachment .attachment-preview,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .media-selection .attachment:hover .attachment-preview {
+	box-shadow: 0 0 0 1px var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .media-selection .attachment.details .attachment-preview,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .media-selection .attachment:focus .attachment-preview {
+	box-shadow: 0 0 0 2px var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .media-selection .attachment.details .thumbnail {
+	box-shadow: none;
+}
+
+/* ---------- 3. The uploader ---------- */
+
+/* "Add media file" on the Media Library, the Upload screen and the window's "Upload files" tab are
+   one thing: the Dropzone recipe with a title, the quiet "Select files" button and a muted note.
+   The recipe's hover colours only show while a file is dragged over: these areas are large and
+   are not themselves clickable, so lighting up under a passing pointer would promise a click. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .uploader-inline,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .drag-drop #drag-drop-area {
+	border: 1.5px dashed var(--favr-field-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+	color: var(--favr-muted);
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .drag-drop.drag-over #drag-drop-area {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .uploader-inline {
+	margin: 6px 0 16px;
+}
+
+/* In the window the dropzone is inset from the edges: the whole "Upload files" tab, or the
+   library when it has nothing to show. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-frame-content > .uploader-inline {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	bottom: 16px;
+	left: 16px;
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .uploader-inline {
+	margin: 0 16px 16px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline h2,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .drag-drop-inside p.drag-drop-info {
+	margin: 0;
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 19px;
+	font-weight: 500;
+	line-height: 1.25;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline p,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .drag-drop-inside p {
+	margin: 6px 0;
+	color: var(--favr-muted);
+	font-size: 14.5px;
+}
+
+/* With a message above it ("No items found."), the instruction steps down to body text. */
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .has-upload-message .upload-instructions {
+	margin: 6px 0;
+	color: var(--favr-muted);
+	font-family: var(--favr-font-sans);
+	font-size: 14.5px;
+	font-weight: 400;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline-content .upload-ui {
+	margin: 28px 0 10px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .has-upload-message .upload-ui {
+	margin: 10px 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline-content .post-upload-ui {
+	margin-bottom: 28px;
+}
+
+/* "Select files" is the shared quiet button at its usual size in every uploader. */
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .browser.button-hero {
+	min-height: 36px;
+	margin-top: 4px;
+	padding: 0 16px;
+	font-size: 14px;
+	line-height: 34px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .max-upload-size,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .max-upload-size,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .upload-flash-bypass,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .upload-html-bypass {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+}
+
+/* The close button of the Media Library's uploader: a quiet round icon button. */
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .close {
+	top: 8px;
+	right: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 999px;
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .close::before {
+	margin: 0;
+	color: currentcolor;
+	font-size: 22px !important;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .close:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .close:focus {
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .close:focus {
+	outline: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .close:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+/* The Upload screen (media-new.php). The id is not wrapped in :where() on purpose: WordPress
+   styles the area as `.drag-drop #drag-drop-area`, which only an id can out-rank. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .drag-drop #drag-drop-area {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	height: auto;
+	min-height: 220px;
+	padding: 24px 16px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .drag-drop .drag-drop-inside {
+	width: auto;
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .drag-drop-inside p.drag-drop-buttons {
+	margin-top: 10px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .upload-flash-bypass,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .max-upload-size {
+	margin: 12px 0 0;
+}
+
+/* Files as they arrive on the Upload screen: one hairline row each inside a card. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form :where(#media-items) {
+	overflow: hidden;
+	margin-top: 20px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form :where(#media-items):empty {
+	display: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item {
+	box-sizing: border-box;
+	min-height: 0;
+	margin: 0;
+	padding: 0 16px;
+	border-top: 1px solid var(--favr-line);
+	background: transparent;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item:first-child {
+	border-top: 0;
+}
+
+/* Still uploading: the file's name on the left, a slim bar with its percentage on the right. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item:has(> .progress) {
+	display: flex;
+	flex-direction: row-reverse;
+	gap: 16px;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 60px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item .progress {
+	position: relative;
+	flex: none;
+	overflow: visible;
+	width: 200px;
+	max-width: 40%;
+	height: 8px;
+	margin: 0;
+	background: var(--favr-line);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item .bar {
+	margin-top: 0;
+	background-color: var(--favr-accent);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item .progress .percent {
+	position: absolute;
+	top: -7px;
+	right: 100%;
+	width: auto;
+	margin-right: 10px;
+	color: var(--favr-muted);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 22px;
+	text-shadow: none;
+	white-space: nowrap;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item .filename {
+	margin-left: 0;
+	padding: 14px 0;
+	color: var(--favr-ink);
+	font-size: 14.5px;
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item .media-list-subtitle {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-weight: 400;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item .pinkynail {
+	margin: 14px 14px 14px 0;
+	border-radius: 6px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item .attachment-tools {
+	gap: 12px;
+	margin-top: 6px;
+	font-size: 13.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item .attachment-tools .edit-attachment {
+	margin: 0;
+	padding: 0;
+}
+
+/* A file that failed: base.css's error notice inside its row. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item.error {
+	padding: 12px 16px;
+	border-left: 0;
+	background: transparent;
+	color: inherit;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .media-item .error {
+	min-height: 0;
+	margin: 0;
+	padding: 10px 16px;
+	box-shadow: none;
+}
+
+/* Dragging a file over the window: the full-page drop target. */
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-window .uploader-editor-title {
+	color: var(--favr-paper);
+	font-family: var(--favr-font-display);
+	font-size: 34px;
+	font-weight: 500;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-window-content {
+	border: 1.5px dashed var(--favr-paper);
+	border-radius: var(--favr-radius);
+}
+
+/* Upload progress and errors, wherever the uploader reports them. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-uploader-status .upload-details {
+	color: var(--favr-muted);
+	font-size: 13px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-uploader-status .upload-count {
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .upload-errors .upload-error,
+body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .upload-errors .upload-error {
+	border-left: 4px solid var(--favr-danger);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-danger-soft);
+	color: var(--favr-danger);
+	box-shadow: none;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .mode-grid .media-sidebar .upload-error {
+	border: 0;
+	background: none;
+	font-size: 14.5px;
+}
+
+/* ---------- 4. The media window: frame, title, tabs, bottom bar ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-backdrop {
+	background: var(--favr-aubergine);
+	opacity: 0.7;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-content {
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-frame-title h1 {
+	padding: 0 16px;
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 22px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	line-height: 50px;
+}
+
+/* Close (and previous / next on attachment details): quiet round icon buttons. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .left,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .right {
+	top: 7px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--favr-muted);
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close {
+	right: 10px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .right {
+	right: 50px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .left {
+	right: 90px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .left::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .right::before {
+	line-height: 1 !important;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .left:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .left:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .right:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .right:focus {
+	border: 0;
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close:hover .media-modal-icon::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close:focus .media-modal-icon::before {
+	color: currentcolor;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .left:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .right:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header [disabled],
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header [disabled]:hover {
+	background: transparent;
+	color: #9a8c93;
+}
+
+/* "Upload files / Media Library": pill tabs. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-router {
+	display: flex;
+	gap: 4px;
+	padding: 0 16px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-router .media-menu-item,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-router .media-menu-item.active:last-child {
+	display: inline-flex;
+	align-items: center;
+	float: none;
+	height: auto;
+	min-height: 30px;
+	margin: 0;
+	padding: 0 12px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--favr-muted);
+	font-family: var(--favr-font-sans);
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-router .media-menu-item:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-router .media-menu-item:focus {
+	color: var(--favr-ink);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-router .media-menu-item.active,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-router .media-menu-item.active:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-router .media-menu-item.active:last-child {
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-menu-item:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+/* The list of jobs down the left side, when a window has one ("Add media", "Create gallery"). */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-menu {
+	border-right-color: var(--favr-line);
+	background: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-frame-menu-heading {
+	color: var(--favr-muted);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-menu .media-menu-item {
+	width: calc(100% - 20px);
+	margin: 0 10px 2px;
+	padding: 8px 12px;
+	border-radius: var(--favr-radius-sm);
+	color: var(--favr-muted);
+	font-family: var(--favr-font-sans);
+	font-size: 13.5px;
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-menu .media-menu-item:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-menu .media-menu-item:focus {
+	background: transparent;
+	color: var(--favr-ink);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-menu .media-menu-item.active,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-menu .media-menu-item.active:hover {
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-menu .separator {
+	border-top-color: var(--favr-line);
+}
+
+/* The body of the window and the bar along its bottom. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-frame-content {
+	border-top-color: var(--favr-line);
+	background: var(--favr-surface);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-frame-toolbar .media-toolbar {
+	border-top-color: var(--favr-line);
+	background: var(--favr-surface);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-frame a:focus {
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal a:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .button-link:focus-visible {
+	border-radius: 4px;
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+/* "3 items selected · Edit selection · Clear" beside the strip of chosen items. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-selection .count {
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-selection .button-link {
+	border-right-color: var(--favr-line);
+	color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-selection .button-link:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-selection .button-link:focus {
+	color: var(--favr-accent-strong);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .selection-info .clear-selection,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .selection-info .clear-selection:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .selection-info .clear-selection:focus {
+	color: var(--favr-danger);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-selection::after {
+	background-image: linear-gradient(to left, var(--favr-surface), transparent);
+}
+
+/* ---------- 5. The media window: filter bar and library ---------- */
+
+/* The same bar as the Media Library's: filters left, search right, one line. The "Filter by…"
+   labels stay for screen readers, as WordPress itself does on the Media Library. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .media-toolbar {
+	display: flex;
+	gap: 8px 16px;
+	align-items: center;
+	justify-content: space-between;
+	background: var(--favr-surface);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .media-toolbar-secondary {
+	display: flex;
+	flex: 0 1 auto;
+	gap: 8px;
+	align-items: center;
+	height: auto;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .media-toolbar-secondary > label {
+	position: absolute;
+	overflow: hidden;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	clip-path: inset(50%);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .media-toolbar-primary {
+	display: flex;
+	flex: 0 1 340px;
+	gap: 10px;
+	align-items: center;
+	height: auto;
+	max-width: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-frame .media-search-input-label {
+	display: inline;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .media-toolbar select.attachment-filters {
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .media-toolbar .search {
+	flex: 1 1 160px;
+	width: auto;
+	min-width: 0;
+	max-width: none;
+	margin: 0;
+}
+
+/* ---------- 6. The media window: the details column ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar {
+	border-left-color: var(--favr-line);
+	background: var(--favr-paper);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar h2,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .image-details .media-embed h2 {
+	color: var(--favr-muted);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+/* The file's facts: name in ink, the rest muted; links in the accent, deleting in danger. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info {
+	border-bottom-color: var(--favr-line);
+	color: var(--favr-muted);
+}
+
+/* flow-root contains the floated thumbnail without clipping the links' focus rings. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .attachment-info {
+	display: flow-root;
+	overflow: visible;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .details {
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .filename {
+	color: var(--favr-ink);
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .thumbnail img {
+	border-radius: 6px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .thumbnail-image::after {
+	border-radius: 6px;
+	box-shadow: inset 0 0 0 1px var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info a,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .button-link {
+	color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .details > a,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .details > .button-link,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .actions a,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .actions .button-link {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .details > a,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .details > .button-link {
+	width: fit-content;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info a:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .button-link:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .button-link:focus {
+	color: var(--favr-accent-strong);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .delete-attachment,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .trash-attachment,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .untrash-attachment,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .delete-attachment,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .delete-attachment:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .delete-attachment:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .trash-attachment,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .trash-attachment:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-info .trash-attachment:focus {
+	color: var(--favr-danger);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .delete-attachment:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .trash-attachment:hover {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+/* Settings: the label (600) sits above its field, which takes the full width of the column. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting {
+	margin: 0 0 12px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting .name,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting .name,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .compat-item .label,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .compat-item label span {
+	display: block;
+	float: none;
+	min-width: 0;
+	max-width: none;
+	min-height: 0;
+	margin: 0 0 4px;
+	padding: 0;
+	color: var(--favr-ink);
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.4;
+	text-align: left;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting input[type="url"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting input[type="email"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting input[type="number"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting textarea,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting select,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting .value,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting input[type="url"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting input[type="email"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting input[type="number"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting textarea,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting select,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting .value,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .compat-item .field {
+	float: none;
+	width: 100%;
+	max-width: 100%;
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting select.columns,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting select.columns {
+	width: auto;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .setting textarea,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting textarea {
+	height: 66px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .setting + .description {
+	float: none;
+	clear: both;
+	width: auto;
+	margin: -4px 0 12px;
+	color: var(--favr-muted);
+	font-size: 12.5px;
+	line-height: 1.45;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .copy-to-clipboard-container,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .copy-to-clipboard-container,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachment-details .attachment-info .copy-to-clipboard-container {
+	float: none;
+	min-width: 0;
+	margin: 8px 0 0;
+	padding: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .copy-to-clipboard-container .success {
+	float: none;
+	min-width: 0;
+	margin: 0 0 0 10px;
+	padding: 0;
+	color: var(--favr-ok);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 30px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .settings-save-status .saved {
+	color: var(--favr-ok);
+	font-weight: 600;
+}
+
+/* "Insert from URL" and "Image details" keep WordPress's layout; their labels get the weight. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .embed-media-settings .setting .name,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .embed-media-settings legend {
+	color: var(--favr-ink);
+	font-size: 13.5px;
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-sidebar .checkbox-label-inline {
+	color: var(--favr-ink);
+	font-size: 13.5px;
+}
+
+/* ---------- 7. Attachment details (a thumbnail clicked on the Media Library) ---------- */
+
+/* The preview sits on paper, the facts and fields beside it on the card's own surface. */
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-details {
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-media-view {
+	background: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-media-view .thumbnail {
+	padding: 24px;
+}
+
+/* The chequered ground under a see-through image, in the brand's sand instead of grey. */
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-media-view .details-image {
+	border-radius: var(--favr-radius-sm);
+	background-color: var(--favr-surface);
+	background-image:
+		linear-gradient(45deg, var(--favr-sand) 25%, transparent 25%, transparent 75%, var(--favr-sand) 75%, var(--favr-sand)),
+		linear-gradient(45deg, var(--favr-sand) 25%, transparent 25%, transparent 75%, var(--favr-sand) 75%, var(--favr-sand));
+	box-shadow: 0 0 0 1px var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-media-view .details-image.icon {
+	background: none;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-media-view .attachment-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info {
+	position: relative;
+	padding: 16px 20px 0;
+	border-left-color: var(--favr-line);
+	background: var(--favr-surface);
+	box-shadow: none;
+}
+
+/* "Saved." appears in the corner instead of holding an empty line above the facts. */
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info .settings-save-status {
+	position: absolute;
+	top: 16px;
+	right: 20px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info .details,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info .settings {
+	margin-bottom: 16px;
+	padding-bottom: 16px;
+	border-bottom-color: var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info .details {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	line-height: 1.6;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info .details strong {
+	color: var(--favr-ink);
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info .filename {
+	color: var(--favr-muted);
+	font-weight: 400;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info .actions {
+	color: var(--favr-line);
+	font-size: 13.5px;
+	line-height: 1.9;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info .actions a,
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info .actions .button-link {
+	font-size: 13.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info .actions .links-separator {
+	margin: 0 4px;
+	color: var(--favr-field-line);
+}
+
+/* "Edit image" swaps the preview for WordPress's image editor: its chequered ground matches. */
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .imgedit-crop-wrap,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .imgedit-crop-wrap img {
+	background-color: var(--favr-surface);
+	background-image:
+		linear-gradient(45deg, var(--favr-sand) 25%, transparent 25%, transparent 75%, var(--favr-sand) 75%, var(--favr-sand)),
+		linear-gradient(45deg, var(--favr-sand) 25%, transparent 25%, transparent 75%, var(--favr-sand) 75%, var(--favr-sand));
+}
+
+/* ---------- 8. Fields in the media window and the grid (base.css section 6, same values) ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="search"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="email"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="url"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="tel"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="number"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="password"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="date"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="time"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="datetime-local"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame select,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame textarea,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="search"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="email"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="url"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="tel"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="number"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="password"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="date"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="time"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="datetime-local"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal select,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal textarea {
+	min-height: 40px;
+	border: 1px solid var(--favr-field-line);
+	border-radius: var(--favr-radius-sm);
+	background-color: var(--favr-field);
+	color: var(--favr-ink);
+	font-family: var(--favr-font-sans);
+	font-size: 14.5px;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="search"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="email"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="url"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="tel"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="number"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="password"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="date"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="time"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="datetime-local"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="search"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="email"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="url"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="tel"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="number"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="password"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="date"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="time"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="datetime-local"] {
+	padding: 0 12px;
+	line-height: 38px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame select,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal select {
+	padding: 0 32px 0 12px;
+	background-position: right 10px top 55%;
+	line-height: 38px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame textarea,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal textarea {
+	padding: 9px 12px;
+	line-height: 1.5;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame select:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame textarea:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal select:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal textarea:focus {
+	border-color: var(--favr-accent);
+	outline: 2px solid var(--favr-accent-soft);
+	outline-offset: 0;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame ::placeholder,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal ::placeholder {
+	color: #8d7f88;
+	opacity: 1;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="checkbox"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="radio"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="checkbox"],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="radio"] {
+	border-color: #b8a99c;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="checkbox"]:checked,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="radio"]:checked,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="checkbox"]:checked,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="radio"]:checked {
+	border-color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="checkbox"]:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[type="radio"]:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="checkbox"]:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[type="radio"]:focus {
+	border-color: var(--favr-accent);
+	outline: 2px solid var(--favr-accent-soft);
+	outline-offset: 1px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input[readonly],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame input:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame select:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-frame textarea:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input[readonly],
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal input:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal select:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) .media-modal textarea:disabled {
+	border-color: var(--favr-line);
+	background-color: var(--favr-sand);
+	color: var(--favr-muted);
+}
+
+/* ---------- 9. Buttons in the media window (base.css section 5, same values) ---------- */
+
+/* :where() keeps these at base.css's own weight, so its sizes and states cascade the same way. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-secondary {
+	min-height: 36px;
+	padding: 0 16px;
+	border: 1px solid var(--favr-line);
+	border-radius: 999px;
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 34px;
+	box-shadow: none;
+	text-shadow: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-secondary:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-secondary:focus {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-primary:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-primary {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent);
+	color: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-primary:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-primary:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-primary:active {
+	border-color: var(--favr-accent-strong);
+	background: var(--favr-accent-strong);
+	color: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button.button-small {
+	min-height: 30px;
+	padding: 0 12px;
+	font-size: 13px;
+	line-height: 28px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button.button-large,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button.button-hero {
+	min-height: 40px;
+	padding: 0 22px;
+	font-size: 15px;
+	line-height: 38px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button[disabled],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button.disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-primary[disabled],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-primary:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-primary.disabled {
+	border-color: var(--favr-line) !important;
+	background: var(--favr-sand) !important;
+	color: #9a8c93 !important;
+	cursor: default;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-link {
+	color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-link:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button-link:focus {
+	color: var(--favr-accent-strong);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .spinner {
+	filter: sepia(1) saturate(0.6);
+}
+
+/* ---------- 10. Elementor's "… with Elementor AI" entry points on these surfaces ---------- */
+
+/* Elementor draws them as magenta outlined buttons with its own generated class names. Here they
+   are the shared quiet button (beside the title and under the preview) or a plain accent link. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-media-library) a,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-attachment-details) a {
+	position: static;
+	display: inline-flex;
+	gap: 2px;
+	align-items: center;
+	box-sizing: border-box;
+	min-height: 36px;
+	margin: 0;
+	padding: 0 16px;
+	border: 1px solid var(--favr-line);
+	border-radius: 999px;
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	font-family: var(--favr-font-sans);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1;
+	text-decoration: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-media-library) a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-media-library) a:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-attachment-details) a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-attachment-details) a:focus {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-media-library) a i,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-attachment-details) a i {
+	color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-media-library) {
+	position: relative;
+	top: -6px;
+	margin-left: 4px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-media-library) > div,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-attachment-details) > div {
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-insert-media) a {
+	color: var(--favr-accent);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-insert-media) a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-insert-media) a:focus {
+	color: var(--favr-accent-strong);
+}
+
+/* ---------- 11. Small screens ---------- */
+
+@media only screen and (max-width: 900px) {
+	/* WordPress centres a shorter title bar here; the round buttons follow it. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-frame-title h1 {
+		font-size: 19px;
+		line-height: 40px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close {
+		top: 2px;
+		right: 6px;
+	}
+
+	/* The list of jobs becomes a drop-down under a "Menu" button. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-frame:not(.hide-menu) .media-menu {
+		padding: 6px 0;
+		border: 1px solid var(--favr-line);
+		border-radius: var(--favr-radius-sm);
+		background: var(--favr-surface);
+		box-shadow: var(--favr-shadow);
+	}
+
+	/* The filter bar takes two lines: the filters, then the search. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .media-toolbar {
+		flex-wrap: wrap;
+		height: 88px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .media-toolbar-secondary,
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .media-toolbar-primary {
+		flex: 1 1 100%;
+		max-width: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .media-toolbar select.attachment-filters {
+		flex: 1 1 0;
+		min-width: 0;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .attachments,
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser:not(.has-load-more) .attachments,
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .attachments-browser .uploader-inline,
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal .media-frame-content .attachments-browser .attachments-wrapper {
+		top: 112px;
+	}
+}
+
+@media only screen and (max-width: 1000px) {
+	/* Media Library toolbar: once it no longer fits one line, the search takes the second. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar-primary {
+		flex-basis: 100%;
+		max-width: none;
+	}
+}
+
+@media only screen and (max-width: 782px) {
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-select .attachments-browser.fixed .media-toolbar {
+		right: 12px;
+	}
+
+	/* base.css makes buttons 40px tall here; "Select files" follows. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .uploader-inline .browser.button-hero {
+		min-height: 40px;
+		line-height: 38px;
+	}
+
+	/* Media Library toolbar on a phone: switch and "Bulk select" on the first line, the two filters
+	   side by side on the second, the search across the third. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar.wp-filter {
+		padding: 12px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar-secondary {
+		flex: 1 1 100%;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar .view-switch {
+		order: 1;
+		margin-right: auto;
+	}
+
+	/* The loading spinner only takes room while it spins, so the buttons keep to the edges. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar-secondary > .spinner {
+		order: 2;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar-secondary > .spinner:not(.is-active) {
+		display: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar-secondary > .media-button {
+		order: 3;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame.mode-grid .media-toolbar select.attachment-filters {
+		flex: 1 1 calc(50% - 4px);
+		order: 4;
+		min-width: 0;
+		max-width: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-media-view .thumbnail {
+		padding: 16px;
+	}
+}
+
+@media only screen and (max-width: 640px), screen and (max-height: 400px) {
+	/* WordPress makes the window fill the screen: no corners to round. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-content {
+		border-radius: 0;
+	}
+}
+
+@media only screen and (max-width: 480px) {
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close,
+	body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .left,
+	body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .right {
+		top: 2px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close {
+		right: 6px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .right {
+		right: 44px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .left {
+		right: 82px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .attachment-info {
+		border-top: 1px solid var(--favr-line);
+		border-left: 0;
+	}
+}
+
+/* ---------- 12. Motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment,
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment-preview,
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .uploader-inline,
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-upload-form .drag-drop #drag-drop-area,
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-modal-close,
+	body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .left,
+	body.favr-skin:where(:not(.favr-dash-screen)) .edit-attachment-frame .edit-media-header .right,
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(.media-modal) .button,
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-media-library) a,
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(#e-image-ai-attachment-details) a {
+		transition: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .media-frame .attachment:hover {
+		transform: none;
+	}
+}

@@ -1,1 +1,1384 @@
-/* Favr skin: fields. See base.css for the components and docs/superpowers/specs/2026-10-11-editor-skin-design.md for the rules. */
+/*
+ * Favr skin: fields. The field panel favr/core draws on the Directory, Events, Members,
+ * Documents, People and Sponsors edit screens, and the insides of the plugins' own boxes
+ * (Listing health, Membership level, Listing managers, Login access, Directory listing, Billing,
+ * the Documents file box).
+ *
+ * See base.css for the two prefixes and the shared components (buttons, fields), and
+ * docs/superpowers/specs/2026-10-11-editor-skin-design.md for the rules and the recipes copied
+ * here ("Pill tab", "Well", "Small caps label", "Dropzone"). edit.css owns the outside of every
+ * .postbox and the WordPress editor's toolbar; screens.css owns the status pills.
+ *
+ * This sheet restyles markup it cannot change (favr/core is a shared library), so a few rules
+ * carry `!important`: only where the plugin's own sheet uses it first. One rule names an id
+ * outright, for the same reason (section 16).
+ */
+
+/* ---------- 1. The panel ---------- */
+
+/* One card: the tab column on the leading side, the fields beside it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-panel {
+	grid-template-columns: 208px minmax(0, 1fr);
+	min-height: 0;
+	margin: 16px 0 0;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+}
+
+/* A panel inside a box is already inside a card. */
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .favr-panel {
+	margin: 0;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+}
+
+/* A panel with one section needs no tabs: the section title already says where you are. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-panel:has(> .favr-tabs > .favr-tab:only-child) {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tabs:has(> .favr-tab:only-child) {
+	display: none;
+}
+
+/* ---------- 2. The tab column ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tabs {
+	gap: 2px;
+	padding: 12px 0;
+	border-right: 1px solid var(--favr-line);
+	border-radius: 13px 0 0 13px;
+	background: var(--favr-sand);
+}
+
+/* A tab is a row: icon, name, and a dot when the section has something in it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab {
+	gap: 10px;
+	min-height: 44px;
+	padding: 0 14px 0 15px;
+	color: var(--favr-ink);
+	font-size: 14.5px;
+	font-weight: 500;
+	line-height: 1.3;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab .dashicons {
+	flex: none;
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab:hover {
+	background: var(--favr-paper);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab:hover .dashicons {
+	color: var(--favr-muted);
+}
+
+/* The current tab joins the fields: same surface, an accent bar on its leading edge, and one
+   pixel wider so it covers the hairline between column and fields. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab.is-active {
+	width: calc(100% + 1px);
+	border-left-color: var(--favr-accent);
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab.is-active .dashicons {
+	color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: -2px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab .favr-tab__dot {
+	flex: none;
+	width: 6px;
+	height: 6px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab.has-content .favr-tab__dot {
+	background: var(--favr-ok);
+}
+
+/* ---------- 3. A section and its rows of fields ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pane {
+	padding: 20px 22px 24px;
+}
+
+/* favr/core sets this heading's size, weight and margin with !important. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pane .favr-pane__title {
+	margin: 0 0 12px !important;
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 19px !important;
+	font-weight: 500 !important;
+	line-height: 1.25;
+}
+
+/* Fields flow in rows with a 20px gap. A half or third-width field keeps its share of the row
+   while the section is wide enough and takes the whole row when it is not: the long product
+   below is far below zero in a wide section and far above 100% in a narrow one. It measures the
+   section itself, so it is right at any window width and whatever sits beside the panel. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-grid > * {
+	flex: 0 0 auto;
+	width: 100%;
+	min-width: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-grid > .favr-w-half {
+	width: max(calc(50% - 10.01px), min(100%, calc((460px - 100%) * 999)));
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-grid > .favr-w-third {
+	width: max(calc(33.333% - 13.34px), min(100%, calc((460px - 100%) * 999)));
+}
+
+/* ---------- 4. One field: label, input, help, counter ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field {
+	border-radius: var(--favr-radius-sm);
+	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* "Add logo" in Listing health jumps here and lights the field up for a moment. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field.is-highlighted {
+	background: var(--favr-accent-soft);
+	box-shadow: 0 0 0 8px var(--favr-accent-soft);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field .favr-field__label {
+	gap: 6px;
+	margin: 0 0 6px;
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field .favr-field__help {
+	margin: 6px 0 0;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	line-height: 20px;
+}
+
+/* The lock on a staff-only field. Its tooltip is the browser's own (title attribute). */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field .favr-private {
+	display: inline-flex;
+	cursor: help;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field .favr-private .dashicons,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field--locked .favr-field__label .dashicons {
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field textarea {
+	min-height: 96px;
+}
+
+/* "94 characters left". favr/core hangs it below the field's corner, on top of the help text.
+   Here it is part of the flow: a line of its own, at the trailing edge. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field .favr-counter {
+	position: static;
+	display: block;
+	margin: 6px 0 0;
+	color: var(--favr-muted);
+	font-size: 12.5px;
+	font-variant-numeric: tabular-nums;
+	line-height: 20px;
+	text-align: right;
+	white-space: nowrap;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field .favr-counter:empty {
+	display: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field .favr-counter.is-low {
+	color: var(--favr-danger);
+	font-weight: 600;
+}
+
+/* Where the browser can, and the field is wide enough for both, the counter shares its line
+   with the help text: help at the leading edge, counter at the trailing edge. In a narrower
+   field the counter keeps the line under the input and the help text takes the next one. (The
+   row runs backwards so that the counter, which comes first in the markup, sits at the trailing
+   edge either way.) */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field:has(> .favr-field__input > .favr-counter) {
+	display: flex;
+	flex-flow: row-reverse wrap;
+	align-content: flex-start;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field:has(> .favr-field__input > .favr-counter) > .favr-field__input {
+	display: contents;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field:has(> .favr-field__input > .favr-counter) > *,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field:has(> .favr-field__input > .favr-counter) > .favr-field__input > * {
+	flex: 0 0 100%;
+	min-width: 0;
+	max-width: 100%;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field:has(> .favr-field__input > .favr-counter) > .favr-field__input > .favr-counter {
+	flex: 0 0 auto;
+	padding-left: 16px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field:has(> .favr-field__input > .favr-counter) > .favr-field__help {
+	flex: 1 1 240px;
+}
+
+/* A field the browser refused on save. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field.has-error input,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field.has-error select,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field.has-error textarea {
+	border-color: var(--favr-danger);
+	box-shadow: 0 0 0 1px var(--favr-danger);
+}
+
+/* The link icon inside a web address field, centered on the input (not on whatever else the
+   wrapper holds). favr/core pads the input with !important. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-input-affix .dashicons {
+	top: 20px;
+	left: 12px;
+	color: var(--favr-muted);
+	opacity: 0.75;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-input-affix input {
+	padding-left: 36px !important;
+}
+
+/* A value kept on another record (a listing's membership dates live on the member). */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field .favr-field__readonly {
+	box-sizing: border-box;
+	min-height: 40px;
+	padding: 9px 12px;
+	border: 1px dashed var(--favr-field-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-sand);
+	color: var(--favr-muted);
+	font-size: 14.5px;
+	line-height: 20px;
+}
+
+/* ---------- 5. Toggles ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field .favr-toggle {
+	gap: 12px;
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-toggle .favr-toggle__track {
+	width: 40px;
+	height: 22px;
+	border-radius: 999px;
+	background: var(--favr-field-line);
+	transition: background-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-toggle .favr-toggle__track::after {
+	width: 16px;
+	height: 16px;
+	background: var(--favr-field);
+	box-shadow: 0 1px 2px rgba(46, 34, 48, 0.25);
+	transition: transform 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-toggle input:checked + .favr-toggle__track {
+	background: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-toggle input:checked + .favr-toggle__track::after {
+	transform: translateX(18px);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-toggle input:focus-visible + .favr-toggle__track {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+/* A switch that shares its row with a labelled field lines up with that field's input, not with
+   its label. The padding is there while the section is wide enough for two fields in a row and
+   gone once they stack (the same measure as the field widths above). */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-grid > .favr-field--toggle.favr-w-half,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-grid > .favr-field--toggle.favr-w-third {
+	padding-top: clamp(0px, calc((100% - 460px) * 999), 35px);
+}
+
+/* The help text starts under the words, not under the switch. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-field--toggle .favr-field__help {
+	margin: 2px 0 0 52px;
+}
+
+/* ---------- 6. Choices: checkbox groups and the either/or switch ---------- */
+
+/* A checkbox group is a row of chips. Chosen is soft rust, not filled: nothing here is the
+   screen's main action. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-chips {
+	gap: 8px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-chip span {
+	display: inline-flex;
+	align-items: center;
+	min-height: 32px;
+	padding: 0 14px;
+	border: 1px solid var(--favr-field-line);
+	border-radius: 999px;
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	font-size: 13.5px;
+	font-weight: 600;
+	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-chip:hover span {
+	border-color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-chip input:checked + span {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	color: var(--favr-accent-strong);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-chip input:checked + span::before {
+	margin-right: 4px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-chip input:focus-visible + span {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+/* One of a few (Individual or Business; In person, Online or Hybrid). */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-segmented {
+	flex-wrap: wrap;
+	gap: 2px;
+	max-width: 100%;
+	padding: 3px;
+	border: 1px solid var(--favr-line);
+	border-radius: 21px;
+	background: var(--favr-sand);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-segmented__option span {
+	min-height: 34px;
+	padding: 0 16px;
+	border-radius: 999px;
+	color: var(--favr-muted);
+	font-size: 14px;
+	font-weight: 600;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-segmented__option:hover span {
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-segmented__option input:checked + span {
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	box-shadow: 0 1px 2px rgba(46, 34, 48, 0.12);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-segmented__option input:focus-visible + span {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 1px;
+}
+
+/* ---------- 7. Pictures: one image, a gallery ---------- */
+
+/* The empty picker is a dropzone; with a picture in it, a framed thumbnail. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image .favr-image__preview {
+	border: 1.5px dashed var(--favr-field-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+	color: var(--favr-muted);
+	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image .favr-image__preview:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image .favr-image__preview:focus {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image .favr-image__preview:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image.has-image .favr-image__preview {
+	border: 1px solid var(--favr-line);
+	background: var(--favr-field);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image.has-image .favr-image__preview:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image.has-image .favr-image__preview:focus {
+	border-color: var(--favr-accent);
+	background: var(--favr-field);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image .favr-image__preview img {
+	background: transparent;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image .favr-image__empty {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+/* "Replace" and "Remove" under a chosen picture. One class on purpose: favr/core hides this
+   row while the picker is empty, and that rule has to keep winning. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image__actions {
+	display: flex;
+	gap: 16px;
+	margin-top: 8px;
+}
+
+/* Text buttons inside the panel and the boxes: quiet links with a visible focus ring. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image__actions .button-link,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours__tools .button-link,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-health__todo .button-link,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins__list .button-link {
+	color: var(--favr-accent);
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image__actions .button-link:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours__tools .button-link:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-health__todo .button-link:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins__list .button-link:hover {
+	color: var(--favr-accent-strong);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image__actions .button-link:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours__tools .button-link:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-health__todo .button-link:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins__list .button-link:focus-visible {
+	border-radius: 4px;
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image__actions .button-link-delete,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-image__actions .button-link-delete:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours__tools .button-link-delete,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours__tools .button-link-delete:hover {
+	color: var(--favr-danger);
+}
+
+/* The gallery: thumbnails in a row, the "Add photos" tile at the end of it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: flex-start;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__list {
+	flex: 0 1 auto;
+	gap: 10px;
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__list:empty {
+	display: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__item,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__placeholder {
+	box-sizing: border-box;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-sand);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__placeholder {
+	border: 1.5px dashed var(--favr-accent);
+	background: var(--favr-accent-soft);
+}
+
+/* Remove a photo. Always shown: a phone has no hover. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__remove {
+	top: 6px;
+	right: 6px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border: 1px solid var(--favr-line);
+	background: var(--favr-surface);
+	color: var(--favr-danger);
+	font-size: 17px;
+	line-height: 1;
+	opacity: 1;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__remove:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__remove:focus {
+	border-color: var(--favr-danger);
+	background: var(--favr-danger-soft);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__remove:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__remove:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+/* "Add photos" is a dropzone tile the size of a thumbnail. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__add {
+	display: inline-flex;
+	flex: none;
+	flex-direction: column;
+	gap: 6px;
+	align-items: center;
+	justify-content: center;
+	width: 110px;
+	height: 110px;
+	min-height: 0;
+	padding: 8px;
+	border: 1.5px dashed var(--favr-field-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+	color: var(--favr-muted);
+	font-size: 13px;
+	line-height: 1.25;
+	text-align: center;
+	white-space: normal;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__add:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__add:focus {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__add .dashicons {
+	width: 24px;
+	height: 24px;
+	margin: 0;
+	color: inherit;
+	font-size: 24px;
+}
+
+/* ---------- 8. Opening hours ---------- */
+
+/* Buttons that start with an icon: "Add opening hours" (only there while no hours are set) and
+   "Add link". */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours.is-empty .favr-hours__start,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__add {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__start .dashicons,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__add .dashicons {
+	margin: 0;
+	color: var(--favr-muted);
+}
+
+/* The week is a well: one row a day, hairlines between, no stripes. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__grid {
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__row {
+	grid-template-columns: 104px 168px minmax(0, 1fr);
+	padding: 8px 14px;
+	border-bottom: 1px solid var(--favr-line);
+	background: transparent;
+}
+
+/* "Copy Monday to all weekdays" flashes the rows it filled. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__row.is-flash {
+	background: var(--favr-ok-soft);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__day {
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__times {
+	gap: 8px;
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__times input {
+	flex: 0 1 128px;
+	width: 128px;
+	min-width: 0;
+}
+
+/* "Copy Monday to all weekdays" and "Remove hours", under the last day. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__tools {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 10px;
+	align-items: center;
+	padding: 10px 14px;
+	background: transparent;
+	color: var(--favr-muted);
+}
+
+/* ---------- 9. Rows you add and remove (Additional links) ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__rows {
+	margin: 0 0 10px;
+	padding: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__rows:empty {
+	display: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__row {
+	padding: 8px 8px 8px 10px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__handle {
+	flex: none;
+	color: var(--favr-muted);
+	cursor: grab;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__cells {
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+	min-width: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__remove {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border-radius: 8px;
+	color: var(--favr-danger);
+	transition: background-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__remove:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__remove:focus {
+	background: var(--favr-danger-soft);
+}
+
+/* ---------- 10. Lines the plugins print above the panel ---------- */
+
+/* Members: the member's name with the type before it and the status after it. The type is a
+   label, not a status, so it is small caps and not a pill. favr-members sets this heading's
+   size and margin with !important. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-member-heading {
+	flex-wrap: wrap;
+	gap: 6px 12px;
+	margin: 4px 0 0 !important;
+	color: var(--favr-ink);
+	font-size: 24px !important;
+	line-height: 1.2;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-member-heading .favr-type-badge {
+	padding: 0;
+	border-radius: 0;
+	background: none;
+	color: var(--favr-muted);
+	font-family: var(--favr-font-sans);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+/* Events: "Next: October 20, 2026" on an event that repeats. */
+body.favr-skin:where(:not(.favr-dash-screen)) p.favr-event-next {
+	margin: 12px 0 0;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-weight: 600;
+}
+
+/* ---------- 11. Listing health (Directory) ---------- */
+
+/* The ring: rust on a sand track, green once the listing is complete. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-health .favr-health__ring {
+	--favr-ring: var(--favr-accent);
+	background: conic-gradient(var(--favr-ring) calc(var(--favr-score) * 1%), var(--favr-sand) 0);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-health[data-tone="good"] .favr-health__ring {
+	--favr-ring: var(--favr-ok);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-health .favr-health__ring::before {
+	background: var(--favr-surface);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-health .favr-health__value {
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-variant-numeric: tabular-nums;
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-health .favr-health__headline {
+	display: block;
+	color: var(--favr-ink);
+	font-size: 14.5px;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-health .favr-health__hint {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	line-height: 1.4;
+}
+
+/* What is still missing: a short list of "+ Add logo" links under a hairline. */
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-health__todo {
+	display: grid;
+	gap: 2px;
+	justify-items: start;
+	margin: 14px 0 0;
+	padding: 10px 0 0;
+	border-top: 1px solid var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-health__todo:empty {
+	display: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-health__todo li {
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-health__todo .button-link {
+	display: inline-block;
+	padding: 4px 0;
+	line-height: 20px;
+}
+
+/* ---------- 12. Membership level (Directory and Members) ---------- */
+
+/* One level a row: radio, the level's color chip, its name. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-levels {
+	gap: 2px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-levels label.favr-level {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	min-height: 32px;
+	color: var(--favr-ink);
+	font-size: 14.5px;
+	cursor: pointer;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-levels .favr-level input[type="radio"] {
+	flex: none;
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-levels .favr-level__swatch {
+	flex: none;
+	width: 12px;
+	height: 12px;
+	border-radius: 4px;
+	box-shadow: inset 0 0 0 1px rgba(46, 34, 48, 0.15);
+}
+
+/* "Manage levels": a quiet link under the list. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-levels + p a {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-levels + p a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-levels + p a:focus {
+	color: var(--favr-accent);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+/* ---------- 13. Listing managers (Directory), Directory listing (Members) ---------- */
+
+/* A label above its field, as in the panel. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#favr-managers, #favr-member-listing) .inside p > label[for] {
+	display: block;
+	margin: 0 0 6px;
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+/* The people who manage the listing: name over e-mail, "Remove" at the trailing edge. */
+body.favr-skin:where(:not(.favr-dash-screen)) .inside ul.favr-managers {
+	margin: 0 0 14px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-managers li {
+	gap: 10px;
+	align-items: center;
+	margin: 0;
+	padding: 8px 0;
+	border-bottom: 1px solid var(--favr-line);
+	line-height: 1.35;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-managers li:first-child {
+	padding-top: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-managers li > span {
+	min-width: 0;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-managers li small,
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-changelog li small,
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-logins__list li small {
+	color: var(--favr-muted);
+	font-size: 13px;
+	font-weight: 400;
+}
+
+/* "Remove" and "Remove access" are checkboxes: ticked now, done on save. */
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-managers li label,
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-logins__list label.favr-logins__remove {
+	display: inline-flex;
+	flex: none;
+	gap: 6px;
+	align-items: center;
+	color: var(--favr-danger);
+	font-size: 13.5px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-managers li label input,
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-logins__list .favr-logins__remove input {
+	flex: none;
+	margin: 0;
+}
+
+/* "Recent changes by representatives". */
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-changelog {
+	margin: 14px 0 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-changelog summary {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-changelog summary:hover {
+	color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-changelog summary:focus-visible {
+	border-radius: 4px;
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-changelog li {
+	margin: 0 0 6px;
+	font-size: 13.5px;
+	line-height: 1.4;
+}
+
+/* Directory listing: "Edit listing" and "View" side by side. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#favr-member-listing) .inside a.button + a {
+	margin-left: 10px;
+	font-size: 13.5px;
+	font-weight: 600;
+}
+
+/* ---------- 14. Login access (Members) ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins p {
+	margin: 0 0 10px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins p.favr-logins__intro,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins p.favr-logins__none {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	line-height: 1.45;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins > :last-child,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins > :last-child > :last-child {
+	margin-bottom: 0;
+}
+
+/* A checkbox and its sentence: the second line starts under the first, not under the box. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins p > label {
+	display: flex;
+	gap: 8px;
+	align-items: flex-start;
+	line-height: 1.4;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins p > label input[type="checkbox"] {
+	flex: none;
+	margin: 2px 0 0;
+}
+
+/* Each login: name, e-mail, when they last came, then what you can do. */
+body.favr-skin:where(:not(.favr-dash-screen)) .inside ul.favr-logins__list {
+	margin: 0 0 14px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-logins__list li {
+	margin: 0;
+	padding: 10px 0;
+	border-bottom: 1px solid var(--favr-line);
+	color: var(--favr-muted);
+	line-height: 1.5;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-logins__list li:first-child {
+	padding-top: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-logins__list li strong {
+	color: var(--favr-ink);
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-logins__list li > a {
+	overflow-wrap: anywhere;
+}
+
+/* "Add a person" on a business member. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins .favr-logins__add p {
+	margin: 0 0 6px;
+	font-size: 14px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins .favr-logins__add strong {
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-logins .favr-logins__names {
+	gap: 8px;
+	margin: 8px 0 14px;
+}
+
+/* ---------- 15. Billing (Favr Payments, on a member) ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-memberbox {
+	border-radius: 0;
+	background: transparent;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-memberbox dl {
+	margin: 0 0 12px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-memberbox dt {
+	margin: 12px 0 0;
+	color: var(--favr-muted);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-memberbox dt:first-child {
+	margin-top: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-memberbox dd {
+	margin: 2px 0 0;
+	color: var(--favr-ink);
+	font-size: 14.5px;
+	line-height: 1.4;
+}
+
+/* Invoices: number at the leading edge, amount and status at the trailing edge. */
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-pay-memberbox ul {
+	margin: 0 0 14px;
+	border-top: 1px solid var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-pay-memberbox li {
+	flex-wrap: wrap;
+	gap: 4px 10px;
+	align-items: center;
+	padding: 8px 0;
+	border-bottom: 1px solid var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-pay-memberbox li > a {
+	font-weight: 600;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-pay-memberbox li > a:hover {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inside .favr-pay-memberbox li > span {
+	display: inline-flex;
+	gap: 8px;
+	align-items: center;
+	color: var(--favr-ink);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-memberbox p {
+	margin: 0 0 10px;
+}
+
+/* ---------- 16. The File card (Documents) ---------- */
+
+/* Not a WordPress box: favr-content prints it between the title and the panel, so the whole
+   card is drawn here. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file {
+	margin: 16px 0 0;
+	padding: 20px 22px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+}
+
+/* The one bare id in this sheet: favr-content and WordPress both size this heading from
+   #poststuff, and nothing short of an id out-ranks that. */
+body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .favr-doc-file .favr-doc-file__title {
+	margin: 0 0 12px;
+	padding: 0;
+	font-size: 19px;
+	font-weight: 500;
+	line-height: 1.25;
+}
+
+/* The file now on the document: name at the leading edge, type and size muted beside it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file .favr-doc-file__current {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 14px;
+	align-items: center;
+	justify-content: space-between;
+	margin: 0 0 16px;
+	padding: 10px 14px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file .favr-doc-file__current a {
+	display: inline-flex;
+	gap: 8px;
+	align-items: center;
+	min-width: 0;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file .favr-doc-file__current a:hover {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file .favr-doc-file__current a::before {
+	flex: none;
+	color: var(--favr-muted);
+	font: 400 18px/1 dashicons;
+	content: "\f497";
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file .favr-doc-file__meta {
+	margin: 0;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file label.favr-doc-file__label {
+	margin: 0 0 6px;
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+/* The browser's own file control, with its button drawn as the quiet button. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file input[type="file"] {
+	display: block;
+	max-width: 100%;
+	padding: 2px 0;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file input[type="file"]::file-selector-button {
+	min-height: 36px;
+	margin: 0 12px 0 0;
+	padding: 0 16px;
+	border: 1px solid var(--favr-line);
+	border-radius: 999px;
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	font-family: var(--favr-font-sans);
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file input[type="file"]:hover::file-selector-button {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file input[type="file"]:focus-visible {
+	border-radius: 999px;
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file p.favr-doc-file__missing,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file p.favr-doc-file__error {
+	margin: 0 0 12px;
+	color: var(--favr-danger);
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file p.favr-doc-file__error {
+	margin: 8px 0 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file p.description,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file p.favr-doc-file__note {
+	margin: 8px 0 0;
+	color: var(--favr-muted);
+}
+
+/* ---------- 17. Narrower windows: the tabs move above the fields ---------- */
+
+/* Up to a small laptop the tab column would take a third of the panel, so the tabs become a row
+   of pill tabs that wraps: every section stays in sight and one tap away. */
+@media (max-width: 1240px) {
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-panel {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tabs {
+		flex-flow: row wrap;
+		gap: 4px;
+		overflow: visible;
+		padding: 12px 14px;
+		border-right: 0;
+		border-bottom: 1px solid var(--favr-line);
+		border-radius: 13px 13px 0 0;
+		background: var(--favr-surface);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab {
+		gap: 6px;
+		width: auto;
+		min-height: 30px;
+		padding: 0 12px;
+		border: 0;
+		border-radius: 999px;
+		background: transparent;
+		color: var(--favr-muted);
+		font-size: 13.5px;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab .favr-tab__label {
+		display: inline;
+		flex: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab .dashicons {
+		width: 16px;
+		height: 16px;
+		font-size: 16px;
+	}
+
+	/* No dot, no room kept for one: the pills stay evenly spaced. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab:not(.has-content) .favr-tab__dot {
+		display: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab:hover {
+		background: transparent;
+		color: var(--favr-ink);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab.is-active {
+		width: auto;
+		margin-right: 0;
+		background: var(--favr-sand);
+		color: var(--favr-ink);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab:focus-visible {
+		outline-offset: 2px;
+	}
+}
+
+/* ---------- 18. Phones ---------- */
+
+@media (max-width: 782px) {
+	/* Thumb-sized tabs. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tabs {
+		gap: 6px;
+		padding: 12px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab {
+		min-height: 38px;
+		padding: 0 13px;
+		font-size: 14px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-pane {
+		padding: 18px 16px 22px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file {
+		padding: 18px 16px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-chip span {
+		min-height: 38px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-segmented__option span {
+		min-height: 38px;
+	}
+
+	/* Hours: the day and its status on one line, the times on the next; a closed day has no
+	   second line. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__row {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+		gap: 8px 12px;
+		padding: 10px 12px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__row:not([data-status="open"]) .favr-hours__times {
+		display: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__times input {
+		flex: 1 1 0;
+		width: auto;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__tools {
+		padding: 10px 12px;
+	}
+
+	/* Added rows: the two fields stack, the handle and the bin stay at the ends. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__cells {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__remove {
+		width: 40px;
+		height: 40px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__remove {
+		width: 32px;
+		height: 32px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-health__todo .button-link {
+		padding: 8px 0;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-levels label.favr-level {
+		min-height: 40px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file input[type="file"]::file-selector-button {
+		min-height: 40px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-member-heading {
+		font-size: 22px !important;
+	}
+}
+
+/* ---------- 19. Less motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-tab,
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-field,
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-toggle .favr-toggle__track,
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-toggle .favr-toggle__track::after,
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-chip span,
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-segmented__option span,
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-image .favr-image__preview,
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-gallery .favr-gallery__remove,
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-repeater .favr-repeater__remove,
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-hours .favr-hours__row {
+		transition: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-doc-file input[type="file"]::file-selector-button {
+		transition: none;
+	}
+}

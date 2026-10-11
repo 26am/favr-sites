@@ -1,1 +1,1562 @@
-/* Favr skin: edit. See base.css for the components and docs/superpowers/specs/2026-10-11-editor-skin-design.md for the rules. */
+/*
+ * Favr skin: edit. The classic edit screens (post.php, post-new.php), the term edit screen
+ * (term.php) and the attachment edit screen, for Editors.
+ *
+ * Buttons, fields, cards and notices come from base.css. This sheet owns the title field, the
+ * permalink line, the chrome of every box (header, collapse toggle, padding), the insides of
+ * the WordPress boxes (Publish, categories, tags, featured image, excerpt), the WordPress
+ * editor wherever it sits, and the term and attachment forms. fields.css owns the inside of
+ * favr/core's field panel (.favr-panel) and the inside of the plugins' own boxes.
+ *
+ * Ids are wrapped in :where() as everywhere in the skin, except where WordPress's own rule is
+ * written with that id (#titlediv #title, #poststuff h2, #major-publishing-actions, ...). There
+ * the id stays bare: out-ranking an id takes an id, and the skin does not use !important.
+ * The editor's sheet (wp-includes/css/editor.css) and TinyMCE's skin load after this file, so
+ * the editor rules win on specificity, never on order.
+ */
+
+/* ---------- 1. Layout ---------- */
+
+/* WordPress already keeps 20px between the main column and the 280px side column, and 20px
+   between boxes; its side-column pinning script expects those widths, so they stay. A field
+   panel that opens the main column (a type without a title field) starts level with the
+   Publish box instead of one margin lower. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#post-body-content) > .favr-panel:not(:where(div, h2, p) ~ .favr-panel) {
+	margin-top: 0;
+}
+
+/* ---------- 2. Title and permalink ---------- */
+
+/* The title is a real field with larger text. */
+body.favr-skin:where(:not(.favr-dash-screen)) #titlediv #title {
+	height: 52px;
+	min-height: 52px;
+	margin: 0;
+	padding: 0 16px;
+	font-size: 22px;
+	font-weight: 600;
+	line-height: 50px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #titlediv #title:focus {
+	outline: 2px solid var(--favr-accent-soft);
+	outline-offset: 0;
+}
+
+/* "Add title": WordPress lays a label over the empty field; line it up with the text. */
+body.favr-skin:where(:not(.favr-dash-screen)) #titlediv #title-prompt-text {
+	top: 0;
+	left: 0;
+	padding: 0 17px;
+	color: #8d7f88;
+	font-size: 22px;
+	font-weight: 600;
+	line-height: 52px;
+}
+
+/* The address line under the title: muted, the address itself in ink. */
+body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box {
+	min-height: 30px;
+	margin: 8px 0 0;
+	padding: 0 2px;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	line-height: 1.5;
+}
+
+/* A new item has no address yet: no empty line under the title. */
+body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box:not(:has(*)) {
+	display: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box strong {
+	color: var(--favr-muted);
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#sample-permalink),
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#sample-permalink) a {
+	color: var(--favr-ink);
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) a:where(#sample-permalink):hover,
+body.favr-skin:where(:not(.favr-dash-screen)) a:where(#sample-permalink):focus,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#sample-permalink) a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#sample-permalink) a:focus {
+	color: var(--favr-accent);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+/* The address being edited: a compact field between the fixed parts of the address. */
+body.favr-skin:where(:not(.favr-dash-screen)) #editable-post-name input {
+	width: 16em;
+	max-width: 100%;
+	min-height: 30px;
+	margin: 2px 0;
+	padding: 0 10px;
+	font-size: 13.5px;
+	line-height: 28px;
+	vertical-align: middle;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#edit-slug-buttons) .button,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#edit-slug-buttons) .button-link {
+	margin: 0 0 0 4px;
+	vertical-align: middle;
+}
+
+/* "Cancel" is a text button in WordPress; here it is the same small quiet button as "OK". */
+body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box .cancel {
+	display: inline-flex;
+	align-items: center;
+	min-height: 30px;
+	margin: 0 0 0 4px;
+	padding: 0 12px;
+	border: 1px solid var(--favr-line);
+	border-radius: 999px;
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 28px;
+	text-decoration: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box .cancel:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box .cancel:focus {
+	border-color: var(--favr-accent);
+	border-radius: 999px;
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box .cancel:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+/* ---------- 3. Box chrome (every box, WordPress's and the plugins') ---------- */
+
+/* Header: a Fraunces title over a hairline. base.css draws the card itself. */
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox-header {
+	border-bottom-color: var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox-header .hndle,
+body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .postbox-header .hndle {
+	padding: 12px 16px;
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 16.5px;
+	font-weight: 500;
+	line-height: 1.25;
+	cursor: pointer;
+}
+
+/* Wide boxes under the main column line their title up with their roomier body. */
+body.favr-skin:where(:not(.favr-dash-screen)) #poststuff :where(#normal-sortables, #advanced-sortables) .postbox-header .hndle {
+	padding: 12px 22px;
+}
+
+/* No move-up / move-down arrows: Editors do not rearrange the screen. */
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handle-order-higher,
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handle-order-lower,
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handle-actions .wp-tooltip:has(> .handle-order-higher),
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handle-actions .wp-tooltip:has(> .handle-order-lower) {
+	display: none;
+}
+
+/* The collapse toggle stays, quietly: a muted chevron that turns accent on hover and focus. */
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv {
+	width: 32px;
+	height: 32px;
+	margin: 0 8px 0 0;
+	border-radius: 8px;
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv .toggle-indicator {
+	color: inherit;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .meta-box-sortables .postbox .handlediv .toggle-indicator::before {
+	top: 0;
+	width: 20px;
+	border-radius: 0;
+	content: "\f343";
+	content: "\f343" / "";
+	text-indent: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .meta-box-sortables .postbox.closed .handlediv .toggle-indicator::before {
+	content: "\f347";
+	content: "\f347" / "";
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv:focus {
+	border-radius: 8px;
+	color: var(--favr-accent);
+	outline: 0;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: -2px;
+}
+
+/* The toggle's hint ("Show or hide panel"). */
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .wp-tooltip.wp-is-tooltip .wp-tooltip__bubble {
+	border-color: var(--favr-aubergine);
+	border-radius: 6px;
+	background: var(--favr-aubergine);
+	color: var(--favr-paper);
+	font-family: var(--favr-font-sans);
+	font-size: 12.5px;
+}
+
+/* Body padding: side boxes 14px 16px, wide boxes 20px 22px. */
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox .inside,
+body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .postbox .inside {
+	margin: 0;
+	padding: 14px 16px;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #poststuff :where(#normal-sortables, #advanced-sortables) .postbox .inside {
+	padding: 20px 22px;
+}
+
+/* A box's first and last paragraph do not add to the padding. :where() keeps this weaker than
+   any rule a plugin box (fields.css) writes for its own content. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.postbox .inside > :first-child) {
+	margin-top: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.postbox .inside > :last-child) {
+	margin-bottom: 0;
+}
+
+/* Where a dragged box will land. */
+body.favr-skin:where(:not(.favr-dash-screen)) .meta-box-sortables .sortable-placeholder {
+	border-color: var(--favr-field-line);
+	border-radius: var(--favr-radius);
+}
+
+body.favr-skin.is-dragging-metaboxes:where(:not(.favr-dash-screen)) .metabox-holder .postbox-container .meta-box-sortables {
+	border-radius: var(--favr-radius);
+}
+
+/* ---------- 4. Publish box ---------- */
+
+/* Top row: "Save draft" and "Preview" as quiet buttons. The space above them belongs to the
+   buttons, so the row takes no room on types that have neither. */
+body.favr-skin:where(:not(.favr-dash-screen)) #minor-publishing-actions {
+	padding: 0 16px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #minor-publishing-actions .button {
+	margin-top: 14px;
+	margin-bottom: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #minor-publishing-actions .spinner {
+	margin-top: 22px;
+}
+
+/* Buttons that are links ("Preview", "OK") keep the pill shape while focused; base.css's link
+   focus rule would square them. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#poststuff) a.button:focus-visible {
+	border-radius: 999px;
+}
+
+/* Rows: muted icon and label, the value in ink. */
+body.favr-skin:where(:not(.favr-dash-screen)) #misc-publishing-actions {
+	padding: 9px 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section {
+	position: relative;
+	padding: 5px 16px 5px 42px;
+	color: var(--favr-muted);
+	font-size: 14px;
+	line-height: 20px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section :where(strong, b, #post-status-display, #post-visibility-display) {
+	color: var(--favr-ink);
+	font-weight: 600;
+}
+
+/* Each row's icon hangs in its own column, so a wrapped line starts under the text. */
+body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-post-status::before,
+body.favr-skin:where(:not(.favr-dash-screen)) #post-body #visibility::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .curtime #timestamp::before,
+body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-uploadedby::before,
+body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-uploadedto::before,
+body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-revisions::before,
+body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-response-to::before,
+body.favr-skin:where(:not(.favr-dash-screen)) #post-body .misc-pub-comment-status::before {
+	position: absolute;
+	top: 5px;
+	left: 16px;
+	margin: 0;
+	padding: 0;
+	color: var(--favr-muted);
+	font-size: 18px;
+	line-height: 20px;
+	opacity: 0.75;
+}
+
+/* Status, visibility, date and revisions: label and value on the left, the link in a column
+   on the right. */
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section:where(.misc-pub-post-status, .misc-pub-visibility, .misc-pub-curtime, .misc-pub-revisions) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 5px;
+	align-items: baseline;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-curtime > :where(#timestamp) {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
+/* A date too long for the row moves to a second line whole, never broken before the time. */
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-curtime :where(#timestamp) b {
+	white-space: nowrap;
+}
+
+/* The small "Edit" and "Browse" links are quiet until pointed at. */
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section > :where(.edit-post-status, .edit-visibility, .edit-timestamp, .misc-pub-revisions > a) {
+	margin-left: auto;
+	color: var(--favr-muted);
+	font-size: 13px;
+	text-decoration: underline;
+	text-decoration-color: var(--favr-field-line);
+	text-underline-offset: 3px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section > :where(.edit-post-status, .edit-visibility, .edit-timestamp, .misc-pub-revisions > a):hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section > :where(.edit-post-status, .edit-visibility, .edit-timestamp, .misc-pub-revisions > a):focus {
+	color: var(--favr-accent);
+	text-decoration-color: currentcolor;
+}
+
+/* What opens under a row after "Edit": a well with its own small OK / Cancel. */
+body.favr-skin:where(:not(.favr-dash-screen)) #post-status-select,
+body.favr-skin:where(:not(.favr-dash-screen)) #post-visibility-select,
+body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv {
+	flex: 0 0 calc(100% + 26px);
+	box-sizing: border-box;
+	min-width: 0;
+	margin: 8px 0 4px -26px;
+	padding: 10px 12px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+	color: var(--favr-ink);
+	line-height: 1.5;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #post-visibility-select :where(label) {
+	color: var(--favr-ink);
+	font-size: 14px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #post-visibility-select p,
+body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv p {
+	margin: 10px 0 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section .button {
+	min-height: 30px;
+	padding: 0 12px;
+	font-size: 13px;
+	line-height: 28px;
+	vertical-align: middle;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section .button-cancel {
+	min-height: 30px;
+	padding: 0 8px;
+	color: var(--favr-muted);
+	font-size: 13px;
+	line-height: 30px;
+	vertical-align: middle;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section .button-cancel:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section .button-cancel:focus {
+	color: var(--favr-accent);
+}
+
+/* The date: month on its own line, then day, year and time. */
+body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv .timestamp-wrap {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 4px;
+	align-items: center;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv .timestamp-wrap > label:first-child {
+	flex: 1 0 100%;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv select {
+	width: 100%;
+	min-height: 34px;
+	padding: 0 28px 0 10px;
+	font-size: 13.5px;
+	line-height: 32px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #jj,
+body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #aa,
+body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #hh,
+body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #mn {
+	width: 2.8em;
+	min-height: 34px;
+	margin: 0;
+	padding: 0 4px;
+	border-radius: 8px;
+	font-size: 13.5px;
+	line-height: 32px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #timestampdiv #aa {
+	width: 4.2em;
+}
+
+/* The action bar: on the card's own surface under a hairline. Trash is quiet danger text on
+   the left, the one filled button sits on the right. */
+body.favr-skin:where(:not(.favr-dash-screen)) #major-publishing-actions {
+	gap: 10px;
+	padding: 12px 16px;
+	border-top: 1px solid var(--favr-line);
+	border-radius: 0 0 var(--favr-radius) var(--favr-radius);
+	background: var(--favr-surface);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #major-publishing-actions .clear {
+	display: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #delete-action {
+	line-height: 1.4;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .submitbox .submitdelete {
+	color: var(--favr-danger);
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .submitbox .submitdelete:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .submitbox .submitdelete:focus {
+	color: var(--favr-danger);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #publishing-action {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	line-height: 1;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #publishing-action .spinner {
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #publishing-action #publish {
+	margin: 0;
+}
+
+/* ---------- 5. Category box ---------- */
+
+/* "All categories | Most used" as pill tabs. */
+body.favr-skin:where(:not(.favr-dash-screen)) ul.category-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin: 0 0 10px;
+	padding: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) ul.category-tabs li,
+body.favr-skin:where(:not(.favr-dash-screen)) ul.category-tabs li.tabs {
+	display: block;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	line-height: 1;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) ul.category-tabs a,
+body.favr-skin:where(:not(.favr-dash-screen)) #post-body ul.category-tabs li a {
+	display: inline-flex;
+	align-items: center;
+	min-height: 30px;
+	padding: 0 12px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) ul.category-tabs a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) #post-body ul.category-tabs li a:hover {
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) ul.category-tabs li.tabs a,
+body.favr-skin:where(:not(.favr-dash-screen)) #post-body ul.category-tabs li.tabs a {
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+}
+
+/* The checklist sits in a well. */
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv div.tabs-panel {
+	max-height: 216px;
+	padding: 8px 12px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv div.tabs-panel:focus {
+	border-color: var(--favr-accent);
+	outline: 2px solid var(--favr-accent-soft);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv ul.categorychecklist {
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv ul.categorychecklist li {
+	margin: 0;
+	padding: 4px 0;
+	font-size: 14px;
+	line-height: 1.4;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv ul.categorychecklist ul {
+	margin-top: 4px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv ul.categorychecklist label {
+	display: flex;
+	gap: 8px;
+	align-items: flex-start;
+	color: var(--favr-ink);
+	font-size: 14px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv ul.categorychecklist input[type="checkbox"] {
+	flex: none;
+	margin: 2px 0 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv ul.categorychecklist label:hover input[type="checkbox"] {
+	border-color: var(--favr-accent);
+}
+
+/* "+ Add category": a quiet text link; its form opens underneath. */
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv .taxonomy-add-new {
+	margin: 10px 0 0;
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv .taxonomy-add-new:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv .taxonomy-add-new:focus {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv .category-add {
+	margin: 10px 0 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv .category-add input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv .category-add select,
+body.favr-skin:where(:not(.favr-dash-screen)) #side-sortables .category-add input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) #side-sortables .category-add select {
+	display: block;
+	width: 100%;
+	max-width: none;
+	margin: 0 0 8px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv .category-add .button {
+	min-height: 30px;
+	margin: 0;
+	padding: 0 12px;
+	font-size: 13px;
+	line-height: 28px;
+}
+
+/* ---------- 6. Tag box ---------- */
+
+/* The "add a tag" field and its hint sit close together. */
+body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .tagsdiv .ajaxtag {
+	margin-top: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .tagsdiv .howto {
+	margin: 8px 0 0;
+}
+
+/* Chosen tags as chips with a small remove button. */
+body.favr-skin:where(:not(.favr-dash-screen)) .tagchecklist {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 10px 0 0;
+	overflow: visible;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tagchecklist > li {
+	display: inline-flex;
+	align-items: center;
+	float: none;
+	min-height: 26px;
+	margin: 0;
+	padding: 0 10px 0 2px;
+	border-radius: 999px;
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tagchecklist .ntdelbutton {
+	position: static;
+	flex: none;
+	margin: 0;
+	border-radius: 50%;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tagchecklist .ntdelbutton .remove-tag-icon::before {
+	width: 24px;
+	height: 24px;
+	margin: 0;
+	color: var(--favr-muted);
+	font-size: 18px;
+	line-height: 24px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tagchecklist .ntdelbutton:hover .remove-tag-icon::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .tagchecklist .ntdelbutton:focus .remove-tag-icon::before {
+	color: var(--favr-danger);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tagchecklist .ntdelbutton:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: -2px;
+}
+
+/* "Choose from the most used tags" and the cloud it opens. */
+body.favr-skin:where(:not(.favr-dash-screen)) .tagcloud-link.button-link {
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tagcloud-link.button-link:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .tagcloud-link.button-link:focus {
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .inside .the-tagcloud {
+	margin: 8px 0 0;
+	padding: 8px 12px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+	line-height: 1.5;
+}
+
+/* ---------- 7. Featured image box ---------- */
+
+/* Nothing chosen: one dropzone-style block to click. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#postimagediv) .inside p {
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #set-post-thumbnail {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	min-height: 104px;
+	padding: 14px;
+	border: 1.5px dashed var(--favr-field-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+	color: var(--favr-muted);
+	font-size: 14px;
+	font-weight: 600;
+	text-align: center;
+	text-decoration: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #set-post-thumbnail::before {
+	font: normal 24px/1 dashicons;
+	opacity: 0.6;
+	content: "\f128";
+	content: "\f128" / "";
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #set-post-thumbnail:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) #set-post-thumbnail:focus {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+}
+
+/* An image is chosen: the link is the picture, rounded, with "Remove" as danger text under it. */
+body.favr-skin:where(:not(.favr-dash-screen)) #set-post-thumbnail:has(img) {
+	display: block;
+	min-height: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #set-post-thumbnail:has(img)::before {
+	content: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #postimagediv .inside img {
+	display: block;
+	box-sizing: border-box;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#postimagediv) .inside .howto {
+	margin: 8px 0 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#postimagediv) .inside p:has(> #remove-post-thumbnail) {
+	margin: 6px 0 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) a#remove-post-thumbnail {
+	color: var(--favr-danger);
+	font-size: 13.5px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) a#remove-post-thumbnail:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) a#remove-post-thumbnail:focus {
+	color: var(--favr-danger);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+/* ---------- 8. Excerpt and other plain WordPress boxes ---------- */
+
+/* Excerpt: a few lines of room, then WordPress's hint in muted text. */
+body.favr-skin:where(:not(.favr-dash-screen)) #excerpt {
+	height: 92px;
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#postexcerpt) .inside p {
+	margin: 8px 0 0;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+}
+
+/* Author and Page attributes, where a site keeps them: full-width choosers. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#authordiv, #pageparentdiv) .inside select,
+body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .inside #parent_id,
+body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .inside #page_template {
+	width: 100%;
+	max-width: 100%;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .post-attributes-label-wrapper {
+	margin: 0 0 6px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(select, input) + .post-attributes-label-wrapper {
+	margin-top: 12px;
+}
+
+/* "Someone else is editing this" window. */
+body.favr-skin:where(:not(.favr-dash-screen)) .notification-dialog {
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	box-shadow: var(--favr-shadow);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#post-lock-dialog) .post-locked-avatar img {
+	border-radius: 50%;
+}
+
+/* ---------- 9. The WordPress editor (main editor, and editors inside a plugin panel) ---------- */
+
+/* The row above the box: "Add media" on the left, Visual / Code on the right. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-editor-tools {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	padding: 0 0 8px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-editor-tools::after {
+	content: none;
+}
+
+/* The main editor's row carries a grey band in WordPress; here it sits on whatever is behind. */
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-content-editor-tools {
+	padding-top: 0;
+	border-bottom: 0;
+	background: transparent;
+}
+
+/* Where WordPress pins that row while a long text scrolls, it needs a solid background: the
+   page's, or the card's when the editor sits in a panel or a box. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-editor-expand #wp-content-editor-tools {
+	padding-top: 12px;
+	border-bottom: 0;
+	background: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(.favr-panel, .postbox) #wp-content-editor-tools {
+	background: var(--favr-surface);
+}
+
+/* "Add media": the small quiet button with its icon on the text's line. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-media-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	float: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-media-buttons .button {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+	min-height: 30px;
+	margin: 0;
+	padding: 0 12px 0 10px;
+	font-size: 13px;
+	line-height: 28px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-media-buttons .button:active {
+	position: static;
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-media-buttons span.wp-media-buttons-icon {
+	width: 18px;
+	height: 18px;
+	margin: 0;
+	color: var(--favr-muted);
+}
+
+/* Visual / Code as pill tabs. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-editor-tabs {
+	display: flex;
+	gap: 4px;
+	float: none;
+	margin-left: auto;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-switch-editor {
+	position: static;
+	display: inline-flex;
+	align-items: center;
+	float: none;
+	box-sizing: border-box;
+	height: auto;
+	min-height: 30px;
+	margin: 0;
+	padding: 0 12px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-switch-editor:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-switch-editor:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-switch-editor:active {
+	background: transparent;
+	color: var(--favr-ink);
+	outline: 0;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tmce-active .switch-tmce,
+body.favr-skin:where(:not(.favr-dash-screen)) .html-active .switch-html {
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-switch-editor:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+/* The box: a well. The border must stay 1px; WordPress's pinning sums are written for it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-editor-container {
+	overflow: hidden;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-editor-container:focus-within {
+	border-color: var(--favr-accent);
+	outline: 2px solid var(--favr-accent-soft);
+	outline-offset: 0;
+}
+
+/* The main editor ends in WordPress's word-count bar, so the two share the rounded corners. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#postdivrich) .wp-editor-container {
+	border-radius: var(--favr-radius-sm) var(--favr-radius-sm) 0 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-editor-expand #wp-content-editor-container {
+	margin-top: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #post-status-info {
+	border-color: var(--favr-line);
+	border-radius: 0 0 var(--favr-radius-sm) var(--favr-radius-sm);
+	background: var(--favr-surface);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #post-status-info td {
+	color: var(--favr-muted);
+	font-size: 12.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #post-status-info :where(#wp-word-count, .autosave-info) {
+	padding: 6px 12px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#postdivrich):has(.wp-editor-container:focus-within) #post-status-info {
+	border-color: var(--favr-accent);
+}
+
+/* Toolbars on sand under a hairline. */
+body.favr-skin:where(:not(.favr-dash-screen)) div.mce-toolbar-grp,
+body.favr-skin:where(:not(.favr-dash-screen)) .quicktags-toolbar {
+	border-bottom: 1px solid var(--favr-line);
+	background: var(--favr-sand);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) div.mce-toolbar-grp > div,
+body.favr-skin:where(:not(.favr-dash-screen)) .quicktags-toolbar {
+	padding: 4px 6px;
+}
+
+/* Toolbar buttons: muted icons, a warm hover, no blue ring. */
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-ico {
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn {
+	border-radius: 6px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn:focus {
+	border-color: transparent;
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn:focus {
+	border-color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn:hover .mce-ico,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn:focus .mce-ico {
+	color: var(--favr-ink);
+}
+
+/* A format that is switched on (bold, a list): raised, with an accent icon. */
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-active,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn:active,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-active:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-active:focus {
+	border-color: var(--favr-field-line);
+	background: var(--favr-surface);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-active .mce-ico {
+	color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-disabled:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-disabled:focus {
+	border-color: transparent;
+	background: transparent;
+	text-shadow: none;
+}
+
+/* The "Paragraph" chooser: a small field. */
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-listbox {
+	border: 1px solid var(--favr-field-line);
+	border-radius: 8px;
+	background: var(--favr-field);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-listbox:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-listbox:focus {
+	border-color: var(--favr-accent);
+	background: var(--favr-field);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-listbox button {
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-panel .mce-btn i.mce-caret {
+	border-top-color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-panel .mce-active i.mce-caret {
+	border-bottom-color: var(--favr-ink);
+}
+
+/* The filled button in the editor's little link bar. */
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-primary,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-primary:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-primary:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-primary:active {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent);
+	color: var(--favr-paper);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-primary:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-primary:focus {
+	border-color: var(--favr-accent-strong);
+	background: var(--favr-accent-strong);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-toolbar .mce-btn-group .mce-btn.mce-primary .mce-ico {
+	color: var(--favr-paper);
+}
+
+/* Writing area on the field colour; the Code view is the same area, not a field in a field. */
+body.favr-skin:where(:not(.favr-dash-screen)) div.mce-edit-area {
+	background: var(--favr-field);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-editor-container textarea.wp-editor-area {
+	min-height: 0;
+	padding: 12px 14px;
+	border: 0;
+	border-radius: 0;
+	background-color: var(--favr-field);
+	color: var(--favr-ink);
+	font-size: 13.5px;
+	line-height: 1.6;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-editor-container textarea.wp-editor-area:focus {
+	outline: 0;
+}
+
+/* The bar under the writing area. */
+body.favr-skin:where(:not(.favr-dash-screen)) div.mce-statusbar {
+	border-top: 1px solid var(--favr-line);
+	background: var(--favr-surface);
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-path,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-path-item,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-path .mce-divider {
+	color: var(--favr-muted);
+	font-size: 12.5px;
+}
+
+/* The editor's drop-down lists, floating link bar and button hints open at the end of <body>. */
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-panel.mce-menu {
+	overflow: hidden;
+	border-color: var(--favr-field-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) div.mce-inline-toolbar-grp {
+	border-color: var(--favr-field-line);
+	box-shadow: var(--favr-shadow);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item {
+	margin-bottom: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-selected,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-active.mce-menu-item-normal,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-active.mce-menu-item-preview {
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-active.mce-menu-item-normal:not(:hover, :focus, .mce-selected),
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-active.mce-menu-item-preview:not(:hover, :focus, .mce-selected) {
+	background: var(--favr-sand);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-active.mce-menu-item-normal .mce-text,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-active.mce-menu-item-normal .mce-ico,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-active.mce-menu-item-preview .mce-text,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-active.mce-menu-item-preview .mce-ico {
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item .mce-menu-shortcut {
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item:hover .mce-caret,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item:focus .mce-caret,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-selected .mce-caret {
+	border-left-color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-menu .mce-menu-item.mce-disabled:hover {
+	background: transparent;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-tooltip {
+	opacity: 1;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-tooltip-inner {
+	border-radius: 6px;
+	background-color: var(--favr-aubergine);
+	color: var(--favr-paper);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-tooltip-n .mce-tooltip-arrow,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-tooltip-nw .mce-tooltip-arrow,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-tooltip-ne .mce-tooltip-arrow {
+	border-bottom-color: var(--favr-aubergine);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-tooltip-s .mce-tooltip-arrow,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-tooltip-sw .mce-tooltip-arrow,
+body.favr-skin:where(:not(.favr-dash-screen)) .mce-tooltip-se .mce-tooltip-arrow {
+	border-top-color: var(--favr-aubergine);
+}
+
+/* "Insert/edit link": the editor's own window, printed at the end of <body>, outside the area
+   base.css reaches, so the field look is repeated here. Its ids are WordPress's. */
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link-wrap {
+	border-radius: var(--favr-radius);
+	background-color: var(--favr-surface);
+	color: var(--favr-ink);
+	font-family: var(--favr-font-sans);
+	box-shadow: var(--favr-shadow);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #link-modal-title {
+	border-bottom-color: var(--favr-line);
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-weight: 500;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link-close {
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link-close:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link-close:focus {
+	color: var(--favr-accent);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link-close:focus-visible {
+	border-radius: 8px;
+	outline: 2px solid var(--favr-accent);
+	outline-offset: -4px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link p.howto {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-style: normal;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link input[type="search"] {
+	min-height: 40px;
+	padding: 0 12px;
+	border: 1px solid var(--favr-field-line);
+	border-radius: var(--favr-radius-sm);
+	background-color: var(--favr-field);
+	color: var(--favr-ink);
+	font-size: 14.5px;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link input[type="text"]:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link input[type="search"]:focus {
+	border-color: var(--favr-accent);
+	outline: 2px solid var(--favr-accent-soft);
+	outline-offset: 0;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link .query-results {
+	border-color: var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link .query-results:focus {
+	border-color: var(--favr-accent);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link li {
+	border-bottom-color: var(--favr-line);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link li:hover {
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link li.selected {
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link .item-info {
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link .query-notice,
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link li.unselectable:hover {
+	border-bottom-color: var(--favr-line);
+	background-color: var(--favr-sand);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link .query-notice .query-notice-default,
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link .query-notice .query-notice-hint {
+	border-left-color: var(--favr-aubergine);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link .unselectable.no-matches-found {
+	border-bottom-color: var(--favr-line);
+	background-color: var(--favr-danger-soft);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link .no-matches-found .item-title {
+	border-left-color: var(--favr-danger);
+	color: var(--favr-danger);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) #wp-link .submitbox {
+	border-top-color: var(--favr-line);
+	background: var(--favr-surface);
+}
+
+/* ---------- 10. Term edit (term.php) ---------- */
+
+/* The form is one card; labels sit above their fields, as in the field panel. */
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) {
+	box-sizing: border-box;
+	margin-top: 4px;
+	padding: 8px 22px 20px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-table {
+	margin: 0;
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-table th,
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-table td {
+	display: block;
+	width: auto;
+	padding: 0;
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-table th {
+	padding: 14px 0 6px;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-table th label {
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-field input[type="text"],
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-field textarea {
+	width: 100%;
+	max-width: 100%;
+}
+
+/* Short answers (a price, an order number) keep a short field, so "in USD" stays beside it. */
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-field input[type="number"],
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-field input[type="text"][size="10"] {
+	display: inline-block;
+	width: 9em;
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-field select {
+	min-width: 220px;
+	max-width: 100%;
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) .form-table td p.description {
+	margin: 6px 0 0;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	line-height: 1.45;
+}
+
+/* Actions under a hairline: "Update" filled on the left, "Delete" as danger text on the right. */
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) .edit-tag-actions {
+	gap: 12px;
+	margin-top: 20px;
+	padding-top: 16px;
+	border-top: 1px solid var(--favr-line);
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) .edit-tag-actions .button {
+	margin: 0;
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#delete-link) {
+	margin-left: auto;
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) #delete-link a.delete {
+	color: var(--favr-danger);
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) #delete-link a.delete:hover,
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) #delete-link a.delete:focus {
+	color: var(--favr-danger);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+/* ---------- 11. Attachment edit ---------- */
+
+/* The picture: rounded, on a hairline frame. */
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_holder {
+	margin-top: 16px;
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_image p {
+	margin: 0 0 12px;
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_image img.thumbnail {
+	box-sizing: border-box;
+	max-width: 100%;
+	height: auto;
+	padding: 8px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-surface);
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details label,
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details label strong {
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details p > textarea {
+	margin-top: 6px;
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details #attachment_alt {
+	max-width: none;
+	height: 64px;
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details #attachment_caption {
+	height: 64px;
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details .attachment-alt-text-description {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .wp_attachment_details .attachment-content-description {
+	margin: 4px 0 6px;
+}
+
+/* "File URL" in the Save box: label over a read-only field with its copy button. */
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .misc-pub-attachment label {
+	display: block;
+	margin-bottom: 6px;
+	color: var(--favr-muted);
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .misc-pub-attachment .urlfield {
+	font-size: 13px;
+}
+
+body.favr-skin.post-type-attachment:where(:not(.favr-dash-screen)) .copy-to-clipboard-container .success {
+	color: var(--favr-ok);
+	font-weight: 600;
+}
+
+/* ---------- 12. Small screens ---------- */
+
+@media (max-width: 782px) {
+	body.favr-skin:where(:not(.favr-dash-screen)) #titlediv #title {
+		font-size: 20px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) #titlediv #title-prompt-text {
+		padding: 0 17px;
+		font-size: 20px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) #poststuff .postbox-header .hndle {
+		padding: 12px 16px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .postbox .handlediv {
+		width: 40px;
+		height: 40px;
+		margin: 0 4px 0 0;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) #poststuff :where(#normal-sortables, #advanced-sortables) .postbox .inside {
+		padding: 16px;
+	}
+
+	/* Roomier rows for thumbs. */
+	body.favr-skin:where(:not(.favr-dash-screen)) ul.category-tabs {
+		margin: 0 0 10px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) ul.category-tabs a,
+	body.favr-skin:where(:not(.favr-dash-screen)) #post-body ul.category-tabs li a,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-switch-editor {
+		min-height: 36px;
+		padding: 0 14px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv ul.categorychecklist li {
+		margin: 0;
+		padding: 7px 0;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-media-buttons .button,
+	body.favr-skin:where(:not(.favr-dash-screen)) .misc-pub-section .button,
+	body.favr-skin:where(:not(.favr-dash-screen)) .categorydiv .category-add .button,
+	body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box .cancel,
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(#edit-slug-buttons) .button.button-small {
+		min-height: 36px;
+		line-height: 34px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) #publishing-action #publish {
+		padding: 0 22px;
+		font-size: 15px;
+	}
+
+	/* The action bar stays at the bottom of the screen on a phone: saving is one tap away
+	   however long the form above the Publish box is. */
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #major-publishing-actions {
+		position: fixed;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 1001;
+		padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+		border-radius: 0;
+	}
+
+	body.favr-skin:is(.post-php, .post-new-php):where(:not(.favr-dash-screen)) #wpbody-content {
+		padding-bottom: 96px;
+	}
+
+	/* A thumb-sized "Move to Trash" (WordPress hides it on a new item; that stays). */
+	body.favr-skin:not(.post-new-php):where(:not(.favr-dash-screen)) .submitbox .submitdelete {
+		display: inline-flex;
+		align-items: center;
+		min-height: 40px;
+	}
+
+	body.favr-skin.term-php:where(:not(.favr-dash-screen)) :where(#edittag) {
+		padding: 4px 16px 16px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.favr-skin:where(:not(.favr-dash-screen)) #edit-slug-box .cancel,
+	body.favr-skin:where(:not(.favr-dash-screen)) #set-post-thumbnail {
+		transition: none;
+	}
+}

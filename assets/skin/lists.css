@@ -1,1 +1,1377 @@
-/* Favr skin: lists. See base.css for the components and docs/superpowers/specs/2026-10-11-editor-skin-design.md for the rules. */
+/*
+ * Favr skin: lists. Every list table an Editor sees (edit.php, upload.php?mode=list, the plugins'
+ * own list tables) and the category/level screens (edit-tags.php).
+ *
+ * The components (button, field, table card) come from base.css; this sheet lays them out, sets
+ * the density and styles the parts only lists have: views, search, filters, pagination, row
+ * titles, row actions, post states, the empty row, Quick Edit and Bulk Edit.
+ * Plugin-specific cell contents (letter tiles, meters, stars, badges, chips) belong to
+ * screens.css: nothing here names a plugin's column, and the only plugin class is the bin icon
+ * Favr Sites itself prints in the row actions.
+ * Rules and recipes: docs/superpowers/specs/2026-10-11-editor-skin-design.md.
+ *
+ * Sections: 1 views · 2 search · 3 filters and pagination · 4 the table · 5 Quick Edit and Bulk
+ * Edit · 6 category and level screens · 7 the media list · 8 phones.
+ */
+
+/* ---------- 1. Views ("All | Published | Draft") as pill tabs ---------- */
+
+/* font-size 0 swallows the "|" WordPress prints between the links; the links set their own size. */
+body.favr-skin:where(:not(.favr-dash-screen)) .subsubsub {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin: 0 0 14px;
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .subsubsub li {
+	margin: 0;
+	font-size: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .subsubsub a {
+	display: inline-flex;
+	gap: 5px;
+	align-items: center;
+	min-height: 30px;
+	padding: 0 12px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .subsubsub a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .subsubsub a:focus {
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .subsubsub a.current {
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+}
+
+/* The count is a quieter figure beside the label. */
+body.favr-skin:where(:not(.favr-dash-screen)) .subsubsub a .count,
+body.favr-skin:where(:not(.favr-dash-screen)) .subsubsub a.current .count {
+	color: var(--favr-muted);
+	font-weight: 400;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 2. Search: one field and one quiet button on a line ---------- */
+
+/* "Search results for: …" beside the title. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap .subtitle {
+	padding-left: 10px;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap .subtitle strong {
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) p.search-box {
+	--favr-search-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.6-3.6'/%3E%3C/svg%3E");
+	flex-wrap: nowrap;
+	gap: 8px;
+	margin: 0 0 14px;
+}
+
+/* A magnifier inside the field (the field has no visible label). The shape is a mask, so its
+   colour is a token. */
+body.favr-skin:where(:not(.favr-dash-screen)) p.search-box::before {
+	position: absolute;
+	top: 50%;
+	left: 12px;
+	width: 16px;
+	height: 16px;
+	margin-top: -8px;
+	background: var(--favr-muted);
+	content: "";
+	pointer-events: none;
+	-webkit-mask: var(--favr-search-icon) center / contain no-repeat;
+	mask: var(--favr-search-icon) center / contain no-repeat;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) p.search-box input[type="search"],
+body.favr-skin:where(:not(.favr-dash-screen)) p.search-box input[type="text"] {
+	width: 240px;
+	min-height: 36px;
+	margin: 0;
+	padding: 0 12px 0 36px;
+	line-height: 34px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) p.search-box .button {
+	flex: none;
+	min-height: 36px;
+	margin: 0;
+	padding: 0 16px;
+	line-height: 34px;
+}
+
+/* ---------- 3. The filters row and pagination (.tablenav) ---------- */
+
+/* One flex row: bulk actions, filters, then the count and pages pushed to the right. */
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 16px;
+	align-items: center;
+	height: auto;
+	margin: 0 0 12px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav.bottom {
+	margin: 12px 0 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav br {
+	display: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	padding: 0;
+}
+
+/* WordPress prints an empty group when a list has nothing to put in it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .actions:not(:has(*)) {
+	display: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav select {
+	float: none;
+	max-width: 14rem;
+	min-height: 36px;
+	margin: 0;
+	padding: 0 32px 0 12px;
+	font-size: 14px;
+	line-height: 34px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .button {
+	min-height: 36px;
+	margin: 0;
+	padding: 0 16px;
+	line-height: 34px;
+}
+
+/* "Empty Trash" is destructive: danger text on the quiet button, never a filled red one. */
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav :where(#delete_all) {
+	color: var(--favr-danger);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav :where(#delete_all):hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav :where(#delete_all):focus {
+	border-color: var(--favr-danger);
+	background: var(--favr-danger-soft);
+	color: var(--favr-danger);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .tablenav-pages {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	float: none;
+	margin: 0 0 0 auto;
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .displaying-num {
+	margin: 0;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-variant-numeric: tabular-nums;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .pagination-links {
+	display: inline-flex;
+	gap: 4px;
+	align-items: center;
+}
+
+/* A list that fits on one page shows the count only. */
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .one-page .pagination-links {
+	display: none;
+}
+
+/* First, previous, next, last: small round quiet buttons. */
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .tablenav-pages .button,
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .tablenav-pages .tablenav-pages-navspan {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	min-width: 32px;
+	height: 32px;
+	min-height: 32px;
+	padding: 0 0 2px;
+	border-radius: 50%;
+	font-size: 17px;
+	font-weight: 400;
+	line-height: 1;
+}
+
+/* The current page: a small field at the top (type a page number), a pill at the bottom
+   ("1 of 3"; white-space keeps the spaces inside the flex pill). */
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .paging-input {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+	margin: 0 4px;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .tablenav-pages .current-page {
+	width: 44px;
+	min-height: 32px;
+	margin: 0;
+	padding: 0 4px;
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 30px;
+	text-align: center;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .total-pages {
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .tablenav.bottom .tablenav-paging-text {
+	display: inline-flex;
+	align-items: center;
+	min-height: 32px;
+	padding: 0 12px;
+	border-radius: 999px;
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+	font-weight: 600;
+	white-space: pre;
+}
+
+/* ---------- 4. The table ---------- */
+
+/* 4a. Column headers. base.css sets the small-caps type; here the spacing and the sort arrows. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead td {
+	padding: 12px 14px;
+	line-height: 1.3;
+	vertical-align: middle;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.sortable,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.sorted {
+	padding: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.sortable a,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.sorted a {
+	display: flex;
+	align-items: center;
+	padding: 12px 14px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.sortable a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.sortable a:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.sorted a {
+	color: var(--favr-ink);
+}
+
+/* A header too long for a narrow column ends in "…" instead of breaking mid-word or pushing
+   its sort arrows out. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th {
+	overflow: hidden;
+	overflow-wrap: normal;
+	text-overflow: ellipsis;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th a > span:first-child {
+	overflow: hidden;
+	min-width: 0;
+	text-overflow: ellipsis;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead .sorting-indicators {
+	flex: none;
+}
+
+/* The focus ring sits inside the cell so the card's rounded corner cannot clip it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th a:focus-visible {
+	border-radius: 6px;
+	outline-offset: -3px;
+}
+
+/* Sort arrows: faint muted until the column is sorted, then the active direction is accent. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .sorting-indicators {
+	margin-top: -4px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .sorting-indicator::before {
+	color: var(--favr-muted);
+	opacity: 0.35;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sorted.asc .sorting-indicator.asc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sorted.desc .sorting-indicator.desc::before {
+	color: var(--favr-accent);
+	opacity: 1;
+}
+
+/* On hover and focus the arrow shows what a click will do, as WordPress does. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sorted.asc:hover .sorting-indicator.asc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sorted.asc a:focus .sorting-indicator.asc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sorted.desc:hover .sorting-indicator.desc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sorted.desc a:focus .sorting-indicator.desc::before {
+	color: var(--favr-muted);
+	opacity: 0.35;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sorted.asc:hover .sorting-indicator.desc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sorted.asc a:focus .sorting-indicator.desc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sorted.desc:hover .sorting-indicator.asc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sorted.desc a:focus .sorting-indicator.asc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sortable.desc:hover .sorting-indicator.asc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sortable.desc a:focus .sorting-indicator.asc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sortable.asc:hover .sorting-indicator.desc::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table th.sortable.asc a:focus .sorting-indicator.desc::before {
+	color: var(--favr-accent);
+	opacity: 1;
+}
+
+/* The column headers repeated under the table are noise; "select all" stays in the top row. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tfoot {
+	display: none;
+}
+
+/* 4b. Rows: one line of text is about 52px tall, everything centred on the row. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody th,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody td {
+	padding: 15px 14px;
+	font-weight: 400;
+	line-height: 22px;
+	vertical-align: middle;
+}
+
+/* Hover and keyboard focus mark the whole row. Written to out-rank base.css's "no zebra
+   stripes" rule, which would otherwise keep every odd row blank. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.widefat > tbody > tr:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.widefat > tbody > tr:focus-within {
+	background-color: var(--favr-paper);
+}
+
+/* A ticked row stays marked while the Editor picks a bulk action. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody tr:has(> .check-column input:checked) {
+	background-color: var(--favr-sand);
+}
+
+/* 4c. The checkbox column. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .check-column {
+	width: 20px;
+	padding: 0 0 0 16px;
+	vertical-align: middle;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .check-column input {
+	margin: 0;
+	vertical-align: middle;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .check-column label:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .check-column input:hover + label {
+	background: transparent;
+}
+
+/* Someone else is editing this item: a lock instead of the checkbox, their name over the title. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .locked-indicator {
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .locked-indicator-icon::before {
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .locked-info {
+	margin: 0;
+	color: var(--favr-muted);
+	font-size: 13px;
+	line-height: 20px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .locked-avatar img {
+	border-radius: 50%;
+	vertical-align: -4px;
+}
+
+/* 4d. The title: the only strong thing in a row. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .column-primary strong {
+	margin: 0;
+	font-size: 14.5px;
+	font-weight: 600;
+}
+
+/* !important only because WordPress sets the size of .row-title with !important. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-title {
+	font-size: 14.5px !important;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-title,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .column-primary > strong > a {
+	color: var(--favr-ink);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-title:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-title:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .column-primary > strong > a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .column-primary > strong > a:focus {
+	color: var(--favr-accent);
+}
+
+/* 4e. Post states ("Draft", "Pending", "Front Page") as status pills after the title.
+   font-size 0 swallows the dash WordPress prints before them; the title and the pills set their
+   own size again. A flex row keeps the line as tall as the title alone. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .column-primary strong:has(> .post-state) {
+	display: flex;
+	flex-wrap: wrap;
+	row-gap: 4px;
+	align-items: center;
+	font-size: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .column-primary strong:has(> .post-state) > :not(.post-state) {
+	margin-right: 8px;
+	font-size: 14.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .post-state {
+	display: inline-flex;
+	align-items: center;
+	min-height: 22px;
+	margin: 0 4px 0 0;
+	padding: 0 9px;
+	border-radius: 999px;
+	background: var(--favr-sand);
+	color: var(--favr-muted);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+/* WordPress ends every state but the last with ", ": a patch in the pill's own colour covers it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .post-state:not(:last-child) {
+	padding-right: 5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .post-state:not(:last-child)::after {
+	width: 0.34em;
+	height: 1.2em;
+	margin-left: -0.34em;
+	background: inherit;
+	content: "";
+}
+
+/* Waiting for someone: the first state of a pending row. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tr.status-pending .column-primary strong > :not(.post-state) + .post-state {
+	background: var(--favr-attention-soft);
+	color: var(--favr-accent-strong);
+}
+
+/* 4f. Row actions: muted 13px links, the destructive one in danger.
+   font-size 0 on each item swallows the "|" WordPress prints after its link. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions {
+	display: flex;
+	gap: 14px;
+	align-items: center;
+	padding: 0;
+	color: var(--favr-muted);
+	font-size: 13px;
+	line-height: 18px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions > span,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .copy-to-clipboard-container {
+	display: inline-flex;
+	align-items: center;
+	margin: 0;
+	font-size: 0;
+	line-height: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions a,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .button-link {
+	display: inline-flex;
+	align-items: center;
+	padding: 0;
+	color: var(--favr-muted);
+	font-size: 13px;
+	font-weight: 400;
+	line-height: 18px;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions a:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .button-link:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .button-link:focus {
+	color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .button-link:focus-visible {
+	border-radius: 4px;
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .trash a,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .delete a,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .spam a,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions a.submitdelete {
+	color: var(--favr-danger);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .trash a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .trash a:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .delete a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .delete a:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions a.submitdelete:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions a.submitdelete:focus {
+	color: var(--favr-danger);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+/* The bin icon Favr Sites prints instead of the word "Trash". !important only because
+   Editors\ListTables prints its grey with !important. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .favr-trash {
+	margin: -3px;
+	padding: 3px;
+	border-radius: 6px;
+	color: var(--favr-danger) !important;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .favr-trash:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .favr-trash:focus {
+	background: var(--favr-danger-soft);
+	color: var(--favr-danger) !important;
+}
+
+/* "Copied!" beside Copy URL in the media list. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .copy-to-clipboard-container .success {
+	padding: 3px 8px;
+	border-radius: 6px;
+	background: var(--favr-aubergine);
+	color: var(--favr-paper);
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+/* 4g. WordPress keeps an empty line under every title for the row actions. With a mouse, on a
+   wide screen, the line is not reserved: the actions hang under the title (out of the flow) and
+   show when the row is hovered or holds the keyboard focus. The cell then moves 10px of its
+   top padding to the bottom, so the title slides up, the actions fit under it and the row keeps
+   its height. On hover this waits a moment, so the list stays still while the pointer only
+   passes over it; keyboard focus shows them at once. The transitions are set on the shown
+   state only, so leaving a row (or resizing the window) snaps back without animating.
+   The media list is left alone: its rows are as tall as the thumbnail anyway. */
+@media (min-width: 783px) {
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tbody .column-primary {
+		position: relative;
+		background-color: inherit;
+	}
+
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) .row-actions {
+		position: absolute;
+		left: auto;
+		z-index: 1;
+		margin-top: 2px;
+		padding-right: 10px;
+		background-color: inherit;
+		white-space: nowrap;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr:hover .row-actions,
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr:focus-within .row-actions,
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) .row-actions.visible {
+		opacity: 1;
+		pointer-events: auto;
+		transition: opacity 0.12s ease;
+	}
+
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr:hover > .column-primary:has(> .row-actions),
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr:focus-within > .column-primary:has(> .row-actions),
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr > .column-primary:has(> .row-actions.visible) {
+		padding-top: 5px;
+		padding-bottom: 25px;
+		transition: padding 0.12s ease;
+	}
+
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr:hover:not(:focus-within) > .column-primary,
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr:hover:not(:focus-within) .row-actions:not(.visible) {
+		transition-delay: 0.1s;
+	}
+
+	/* The title's focus ring stays above the actions that hang under it. */
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tbody .column-primary strong a:focus-visible {
+		position: relative;
+		z-index: 2;
+	}
+}
+
+@media (min-width: 783px) and (prefers-reduced-motion: reduce) {
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr:hover .row-actions,
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr:focus-within .row-actions,
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) .row-actions.visible,
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr:hover > .column-primary:has(> .row-actions),
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr:focus-within > .column-primary:has(> .row-actions),
+	body.favr-skin:not(.mobile):where(:not(.favr-dash-screen)) .wp-list-table:not(.media) tr > .column-primary:has(> .row-actions.visible) {
+		transition: none;
+	}
+}
+
+/* 4h. Everything else in a row is quiet: links in cells read as text until hovered. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table :where(tbody td) a {
+	color: inherit;
+	text-decoration: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table :where(tbody td) a:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table :where(tbody td) a:focus {
+	color: var(--favr-accent);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody td.column-date,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody td.column-author,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody td.column-slug,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody td.column-posts,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody td.column-parent {
+	color: var(--favr-muted);
+}
+
+/* The count column of category tables: room for its header and sort arrow. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-posts {
+	width: 96px;
+}
+
+/* 4i. "No events found." */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody .no-items td {
+	padding: 56px 20px;
+	color: var(--favr-muted);
+	font-size: 15px;
+	text-align: center;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody tr.no-items:hover {
+	background-color: transparent;
+}
+
+/* ---------- 5. Quick Edit and Bulk Edit ---------- */
+
+/* A paper panel inside the table card; fields and buttons are base.css's. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody tr.inline-edit-row td {
+	padding: 0;
+	background: var(--favr-paper);
+	line-height: 1.5;
+	vertical-align: top;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-wrapper {
+	padding: 14px 20px 8px;
+	border: 0;
+	border-radius: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-wrapper:focus {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: -2px;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row .inline-edit-legend {
+	color: var(--favr-muted);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset label,
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset span.inline-edit-categories-label {
+	margin: 0 0 8px;
+	line-height: 40px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset label span.title,
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset span.inline-edit-categories-label,
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset.inline-edit-date legend,
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset span.checkbox-title {
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 40px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset span.checkbox-title {
+	font-weight: 400;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset.inline-edit-date,
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset .inline-edit-group {
+	color: var(--favr-muted);
+	line-height: 40px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset .inline-edit-group {
+	margin-bottom: 8px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset.inline-edit-date label {
+	margin: 0;
+	line-height: 40px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset.inline-edit-date input {
+	padding: 0 6px;
+	text-align: center;
+}
+
+/* The date line is a float: its gap to the next line goes inside it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset .timestamp-wrap {
+	padding-bottom: 8px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset label textarea {
+	height: auto;
+	min-height: 40px;
+	line-height: 1.5;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row .inline-edit-or {
+	margin: 0 10px;
+	color: var(--favr-muted);
+	font-size: 12px;
+	line-height: 40px;
+}
+
+/* The category checklist and the list of titles being bulk-edited: a well. */
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row ul.cat-checklist {
+	margin: 0 0 8px;
+	padding: 8px 12px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-surface);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset ul.cat-checklist label {
+	margin: 0;
+	padding: 4px 0;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 20px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset ul.cat-checklist input {
+	margin: -2px 8px 0 0;
+}
+
+/* A bare id, on purpose: WordPress draws this box's grey border with an id selector. */
+body.favr-skin:where(:not(.favr-dash-screen)) #bulk-titles {
+	margin: 0 0 8px;
+	padding: 8px 12px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-surface);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#bulk-titles) .ntdelbutton {
+	border-radius: 50%;
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#bulk-titles) .ntdelbutton:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#bulk-titles) .ntdelbutton:focus {
+	color: var(--favr-danger);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#bulk-titles) .ntdelbutton:focus {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 0;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row .submit {
+	gap: 8px;
+	padding: 6px 0 8px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row .submit .button {
+	margin: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row .submit .notice {
+	margin: 8px 0 0;
+}
+
+/* ---------- 6. Category and level screens (edit-tags.php) ---------- */
+
+/* The add form in a card on the left, the table on the right. flex-basis beats the widths
+   WordPress gives the two columns, so the ids can stay inside :where(). The clearfix
+   pseudo-elements are switched off: they would be extra flex items, each with a gap. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-container) {
+	display: flex;
+	gap: 24px;
+	align-items: flex-start;
+	clear: both;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-container)::before,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-container)::after {
+	content: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-left) {
+	flex: 0 0 340px;
+	min-width: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-right) {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-left, #col-right) .col-wrap {
+	padding: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-left) .form-wrap {
+	padding: 20px 22px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-left) .form-wrap h2 {
+	margin: 0 0 12px;
+	padding: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap .form-field {
+	margin: 0 0 16px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap label {
+	padding: 0 0 6px;
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap .form-field input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap .form-field input[type="email"],
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap .form-field input[type="number"],
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap .form-field input[type="url"],
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap .form-field select,
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap .form-field textarea {
+	width: 100%;
+	max-width: 100%;
+	margin: 0;
+}
+
+/* Short fields a plugin adds (an amount with "in USD" after it, a number) keep their size. */
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap .form-field input[type="text"][size]:not([size="40"]),
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap .form-field input[type="number"] {
+	width: 140px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap .form-field p,
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap > p {
+	max-width: none;
+	margin: 6px 0 0;
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	line-height: 1.45;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap p.submit {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin: 4px 0 0;
+	padding: 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .form-wrap p.submit .spinner {
+	float: none;
+	margin: 0;
+}
+
+/* The note under the table ("Deleting a category does not delete the posts…"). */
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-term-notes {
+	margin-top: 16px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .edit-term-notes p {
+	max-width: 70ch;
+}
+
+/* Between a phone and a wide screen the table is short of room: the form column narrows and
+   the slug column (the least useful one for an Editor) steps out. */
+@media (min-width: 783px) and (max-width: 1100px) {
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-left) {
+		flex-basis: 280px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.tags .column-slug {
+		display: none;
+	}
+}
+
+/* ---------- 7. The media list (upload.php?mode=list) ---------- */
+
+/* The toolbar over the list is the same card as the grid's toolbar (media.css styles that one,
+   .media-toolbar), with the same sizes, so switching between the two views does not jump. */
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) {
+	gap: 10px 16px;
+	margin: 6px 0 0;
+	padding: 12px 16px;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+	color: var(--favr-ink);
+	font-size: 14.5px;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .filter-items {
+	display: flex;
+	flex: 1 1 auto;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	float: none;
+	min-height: 40px;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) select {
+	min-height: 40px;
+	margin: 0;
+	padding: 0 32px 0 12px;
+	font-size: 14.5px;
+	line-height: 38px;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .button {
+	min-height: 40px;
+	margin: 0;
+	padding: 0 16px;
+	line-height: 38px;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .search-form {
+	flex: 0 1 380px;
+	float: none;
+	margin: 0;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) p.search-box {
+	float: none;
+	width: 100%;
+	margin: 0;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) p.search-box input[type="search"] {
+	flex: 1 1 200px;
+	width: auto;
+	min-width: 0;
+	min-height: 40px;
+	line-height: 38px;
+}
+
+/* List / grid switch: muted icons, the current view in the accent (as in the grid's toolbar). */
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .view-switch {
+	display: inline-flex;
+	gap: 2px;
+	margin: 0 6px 0 -6px;
+	padding: 0;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .view-switch a {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	float: none;
+	width: 36px;
+	height: 36px;
+	border: 0;
+	border-radius: var(--favr-radius-sm);
+	line-height: 1;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .view-switch a::before {
+	color: var(--favr-muted);
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .view-switch a:hover::before,
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .view-switch a:focus::before {
+	color: var(--favr-ink);
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .view-switch a.current::before {
+	color: var(--favr-accent);
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .view-switch a:focus {
+	box-shadow: none;
+}
+
+body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .view-switch a:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 0;
+}
+
+/* Room between the toolbar card and the bulk actions under it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-filter ~ .tablenav.top {
+	margin-top: 16px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.media tbody th,
+body.favr-skin:where(:not(.favr-dash-screen)) table.media tbody td {
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.media .column-title .media-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 60px;
+	margin: 0 14px 0 0;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.media .column-title .media-icon img {
+	border-radius: 8px;
+}
+
+/* overflow keeps the file name beside the thumbnail when it wraps. */
+body.favr-skin:where(:not(.favr-dash-screen)) table.media .column-title .filename {
+	overflow: hidden;
+	margin: 0;
+	color: var(--favr-muted);
+	font-size: 13px;
+	line-height: 20px;
+	overflow-wrap: anywhere;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.media .column-title .has-media-icon ~ .row-actions {
+	margin-left: 74px;
+}
+
+/* "Uploaded to": the page's name is not a second title. */
+body.favr-skin:where(:not(.favr-dash-screen)) table.media td.column-parent strong {
+	font-weight: 400;
+}
+
+/* ---------- 8. Phones and narrow windows ---------- */
+
+@media (max-width: 782px) {
+	/* Views wrap under the title; search takes the full width, field and button on one line. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .subsubsub {
+		float: none;
+		margin-bottom: 12px;
+		text-align: left;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .subsubsub a {
+		min-height: 34px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) p.search-box {
+		clear: both;
+		float: none;
+		width: 100%;
+		margin: 0 0 14px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) p.search-box input[type="search"],
+	body.favr-skin:where(:not(.favr-dash-screen)) p.search-box input[type="text"] {
+		flex: 1 1 auto;
+		width: auto;
+		min-width: 0;
+		min-height: 40px;
+		margin: 0;
+		line-height: 38px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) p.search-box input[type="submit"].button {
+		min-height: 40px;
+		margin: 0;
+		line-height: 38px;
+	}
+
+	/* As in WordPress, the filters leave the top row on phones; bulk actions stay at the bottom. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav.top {
+		margin: 0 0 12px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav.top .actions {
+		display: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav.bottom {
+		margin: 14px 0 0;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav select,
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .button {
+		min-height: 40px;
+		line-height: 38px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .tablenav-pages,
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav.bottom .tablenav-pages {
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		width: auto;
+		height: auto;
+		margin: 0 0 0 auto;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav.bottom .displaying-num {
+		position: static;
+		padding: 0;
+		font-size: 13.5px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .tablenav-pages .button,
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .tablenav-pages .tablenav-pages-navspan {
+		width: 40px;
+		min-width: 40px;
+		height: 40px;
+		min-height: 40px;
+		padding: 0 0 2px;
+		font-size: 19px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav .tablenav-pages .current-page {
+		width: 48px;
+		min-height: 40px;
+		padding: 0 4px;
+		font-size: 16px;
+		line-height: 38px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .tablenav.bottom .tablenav-paging-text {
+		float: none;
+		width: auto;
+		min-height: 40px;
+		padding: 0 14px;
+	}
+
+	/* The table: WordPress keeps the checkbox and the title, and folds the other columns behind
+	   a button per row. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .check-column {
+		flex: 0 0 26px;
+		width: 26px;
+		padding: 0 0 0 14px;
+		align-content: center;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody .check-column {
+		padding-top: 13px;
+		align-content: start;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody th.column-primary,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody td.column-primary {
+		padding: 15px 60px 15px 12px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.column-primary:not(.sortable):not(.sorted) {
+		padding-left: 12px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.column-primary a {
+		padding-left: 12px;
+	}
+
+	/* Columns that sit before the title (a thumbnail, an order handle) fold away with the rest,
+	   and open above the other details. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th:has(~ .column-primary),
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody tr:not(.inline-edit-row):not(.no-items) td:not(.check-column):has(~ .column-primary) {
+		display: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody .check-column,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody .column-primary {
+		order: -1;
+	}
+
+	/* The folded details: a muted label on the left, the value on the right, no lines between. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody tr:not(.inline-edit-row):not(.no-items) td:not(.check-column):not(.column-primary) {
+		flex: 0 1 100%;
+		padding: 5px 16px 5px 38%;
+		border-top: 0;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody tr:not(.inline-edit-row):not(.no-items) td:not(.check-column):not(.column-primary)::before {
+		left: 16px;
+		width: calc(38% - 28px);
+		color: var(--favr-muted);
+		font-size: 13px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody tr.is-expanded td:not(.check-column):not(.column-primary):last-child {
+		padding-bottom: 16px;
+	}
+
+	/* A detail with nothing in it is left out. !important only because WordPress opens the
+	   folded cells with !important. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody tr.is-expanded td:empty {
+		display: none !important;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.widefat > tbody > tr.is-expanded {
+		background-color: var(--favr-paper);
+	}
+
+	/* The fold button: a small round quiet button, marked when its row is open. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .toggle-row {
+		top: 8px;
+		right: 12px;
+		width: 36px;
+		height: 36px;
+		border: 1px solid var(--favr-line);
+		border-radius: 50%;
+		background: var(--favr-surface);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .toggle-row::before {
+		top: 7px;
+		left: 7px;
+		padding: 0;
+		color: var(--favr-muted);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .toggle-row:hover,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .is-expanded .toggle-row {
+		border-color: var(--favr-accent);
+		background: var(--favr-accent-soft);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .toggle-row:hover::before,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .is-expanded .toggle-row::before {
+		color: var(--favr-accent);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .toggle-row:focus::before {
+		box-shadow: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .toggle-row:focus-visible {
+		outline: 2px solid var(--favr-accent);
+		outline-offset: 2px;
+	}
+
+	/* Row actions open with the row instead of taking a line under every title. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions {
+		display: none;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .is-expanded .row-actions {
+		position: static;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 18px;
+		margin: 0;
+		padding: 8px 0 0;
+		color: var(--favr-muted);
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions a,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .row-actions .button-link {
+		padding: 4px 0;
+		font-size: 14px;
+		line-height: 20px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody .no-items td {
+		flex: 1 1 100%;
+		padding: 40px 16px;
+	}
+
+	/* Quick Edit and Bulk Edit: one column. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table tbody tr.inline-edit-row td {
+		flex: 1 1 100%;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-wrapper {
+		padding: 12px 14px 8px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset label,
+	body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset label span.title,
+	body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset.inline-edit-date legend {
+		font-size: 14px;
+		line-height: 1.5;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset label span.title,
+	body.favr-skin:where(:not(.favr-dash-screen)) .inline-edit-row fieldset.inline-edit-date legend {
+		padding-bottom: 6px;
+	}
+
+	/* Category and level screens: the form first, the table under it. */
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-container) {
+		flex-direction: column;
+		gap: 20px;
+		align-items: stretch;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-left),
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-right) {
+		flex: 0 0 auto;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(#col-left) .form-wrap {
+		padding: 16px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) table.media .column-title .has-media-icon ~ .row-actions {
+		margin-left: 0;
+	}
+
+	/* The media list's toolbar: switch and filters first, the search across the next line. */
+	body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) {
+		padding: 12px;
+	}
+
+	body.favr-skin.upload-php:where(:not(.favr-dash-screen)) .wp-filter:not(.media-toolbar) .search-form {
+		flex: 1 1 100%;
+	}
+}
