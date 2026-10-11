@@ -13,8 +13,10 @@ use FavrSites\Dashboard\Audience;
 use FavrSites\Dashboard\Icons;
 
 /**
- * Row links: the title opens the right editor; "View" stays; Trash becomes a quiet bin icon.
- * Columns: no Comments, no Yoast or Rank Math scores.
+ * Row links: the title opens the right editor; "View" stays; Trash becomes a quiet bin icon. A row
+ * left with no link keeps an empty placeholder, because WordPress prints the "Show more details"
+ * toggle a phone needs together with the row's links, and only when there is at least one.
+ * Columns: no Author, no Comments, no Yoast or Rank Math scores.
  * Dates: "Oct 8, 2026", with a status word only when the item is not published.
  * Filters: no month filter on Favr's own lists (events have their own dates; members, listings,
  * documents, people and sponsors are not looked up by the month they were added).
@@ -23,6 +25,12 @@ final class ListTables {
 
 	private const KEEP = array( 'view', 'trash', 'untrash', 'delete' );
 
+	/** Row-action key (WordPress prints it as a class) of the placeholder for a row with no links. */
+	public const NO_ACTIONS = 'favr-no-actions';
+
+	/** Columns Editors lose: who wrote it (they have no Author box either) and comments (off). */
+	private const DROP_COLUMNS = array( 'author', 'comments' );
+
 	/** Column key prefixes of the SEO plugins. */
 	private const SEO_COLUMNS = array( 'wpseo-', 'rank_math_' );
 
@@ -30,7 +38,10 @@ final class ListTables {
 	public const NO_MONTHS = array( 'favr_business', 'favr_event', 'favr_member', 'favr_document', 'favr_person', 'favr_sponsor' );
 
 	/**
-	 * Keep only the row actions an Editor needs, in a fixed order.
+	 * Keep only the row actions an Editor needs, in a fixed order. Never none: a draft the Editor
+	 * may not edit has no View (WordPress only offers a preview to those who can edit it) and no
+	 * Trash, and a row without actions gets no "Show more details" toggle either, so on a phone
+	 * its folded columns could not be opened. Such a row keeps an empty placeholder.
 	 *
 	 * @param array<string, string> $actions Actions.
 	 * @return array<string, string>
@@ -42,7 +53,7 @@ final class ListTables {
 				$out[ $key ] = 'trash' === $key ? self::trashIcon( (string) $actions[ $key ] ) : $actions[ $key ];
 			}
 		}
-		return $out;
+		return $out ? $out : array( self::NO_ACTIONS => '' );
 	}
 
 	/**
@@ -59,14 +70,14 @@ final class ListTables {
 	}
 
 	/**
-	 * Drop the Comments, Yoast and Rank Math columns.
+	 * Drop the Author, Comments, Yoast and Rank Math columns.
 	 *
 	 * @param array<string, string> $columns Columns.
 	 * @return array<string, string>
 	 */
 	public static function columns( $columns ) {
 		foreach ( array_keys( (array) $columns ) as $key ) {
-			if ( 'comments' === $key || self::isSeoColumn( (string) $key ) ) {
+			if ( in_array( $key, self::DROP_COLUMNS, true ) || self::isSeoColumn( (string) $key ) ) {
 				unset( $columns[ $key ] );
 			}
 		}

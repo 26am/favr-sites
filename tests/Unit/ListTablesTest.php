@@ -39,17 +39,49 @@ final class ListTablesTest extends TestCase {
 		$this->assertSame( $actions, ListTables::rowActions( $actions ) );
 	}
 
-	public function test_columns_drop_comments_and_yoast(): void {
+	public function test_a_row_without_actions_keeps_the_toggle_a_phone_needs(): void {
+		// WordPress prints "Show more details" with the row's actions, and only when there is one:
+		// a draft page an Editor may not edit (the Privacy Policy page) has neither View nor Trash.
+		$none = ListTables::rowActions( array() );
+		$this->assertSame( array( ListTables::NO_ACTIONS ), array_keys( $none ) );
+		$this->assertSame( '', $none[ ListTables::NO_ACTIONS ], 'Nothing to read or click.' );
+		$this->assertMatchesRegularExpression( '/^[a-z-]+$/', ListTables::NO_ACTIONS, 'WordPress prints the key as a class name.' );
+	}
+
+	public function test_a_row_left_with_nothing_after_the_tidy_up_keeps_its_toggle_too(): void {
+		$actions = array(
+			'edit'                 => '<a href="post.php?post=1&amp;action=edit">Edit</a>',
+			'inline hide-if-no-js' => '<button>Quick&nbsp;Edit</button>',
+		);
+		$this->assertSame( array( ListTables::NO_ACTIONS => '' ), ListTables::rowActions( $actions ) );
+	}
+
+	public function test_a_row_with_an_action_gets_no_placeholder(): void {
+		$this->assertSame( array( 'view' => '<a href="/about/">View</a>' ), ListTables::rowActions( array( 'view' => '<a href="/about/">View</a>' ) ) );
+	}
+
+	public function test_columns_drop_author_comments_and_yoast(): void {
 		$cols = array(
 			'cb'          => '',
 			'title'       => 'Title',
 			'author'      => 'Author',
+			'categories'  => 'Categories',
 			'comments'    => 'C',
 			'wpseo-score' => 'SEO',
 			'wpseo-links' => 'L',
 			'date'        => 'Date',
 		);
-		$this->assertSame( array( 'cb', 'title', 'author', 'date' ), array_keys( ListTables::columns( $cols ) ) );
+		$this->assertSame( array( 'cb', 'title', 'categories', 'date' ), array_keys( ListTables::columns( $cols ) ) );
+	}
+
+	public function test_a_plugins_own_column_about_people_stays(): void {
+		$cols = array(
+			'cb'        => '',
+			'title'     => 'Title',
+			'favr_host' => 'Host',
+			'author'    => 'Author',
+		);
+		$this->assertSame( array( 'cb', 'title', 'favr_host' ), array_keys( ListTables::columns( $cols ) ) );
 	}
 
 	public function test_columns_drop_rank_math_the_same_way(): void {
