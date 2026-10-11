@@ -11,12 +11,19 @@ namespace FavrSites\Dashboard;
 
 /**
  * Normalizes plain-array contributions: drops invalid rows and rows the user can't use,
- * dedupes by id (last wins), sorts by priority then label.
+ * dedupes by id (last wins), sorts by priority then label, then puts the items Favr knows in the
+ * order of the Editor's menu (Editors\Menu) so the dashboard and the menu read as one map.
  */
 final class Items {
 
 	public const MAX_STATS = 3;
 	public const MAX_ITEMS = 5;
+
+	/** Quick actions by id: the things added most often first, then the website tools as in the menu. */
+	public const ACTION_ORDER = array( 'add-event', 'add-post', 'add-member', 'add-listing', 'add-document', 'edit-pages', 'edit-header', 'edit-footer', 'banner' );
+
+	/** Cards by id, as the Organization group of the menu (dues belong to members). */
+	public const CARD_ORDER = array( 'members', 'dues', 'directory', 'events', 'content' );
 
 	/**
 	 * Quick actions.
@@ -45,7 +52,7 @@ final class Items {
 				'priority' => (int) ( $row['priority'] ?? 50 ),
 			);
 		}
-		return self::sorted( $out, 'label' );
+		return self::inOrder( self::sorted( $out, 'label' ), self::ACTION_ORDER );
 	}
 
 	/**
@@ -87,7 +94,32 @@ final class Items {
 				'empty'    => self::emptyState( $row['empty'] ?? null ),
 			);
 		}
-		return self::sorted( $out, 'title' );
+		return self::inOrder( self::sorted( $out, 'title' ), self::CARD_ORDER );
+	}
+
+	/**
+	 * Rows whose id is in a known order come first, in that order; the rest follow in the order
+	 * they came in.
+	 *
+	 * @param list<array<string, mixed>> $rows  Rows with an `id`.
+	 * @param list<string>               $order Known ids.
+	 * @return list<array<string, mixed>>
+	 */
+	public static function inOrder( array $rows, array $order ): array {
+		$rank  = array_flip( array_values( $order ) );
+		$known = array();
+		$rest  = array();
+		foreach ( $rows as $row ) {
+			$id = self::str( $row['id'] ?? '' );
+			if ( isset( $rank[ $id ] ) ) {
+				$known[ $rank[ $id ] ][] = $row;
+			} else {
+				$rest[] = $row;
+			}
+		}
+		ksort( $known );
+		$known[] = $rest;
+		return array_merge( ...array_values( $known ) );
 	}
 
 	/**

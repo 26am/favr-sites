@@ -27,6 +27,66 @@ final class ItemsTest extends TestCase {
 		$this->assertSame( '', $out[1]['icon'] );
 	}
 
+	public function test_quick_actions_follow_the_menu_whatever_their_priority(): void {
+		$raw = array();
+		foreach ( array(
+			'zebra'        => 1,
+			'banner'       => 22,
+			'edit-footer'  => 21,
+			'edit-header'  => 20,
+			'edit-pages'   => 90,
+			'add-document' => 40,
+			'add-listing'  => 40,
+			'add-member'   => 50,
+			'add-post'     => 10,
+			'add-event'    => 30,
+			'apple'        => 99,
+		) as $id => $priority ) {
+			$raw[] = array( 'id' => $id, 'label' => ucfirst( $id ), 'url' => '/' . $id, 'priority' => $priority );
+		}
+		$this->assertSame(
+			array( 'add-event', 'add-post', 'add-member', 'add-listing', 'add-document', 'edit-pages', 'edit-header', 'edit-footer', 'banner', 'zebra', 'apple' ),
+			array_column( Items::actions( $raw, self::can( array() ) ), 'id' )
+		);
+	}
+
+	public function test_cards_follow_the_menu_whatever_their_priority(): void {
+		$raw = array();
+		foreach ( array(
+			'content'   => 40,
+			'events'    => 30,
+			'directory' => 20,
+			'dues'      => 45,
+			'members'   => 40,
+			'weather'   => 5,
+		) as $id => $priority ) {
+			$raw[] = array( 'id' => $id, 'title' => ucfirst( $id ), 'priority' => $priority );
+		}
+		$this->assertSame(
+			array( 'members', 'dues', 'directory', 'events', 'content', 'weather' ),
+			array_column( Items::cards( $raw, self::can( array() ) ), 'id' )
+		);
+	}
+
+	public function test_known_ids_come_first_in_the_given_order_and_the_rest_keep_theirs(): void {
+		$rows = array(
+			array( 'id' => 'x' ),
+			array( 'id' => 'c' ),
+			array( 'id' => 'y' ),
+			array( 'id' => 'a' ),
+			array( 'id' => 'z' ),
+		);
+		$this->assertSame( array( 'a', 'c', 'x', 'y', 'z' ), array_column( Items::inOrder( $rows, array( 'a', 'b', 'c' ) ), 'id' ) );
+		$this->assertSame( array( 'x', 'c', 'y', 'a', 'z' ), array_column( Items::inOrder( $rows, array() ), 'id' ) );
+		$this->assertSame( array(), Items::inOrder( array(), array( 'a' ) ) );
+		$this->assertSame( array( 'a', 'a', 'x' ), array_column( Items::inOrder( array( array( 'id' => 'a' ), array( 'id' => 'x' ), array( 'id' => 'a' ) ), array( 'a' ) ), 'id' ), 'Nothing is dropped.' );
+	}
+
+	public function test_the_known_orders_list_each_id_once(): void {
+		$this->assertSame( Items::ACTION_ORDER, array_values( array_unique( Items::ACTION_ORDER ) ) );
+		$this->assertSame( Items::CARD_ORDER, array_values( array_unique( Items::CARD_ORDER ) ) );
+	}
+
 	public function test_cards_cap_stats_and_items_and_drop_invalid_rows(): void {
 		$card = array(
 			'id'    => 'events',
