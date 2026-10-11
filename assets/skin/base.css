@@ -120,9 +120,79 @@ body.favr-skin #adminmenu li.favr-menu-group--account::before {
 	}
 }
 
+/* In the collapsed menu an item with a submenu opens a flyout headed with its name; an item
+   without one (Dashboard, Approvals, Profile…) had nothing to say what it is. Its name now slides
+   out beside the icon under the pointer or the keyboard, as part of the same link. */
+@media only screen and (min-width: 783px) {
+	body.favr-skin.folded #adminmenu li.menu-top:not(.wp-has-submenu):hover .wp-menu-name,
+	body.favr-skin.folded #adminmenu li.menu-top:not(.wp-has-submenu):focus-within .wp-menu-name {
+		top: 0;
+		left: 36px;
+		z-index: 9999;
+		box-sizing: border-box;
+		min-width: 160px;
+		min-height: 34px;
+		padding: 8px 14px;
+		border-radius: 0 8px 8px 0;
+		background: var(--favr-accent);
+		color: var(--favr-paper);
+		font-weight: 600;
+		white-space: nowrap;
+		box-shadow: var(--favr-shadow);
+	}
+
+	/* The count ("3" on Approvals) is hidden with the name: a gold dot on the icon stands in. */
+	body.favr-skin.folded #adminmenu li.menu-top:has(.awaiting-mod:not(.count-0), .update-plugins:not(.count-0), .menu-counter:not(.count-0)) .wp-menu-image::after {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--favr-gold);
+		content: "";
+		box-shadow: 0 0 0 2px var(--favr-aubergine);
+	}
+}
+
+@media only screen and (max-width: 960px) and (min-width: 783px) {
+	body.favr-skin.auto-fold #adminmenu li.menu-top:not(.wp-has-submenu):hover .wp-menu-name,
+	body.favr-skin.auto-fold #adminmenu li.menu-top:not(.wp-has-submenu):focus-within .wp-menu-name {
+		top: 0;
+		left: 36px;
+		z-index: 9999;
+		box-sizing: border-box;
+		min-width: 160px;
+		min-height: 34px;
+		padding: 8px 14px;
+		border-radius: 0 8px 8px 0;
+		background: var(--favr-accent);
+		color: var(--favr-paper);
+		font-weight: 600;
+		white-space: nowrap;
+		box-shadow: var(--favr-shadow);
+	}
+
+	body.favr-skin.auto-fold #adminmenu li.menu-top:has(.awaiting-mod:not(.count-0), .update-plugins:not(.count-0), .menu-counter:not(.count-0)) .wp-menu-image::after {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--favr-gold);
+		content: "";
+		box-shadow: 0 0 0 2px var(--favr-aubergine);
+	}
+}
+
 /* ---------- 3. The page frame ---------- */
 
+/* As wide as the dashboard on every screen, whatever the monitor: the right edge stays put as an
+   Editor moves about. lists.css widens the three lists with many columns; the narrow form
+   screens (a category, Approvals) set their own 880px. */
 body.favr-skin:where(:not(.favr-dash-screen)) .wrap {
+	max-width: 1180px;
 	margin: 24px 24px 48px 4px;
 	color: var(--favr-ink);
 	font-size: 14.5px;
@@ -389,12 +459,81 @@ body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) .trash a {
 	color: var(--favr-danger);
 }
 
-/* The colour swatch button keeps WordPress's shape. */
-body.favr-skin:where(:not(.favr-dash-screen)) .button.wp-color-result {
-	min-height: 30px;
-	padding: 0 0 0 30px;
+/* The colour picker (Badge color on Membership levels). The button is the quiet button with the
+   chosen colour in its left cap (WordPress paints the colour on the button itself, inline, and
+   covers the rest with the label); the hex value is a field; the palette opens in a well. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .button.wp-color-result {
+	overflow: hidden;
+	min-height: 36px;
+	margin: 0 8px 6px 0;
+	padding: 0 0 0 34px;
+	border-color: var(--favr-field-line);
+	border-radius: 999px;
+	font-size: 14px;
+	line-height: 34px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .button.wp-color-result:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .button.wp-color-result:focus {
+	border-color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .wp-color-result-text {
+	padding: 0 14px 0 12px;
+	border-left: 1px solid var(--favr-field-line);
+	border-radius: 0;
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	font-size: 14px;
+	line-height: 34px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .button.wp-color-result:hover .wp-color-result-text,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .button.wp-color-result:focus .wp-color-result-text {
+	background: var(--favr-accent-soft);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) .wp-picker-container .wp-picker-input-wrap input[type="text"].wp-color-picker {
+	width: 104px;
+	min-height: 36px;
+	padding: 0 12px;
+	font-family: inherit;
+	font-size: 14.5px;
+	line-height: 34px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-input-wrap .button.wp-picker-clear,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-input-wrap .button.wp-picker-default {
+	min-height: 36px;
+	margin-left: 8px;
+	padding: 0 14px;
+	font-size: 14px;
+	line-height: 34px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .iris-picker {
+	margin-top: 4px;
+	border-color: var(--favr-line);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-paper);
+	box-shadow: var(--favr-shadow);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .iris-picker .iris-square,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .iris-picker .iris-slider,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .iris-picker .iris-square-inner,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .iris-picker .iris-strip {
 	border-radius: 6px;
-	line-height: 28px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .iris-picker .iris-palette {
+	border-radius: 50%;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .iris-picker .iris-palette:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+	box-shadow: none;
 }
 
 /* ---------- 6. Fields ---------- */
@@ -454,9 +593,39 @@ body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) textarea:f
 	box-shadow: none;
 }
 
+/* A dropdown under the pointer or the keyboard keeps the Favr ink: WordPress turns its text
+   and border near-black (and, in Firefox, draws the focused text as a blue text-shadow). */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) select:hover {
+	border-color: var(--favr-field-line);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) select:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) select:focus:hover {
+	border-color: var(--favr-accent);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) select:-moz-focusring {
+	color: var(--favr-ink);
+	text-shadow: none;
+}
+
+/* Lighter than a typed value, still 4.5:1 or better on the white field. */
 body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) ::placeholder {
-	color: #8d7f88;
+	color: color-mix(in srgb, var(--favr-muted) 85%, var(--favr-field));
 	opacity: 1;
+}
+
+/* The calendar and clock buttons inside date and time fields are Tab stops of their own, and
+   the browser draws their focus ring itself, in its blue: no selector of ours matches the
+   focused button (`:focus-visible` after the pseudo-element does nothing in Chrome). So the
+   ring keeps the browser's shape and takes our colour. !important because it has to beat the
+   browser's own focus rule. */
+body.favr-skin input::-webkit-calendar-picker-indicator {
+	border-radius: 4px;
+	outline-color: var(--favr-accent) !important;
+	outline-offset: 1px;
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="checkbox"],
@@ -475,6 +644,14 @@ body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type
 	border-color: var(--favr-accent);
 	outline: 2px solid var(--favr-accent-soft);
 	outline-offset: 1px;
+}
+
+/* From the keyboard: the ring links and buttons have. The pale one above cannot be seen around
+   a ticked box, whose border and fill are already the accent. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="checkbox"]:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="radio"]:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[readonly],
@@ -505,8 +682,14 @@ body.favr-skin:where(:not(.favr-dash-screen)) .notice p,
 body.favr-skin:where(:not(.favr-dash-screen)) div.updated p,
 body.favr-skin:where(:not(.favr-dash-screen)) div.error p {
 	margin: 8px 0;
+	color: inherit;
 	font-size: 14.5px;
 	font-weight: 600;
+}
+
+/* The close button takes the notice's colour too (its × is drawn in currentcolor below). */
+body.favr-skin:where(:not(.favr-dash-screen)) .notice-dismiss {
+	color: inherit;
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) .notice-success,
@@ -673,11 +856,41 @@ body.favr-skin:where(:not(.favr-dash-screen)) .spinner {
 	body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) textarea {
 		font-size: 16px;
 	}
+
+	/* The colour picker's button, field and Clear are thumb-sized too. */
+	body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) .wp-picker-container .wp-picker-input-wrap input[type="text"].wp-color-picker {
+		width: 112px;
+		min-height: 40px;
+		font-size: 16px;
+		line-height: 38px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .button.wp-color-result,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-input-wrap .button.wp-picker-clear,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-input-wrap .button.wp-picker-default {
+		min-height: 40px;
+		line-height: 38px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .button.wp-color-result {
+		padding-left: 38px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-picker-container .wp-color-result-text {
+		line-height: 38px;
+	}
 }
 
+/* Reduced motion: nothing an Editor sees fades or slides, WordPress's own short colour fades and
+   the plugins' included. Near-zero instead of none, so scripts waiting for a transition to end
+   still hear it. !important because this one rule has to beat every sheet on the page. */
 @media (prefers-reduced-motion: reduce) {
-	body.favr-skin:where(:not(.favr-dash-screen)) .button,
-	body.favr-skin:where(:not(.favr-dash-screen)) .wrap .page-title-action {
-		transition: none;
+	body.favr-skin *,
+	body.favr-skin *::before,
+	body.favr-skin *::after {
+		transition-duration: 0.01ms !important;
+		transition-delay: 0s !important;
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
 	}
 }
