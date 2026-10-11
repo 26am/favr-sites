@@ -43,6 +43,20 @@ final class ProfilePageTest extends TestCase {
 		$this->assertStringNotContainsString( 'favr-swatch', $template );
 	}
 
+	public function test_elementor_ai_is_off_for_editors_whatever_is_stored(): void {
+		// Elementor reads the user option `elementor_enable_ai` and treats "never set" as on.
+		$this->assertSame( '0', ProfilePage::elementorAi( false, true ), 'Never set.' );
+		$this->assertSame( '0', ProfilePage::elementorAi( '1', true ), 'Turned on.' );
+		$this->assertSame( '0', ProfilePage::elementorAi( '0', true ) );
+		$this->assertFalse( (bool) ProfilePage::elementorAi( false, true ), 'Elementor casts the value to a boolean.' );
+	}
+
+	public function test_everybody_else_keeps_their_elementor_ai_choice(): void {
+		$this->assertFalse( ProfilePage::elementorAi( false, false ), 'Never set stays never set: Elementor then uses its default.' );
+		$this->assertSame( '1', ProfilePage::elementorAi( '1', false ) );
+		$this->assertSame( '0', ProfilePage::elementorAi( '0', false ) );
+	}
+
 	public function test_editors_always_get_the_toolbar_on_the_public_site(): void {
 		$this->assertTrue( ProfilePage::showsToolbar( false, true, false ) );
 		$this->assertTrue( ProfilePage::showsToolbar( true, true, false ) );

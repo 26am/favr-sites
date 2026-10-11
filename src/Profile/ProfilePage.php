@@ -18,10 +18,16 @@ use FavrSites\Dashboard\Audience;
  *
  * Settings Editors no longer see are pinned: toolbar on, Media infinite scrolling on, application
  * passwords off, Elementor AI off (it stays off until Favr's AI controls), comment shortcuts off.
+ * Elementor AI is pinned where Elementor reads it (the user option `elementor_enable_ai`, "on"
+ * when never set), not stored: nothing is written, and an Editor who never saved this page has
+ * no "Generate with Elementor AI" buttons in the Media Library either.
  * There is no colour scheme to pick: Editors always get Favr's (Brand\ColorScheme), and saving
  * the page leaves the scheme stored for the user as it was.
  */
 final class ProfilePage {
+
+	/** The user option Elementor keeps its per-user AI switch in (Elementor\Modules\Ai\Preferences::ENABLE_AI). */
+	public const ELEMENTOR_AI = 'elementor_enable_ai';
 
 	/**
 	 * Display name and nickname from first/last name; blanks keep what's there.
@@ -65,6 +71,32 @@ final class ProfilePage {
 		add_filter( 'wp_is_application_passwords_available_for_user', array( $this, 'appPasswords' ), 10, 2 );
 		add_filter( 'show_admin_bar', array( $this, 'toolbar' ), PHP_INT_MAX );
 		add_filter( 'media_library_infinite_scrolling', array( $this, 'infiniteScrolling' ), PHP_INT_MAX );
+		add_filter( 'get_user_option_' . self::ELEMENTOR_AI, array( $this, 'elementorAiOption' ), PHP_INT_MAX, 3 );
+	}
+
+	/**
+	 * Pure: the value Elementor gets for its "Enable Elementor AI functionality" preference.
+	 * Always off for Editors; everybody else keeps what is stored (false when never set).
+	 *
+	 * @param mixed $stored    The stored user option.
+	 * @param bool  $is_editor The user is in the Favr audience.
+	 * @return mixed
+	 */
+	public static function elementorAi( $stored, bool $is_editor ) {
+		return $is_editor ? '0' : $stored;
+	}
+
+	/**
+	 * Elementor AI is off for Editors. Elementor asks once, when it loads its AI module, and
+	 * then adds no AI buttons to the Media Library, the media window or its editor.
+	 *
+	 * @param mixed $stored Stored value.
+	 * @param mixed $option Option name.
+	 * @param mixed $user   The user it is read for.
+	 * @return mixed
+	 */
+	public function elementorAiOption( $stored, $option = '', $user = null ) {
+		return self::elementorAi( $stored, $user instanceof \WP_User && Audience::includes( $user ) );
 	}
 
 	/**
