@@ -49,7 +49,8 @@ $favr_link  = static function ( string $url, string $inner, string $css_class = 
 			<h2 id="favr-dash-attention"><?php esc_html_e( 'Needs your attention', 'favr-sites' ); ?></h2>
 			<ul>
 				<?php foreach ( $view['attention'] as $favr_queue ) : ?>
-					<li><a href="<?php echo esc_url( $view['review'] ); ?>"><strong><?php echo esc_html( number_format_i18n( $favr_queue['count'] ) ); ?></strong> <?php echo esc_html( $favr_queue['label'] ); ?></a></li>
+					<?php // The name first and the number after it: "Event submissions 1" reads right for one and for many. ?>
+					<li><a href="<?php echo esc_url( $view['review'] ); ?>"><?php echo esc_html( $favr_queue['label'] ); ?> <strong><?php echo esc_html( number_format_i18n( $favr_queue['count'] ) ); ?></strong></a></li>
 				<?php endforeach; ?>
 			</ul>
 			<a class="favr-dash__attention-go" href="<?php echo esc_url( $view['review'] ); ?>"><?php esc_html_e( 'Review now', 'favr-sites' ); ?><?php echo Icons::svg( 'arrow', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?></a>

@@ -40,6 +40,12 @@ body.favr-dash-screen,
 	box-shadow: none;
 }
 
+/* WordPress moves an Administrator's notices to just after this marker, so they land under the
+   page title. It is only a marker: left in the grid it would cost a second gap under the title. */
+.favr-dash > .wp-header-end {
+	display: none;
+}
+
 /* The page title of a Favr screen (Header & footer, Alert banner, Your profile): the title
    assets/skin/base.css gives every other screen, value for value. `:not()` adds the weight it
    needs to out-rank WordPress's `.wrap h1` and leaves the dashboard's own h1, which is for
@@ -196,9 +202,27 @@ body.favr-dash-screen,
 	margin: 0;
 }
 
+/* How many are waiting: a pill after the queue's name, as on Approvals. */
 .favr-dash__attention strong {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-sizing: border-box;
+	min-width: 24px;
+	min-height: 24px;
+	margin-left: 4px;
+	padding: 0 8px;
+	border-radius: 999px;
+	background: var(--favr-surface);
 	color: var(--favr-attention);
 	font-variant-numeric: tabular-nums;
+	line-height: 1;
+	vertical-align: middle;
+}
+
+/* Only the name underlines on hover, not the gap and the pill beside it. */
+.favr-dash .favr-dash__attention li a:hover {
+	text-decoration: none;
 }
 
 .favr-dash__attention-go {
@@ -235,17 +259,26 @@ body.favr-dash-screen,
 	color: var(--favr-accent);
 }
 
-.favr-dash__action:hover {
+/* A pill is a button: it changes its fill on hover and never underlines, and it keeps its shape
+   under the keyboard's focus ring. Written with `.favr-dash a` so the link rules above (underline
+   on hover, a 4px corner on focus) do not win. */
+.favr-dash a.favr-dash__action:hover,
+.favr-dash a.favr-dash__action:focus {
 	border-color: var(--favr-accent);
 	background: var(--favr-accent-soft);
 	text-decoration: none;
 }
 
-/* Cards */
+.favr-dash a.favr-dash__action:focus-visible {
+	border-radius: 999px;
+}
+
+/* Cards. The grid is a container, so the rules after the cards can tell how many columns it has. */
 .favr-dash__cards {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 	gap: var(--favr-gap);
+	container-type: inline-size;
 }
 
 .favr-dash__card {
@@ -294,14 +327,22 @@ a.favr-dash__stat:hover strong {
 	list-style: none;
 }
 
+/* A row: a name and, beside it, a short note (a date, an amount). The name is promised 8em; a
+   note that would leave it less drops to a line of its own under the name, so "Walter Greene" is
+   never broken in two to make room for "$150.00, due Jun 8, 2025". */
 .favr-dash__list li {
 	display: flex;
-	gap: 12px;
+	flex-wrap: wrap;
+	gap: 2px 12px;
 	align-items: baseline;
 	justify-content: space-between;
 	margin: 0;
 	padding: 9px 0;
 	border-top: 1px solid var(--favr-line);
+}
+
+.favr-dash__list li > :first-child {
+	flex: 1 1 8em;
 }
 
 .favr-dash__list li:first-child {
@@ -337,6 +378,81 @@ a.favr-dash__stat:hover strong {
 	margin-top: auto;
 	color: var(--favr-accent) !important;
 	font-weight: 600;
+}
+
+/* No lone last card. The grid makes as many 260px columns as fit (two from 540px, three from
+   820px, four from 1100px); when the cards overflow into a last row that they do not fill, the
+   last card takes the columns left over. */
+@container (min-width: 540px) and (max-width: 819.98px) {
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(2n+3) {
+		grid-column: 1 / -1;
+	}
+}
+
+@container (min-width: 820px) and (max-width: 1099.98px) {
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(3n+4) {
+		grid-column: 1 / -1;
+	}
+
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(3n+5) {
+		grid-column: span 2;
+	}
+}
+
+@container (min-width: 1100px) {
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(4n+5) {
+		grid-column: 1 / -1;
+	}
+
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(4n+6) {
+		grid-column: span 3;
+	}
+
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(4n+7) {
+		grid-column: span 2;
+	}
+}
+
+/* A card alone across the whole row is a short strip: its title, its numbers and its link side
+   by side. Only a card of numbers; one with a list keeps its shape. The three selectors are the
+   three "alone" cases above. */
+@container (min-width: 540px) and (max-width: 819.98px) {
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(2n+3):not(:has(.favr-dash__list)) {
+		flex-flow: row wrap;
+		gap: 12px 40px;
+		align-items: center;
+	}
+
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(2n+3):not(:has(.favr-dash__list)) .favr-dash__card-link {
+		align-self: center;
+		margin: 0 0 0 auto;
+	}
+}
+
+@container (min-width: 820px) and (max-width: 1099.98px) {
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(3n+4):not(:has(.favr-dash__list)) {
+		flex-flow: row wrap;
+		gap: 12px 40px;
+		align-items: center;
+	}
+
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(3n+4):not(:has(.favr-dash__list)) .favr-dash__card-link {
+		align-self: center;
+		margin: 0 0 0 auto;
+	}
+}
+
+@container (min-width: 1100px) {
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(4n+5):not(:has(.favr-dash__list)) {
+		flex-flow: row wrap;
+		gap: 12px 40px;
+		align-items: center;
+	}
+
+	.favr-dash__cards > .favr-dash__card:last-child:nth-child(4n+5):not(:has(.favr-dash__list)) .favr-dash__card-link {
+		align-self: center;
+		margin: 0 0 0 auto;
+	}
 }
 
 /* Activity + help */

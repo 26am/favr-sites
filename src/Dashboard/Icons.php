@@ -17,6 +17,9 @@ final class Icons {
 	private const PATHS = array(
 		'news'     => '<path d="M4 5h13v14H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v8a2 2 0 0 1-2 2"/><path d="M8 9h5M8 13h5"/>',
 		'page'     => '<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/>',
+		'pages'    => '<path d="M8 7h7l4 4v10H8z"/><path d="M15 7v4h4"/><path d="M5 17V3h7"/>',
+		'header'   => '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M7 6.5h4"/>',
+		'footer'   => '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 15h16M7 17.5h4"/>',
 		'calendar' => '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
 		'users'    => '<circle cx="9" cy="9" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3.5 3.5 0 0 1 0 7M21 20a6 6 0 0 0-4-5.6"/>',
 		'store'    => '<path d="M4 9l1.5-5h13L20 9"/><path d="M4 9v11h16V9"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M10 20v-5h4v5"/>',

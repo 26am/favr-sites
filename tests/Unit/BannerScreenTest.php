@@ -26,6 +26,41 @@ final class BannerScreenTest extends TestCase {
 		$this->assertSame( 'The banner stopped showing on 7 Oct 17:00.', self::status( $on + array( 'ends' => '2026-10-07 17:00' ), '2026-10-07 18:00' ) );
 	}
 
+	public function test_the_saved_message_says_what_visitors_see_now(): void {
+		$zone  = new \DateTimeZone( 'UTC' );
+		$now   = new \DateTimeImmutable( '2026-10-07 12:00', $zone );
+		$saved = static fn( array $stored ): string => Screen::savedNotice( Banner::fromArray( $stored ), $now, $zone );
+		$on    = array( 'enabled' => true, 'message' => 'Hi' );
+		$this->assertSame( 'Banner saved. It is off the site now.', $saved( array( 'message' => 'Hi' ) ) );
+		$this->assertSame( 'Banner saved. It is showing on the site now.', $saved( $on ) );
+		$this->assertSame( 'Banner saved. It is not on the site yet.', $saved( $on + array( 'starts' => '2026-10-08 09:00' ) ) );
+		$this->assertSame( 'Banner saved. Its hide time has passed, so it is off the site.', $saved( $on + array( 'ends' => '2026-10-07 09:00' ) ) );
+		$this->assertSame( 'Banner saved. It needs a message before it can show.', $saved( array( 'enabled' => true ) ) );
+	}
+
+	public function test_the_time_zone_reads_as_a_plain_name(): void {
+		$name = static fn( string $zone, string $now = '2026-10-07 12:00' ): string => Screen::zoneName( new \DateTimeZone( $zone ), new \DateTimeImmutable( $now, new \DateTimeZone( 'UTC' ) ) );
+		$this->assertSame( 'Eastern Time', $name( 'America/New_York' ) );
+		$this->assertSame( 'Eastern Time', $name( 'America/New_York', '2026-01-07 12:00' ), 'The same name in winter and in summer.' );
+		$this->assertSame( 'Central Time', $name( 'America/Chicago' ) );
+		$this->assertSame( 'Mountain Time', $name( 'America/Denver' ) );
+		$this->assertSame( 'Mountain Time', $name( 'America/Phoenix' ) );
+		$this->assertSame( 'Pacific Time', $name( 'America/Los_Angeles' ) );
+		$this->assertSame( 'Alaska Time', $name( 'America/Anchorage' ) );
+		$this->assertSame( 'Hawaii Time', $name( 'Pacific/Honolulu' ) );
+		$this->assertSame( 'London time', $name( 'Europe/London' ) );
+		$this->assertSame( 'Buenos Aires time', $name( 'America/Argentina/Buenos_Aires' ) );
+		$this->assertSame( 'Shanghai time', $name( 'Asia/Shanghai' ), 'China Standard Time is not Central Time.' );
+		$this->assertSame( 'UTC', $name( 'UTC' ) );
+		$this->assertSame( 'UTC+05:30', $name( '+05:30' ) );
+	}
+
+	public function test_the_preview_is_labelled_when_the_banner_is_not_on_the_site(): void {
+		$this->assertSame( '', Screen::previewLabel( 'live' ) );
+		$this->assertSame( 'Preview (not on the site)', Screen::previewLabel( 'off' ) );
+		$this->assertSame( 'Preview (not on the site yet)', Screen::previewLabel( 'pending' ) );
+	}
+
 	/**
 	 * Load the screen as a user with these roles and capabilities; was notice stripping hooked?
 	 *

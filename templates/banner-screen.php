@@ -8,6 +8,7 @@
  */
 
 use FavrSites\Banner\Display;
+use FavrSites\Banner\Screen;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -18,9 +19,10 @@ $favr_banner = $view['banner'];
 		<h1 class="favr-banner-admin__title"><?php esc_html_e( 'Alert banner', 'favr-sites' ); ?></h1>
 		<p class="favr-banner-admin__sub"><?php esc_html_e( 'One message across the top of every page. Switch it on when you need it.', 'favr-sites' ); ?></p>
 	</header>
+	<hr class="wp-header-end">
 
-	<?php if ( $view['saved'] ) : ?>
-		<div class="favr-banner-admin__notice is-success" role="status"><?php esc_html_e( 'Banner saved.', 'favr-sites' ); ?></div>
+	<?php if ( '' !== $view['saved'] ) : ?>
+		<div class="favr-banner-admin__notice is-success" role="status"><?php echo esc_html( $view['saved'] ); ?></div>
 	<?php endif; ?>
 	<?php if ( $view['warnings'] ) : ?>
 		<div class="favr-banner-admin__notice is-error" role="alert">
@@ -33,7 +35,11 @@ $favr_banner = $view['banner'];
 	<section class="favr-dash__card favr-banner-admin__card">
 		<p class="favr-banner-admin__status" data-state="<?php echo esc_attr( $view['state'] ); ?>"><?php echo esc_html( $view['status'] ); ?></p>
 		<?php if ( '' !== $favr_banner->message() ) : ?>
-			<div class="favr-banner-admin__preview">
+			<?php $favr_label = Screen::previewLabel( (string) $view['state'] ); ?>
+			<?php if ( '' !== $favr_label ) : ?>
+				<p class="favr-banner-admin__preview-label"><?php echo esc_html( $favr_label ); ?></p>
+			<?php endif; ?>
+			<div class="favr-banner-admin__preview<?php echo '' !== $favr_label ? ' is-off' : ''; ?>">
 				<?php echo Display::markup( $favr_banner, 'live', $view['colors'], false, true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- the template escapes. ?>
 			</div>
 		<?php endif; ?>
@@ -89,7 +95,7 @@ $favr_banner = $view['banner'];
 		</div>
 		<p class="favr-banner-admin__help">
 			<?php
-			/* translators: %s: time zone, e.g. "America/New_York". */
+			/* translators: %s: time zone, e.g. "Eastern Time". */
 			echo esc_html( sprintf( __( 'Times are in the site’s time zone (%s).', 'favr-sites' ), $view['zone'] ) );
 			?>
 		</p>

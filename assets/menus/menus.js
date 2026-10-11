@@ -11,6 +11,7 @@
 	const i18n = ( window.favrMenus && window.favrMenus.i18n ) || {};
 	const template = document.getElementById( 'favr-menu-row' );
 	const dirty = new Set();
+	const forms = Array.from( document.querySelectorAll( '.favr-menu__form' ) );
 
 	const listOf = ( form ) => form.querySelector( '.favr-menu__list' );
 	const rowsOf = ( list ) => Array.from( list.children ).filter( ( el ) => el.classList.contains( 'favr-menu-row' ) );
@@ -91,10 +92,40 @@
 		form.querySelector( '.favr-menu__empty' ).hidden = rows.length > 0;
 	}
 
+	// One Save press sends every menu with unsaved changes, so each card says what its button will
+	// save: "Save both menus" and "Unsaved changes in the header menu" when the other card changed.
+	function sync() {
+		forms.forEach( ( form ) => {
+			const other = forms.find( ( el ) => el !== form && dirty.has( el ) );
+			const save = form.querySelector( '.favr-menu__save' );
+			const flag = form.querySelector( '.favr-menu__dirty' );
+			save.textContent = other && i18n.saveBoth ? i18n.saveBoth : save.dataset.label;
+			flag.hidden = ! dirty.has( form ) && ! other;
+			flag.textContent = dirty.has( form ) || ! other ? flag.dataset.label : ( 'footer' === other.dataset.slot ? i18n.inFooter : i18n.inHeader ) || flag.dataset.label;
+		} );
+	}
+
 	function changed( form ) {
 		dirty.add( form );
-		form.querySelector( '.favr-menu__dirty' ).hidden = false;
+		// "Saved. They're live on the site" stops being the whole truth with the first new change.
+		document.querySelectorAll( '.favr-menus__notice.is-success' ).forEach( ( el ) => {
+			el.hidden = true;
+		} );
 		refresh( form );
+		sync();
+	}
+
+	// Show where a new row went: bring it into view and flash it once.
+	function reveal( row ) {
+		const calm = window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+		const box = row.getBoundingClientRect();
+		if ( box.top < 60 || box.bottom > window.innerHeight - 20 ) {
+			row.scrollIntoView( { block: 'center', behavior: calm ? 'auto' : 'smooth' } );
+		}
+		row.classList.remove( 'is-new' );
+		void row.offsetWidth; // Restart the flash when two rows are added in a row.
+		row.classList.add( 'is-new' );
+		row.addEventListener( 'animationend', () => row.classList.remove( 'is-new' ), { once: true } );
 	}
 
 	function act( form, row, action ) {
@@ -160,6 +191,8 @@
 		if ( 'page' === data.type ) {
 			untray( document.querySelector( '.favr-menus__tray-list li[data-id="' + data.objectId + '"]' ) );
 		}
+		reveal( row );
+		return row;
 	}
 
 	// A page added to a menu leaves the "not in a menu yet" tray.
@@ -235,6 +268,12 @@
 		address.value = '';
 		showError( form, '' );
 		return true;
+	}
+
+	// A link typed or a page chosen but not added yet: add it. False when it can't be added.
+	function flush( form ) {
+		const pending = [ 'label', 'url' ].some( ( key ) => form.querySelector( '[data-add="' + key + '"]' ).value.trim() );
+		return ! ( ( pending && ! addLink( form ) ) || ( form.querySelector( '[data-add="page"]' ).value && ! addPage( form ) ) );
 	}
 
 	function serialize( form ) {
@@ -327,22 +366,46 @@
 		} );
 
 		form.addEventListener( 'submit', ( event ) => {
-			// Something typed or chosen but not added yet is added now (or stops the save if it's wrong).
-			const pending = [ 'label', 'url' ].some( ( key ) => form.querySelector( '[data-add="' + key + '"]' ).value.trim() );
-			if ( ( pending && ! addLink( form ) ) || ( form.querySelector( '[data-add="page"]' ).value && ! addPage( form ) ) ) {
+			// Something typed or chosen but not added yet is added now (or stops the save if it's wrong),
+			// in this card first and then in the other one.
+			const stuck = [ form ].concat( forms.filter( ( el ) => el !== form ) ).find( ( el ) => ! flush( el ) );
+			if ( stuck ) {
 				event.preventDefault();
+				stuck.querySelector( '.favr-menu__add-error' ).scrollIntoView( { block: 'center' } );
 				return;
 			}
 			form.querySelector( '[name="rows"]' ).value = JSON.stringify( serialize( form ) );
-			dirty.delete( form );
-			form.querySelector( '.favr-menu__save' ).disabled = true; // One save per click.
+			// The other menu's unsaved changes go with this save, each with its own nonce.
+			form.querySelectorAll( '[data-also]' ).forEach( ( el ) => el.remove() );
+			forms.filter( ( el ) => el !== form && dirty.has( el ) ).forEach( ( el ) => {
+				const key = 'also[' + el.querySelector( '[name="menu_id"]' ).value + ']';
+				const fields = {};
+				fields[ key + '[rows]' ] = JSON.stringify( serialize( el ) );
+				fields[ key + '[nonce]' ] = el.querySelector( '[name="_wpnonce"]' ).value;
+				Object.keys( fields ).forEach( ( name ) => {
+					const input = document.createElement( 'input' );
+					input.type = 'hidden';
+					input.name = name;
+					input.value = fields[ name ];
+					input.dataset.also = '1';
+					form.appendChild( input );
+				} );
+			} );
+			dirty.clear(); // Everything unsaved is in this request: no leave prompt.
+			forms.forEach( ( el ) => {
+				el.querySelector( '.favr-menu__save' ).disabled = true; // One save per click.
+			} );
 		} );
 
 		refresh( form );
 	}
 
-	const forms = Array.from( document.querySelectorAll( '.favr-menu__form' ) );
-	forms.forEach( setup );
+	forms.forEach( ( form ) => {
+		form.querySelectorAll( '.favr-menu__save, .favr-menu__dirty' ).forEach( ( el ) => {
+			el.dataset.label = el.textContent.trim();
+		} );
+		setup( form );
+	} );
 
 	document.addEventListener( 'click', ( event ) => {
 		const button = event.target.closest( '[data-act="tray-add"]' );
@@ -354,7 +417,9 @@
 		if ( ! form || ! item ) {
 			return;
 		}
-		append( form, { type: 'page', objectId: item.dataset.id, title: item.dataset.title } );
+		const row = append( form, { type: 'page', objectId: item.dataset.id, title: item.dataset.title } );
+		row.tabIndex = -1;
+		row.focus( { preventScroll: true } );
 	} );
 
 	// Back/forward cache: a restored page must be able to save again.

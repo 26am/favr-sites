@@ -44,7 +44,8 @@ final class Activity {
 	/**
 	 * When an item last changed, as a Unix time: the first real date among the candidates, else
 	 * now. WordPress leaves the GMT dates of a draft at 0000-00-00 until it is saved a second time,
-	 * and "2028 years ago" is not when anything happened.
+	 * and "2028 years ago" is not when anything happened. Nor is a date later than now: that is
+	 * when a scheduled item goes out, not when somebody touched it.
 	 *
 	 * @param array<mixed> $gmt_dates Dates in GMT ("Y-m-d H:i:s"), best first.
 	 * @param int          $now       The current Unix time.
@@ -55,11 +56,61 @@ final class Activity {
 				continue;
 			}
 			$stamp = strtotime( $date . ' UTC' );
-			if ( false !== $stamp && $stamp > 0 ) {
+			if ( false !== $stamp && $stamp > 0 && $stamp <= $now ) {
 				return $stamp;
 			}
 		}
 		return $now;
+	}
+
+	/**
+	 * The time beside a row: "2 hours ago", or "scheduled for Jan 5" for an item waiting to go out.
+	 *
+	 * @param string                        $status     The item's status.
+	 * @param int                           $publish_at When it is published, as a Unix time.
+	 * @param int                           $changed    When it last changed, as a Unix time.
+	 * @param int                           $now        The current Unix time.
+	 * @param callable(int, int): string    $diff       Words for a time difference ("2 hours").
+	 * @param callable(string, int): string $date       Formats a Unix time in the site's time zone.
+	 */
+	public static function when( string $status, int $publish_at, int $changed, int $now, callable $diff, callable $date ): string {
+		if ( 'future' === $status && $publish_at > $now ) {
+			$far = $publish_at - $now >= 365 * 24 * 60 * MINUTE_IN_SECONDS;
+			/* translators: %s: a date, e.g. "Jan 5". */
+			return sprintf( __( 'scheduled for %s', 'favr-sites' ), $date( $far ? 'M j, Y' : 'M j', $publish_at ) );
+		}
+		/* translators: %s: human time difference, e.g. "2 hours". */
+		return sprintf( __( '%s ago', 'favr-sites' ), $diff( $changed, $now ) );
+	}
+
+	/**
+	 * The query for the list: the latest changes that have happened. An item inserted already
+	 * scheduled (an import, WP-CLI) carries its publish date as its modified date; left in, it sat
+	 * on top of the list until that day. One scheduled in the editor has a real modified time and
+	 * stays, in its place.
+	 *
+	 * @param list<string> $types Post types.
+	 * @param int          $limit Max rows.
+	 * @param int          $now   The current Unix time.
+	 * @return array<string, mixed>
+	 */
+	public static function query( array $types, int $limit, int $now ): array {
+		return array(
+			'post_type'              => $types,
+			'post_status'            => array( 'publish', 'draft', 'pending', 'future' ),
+			'orderby'                => 'modified',
+			'order'                  => 'DESC',
+			'posts_per_page'         => $limit,
+			'no_found_rows'          => true,
+			'ignore_sticky_posts'    => true,
+			'update_post_term_cache' => false,
+			'date_query'             => array(
+				array(
+					'column' => 'post_modified_gmt',
+					'before' => gmdate( 'Y-m-d H:i:s', $now + MINUTE_IN_SECONDS ),
+				),
+			),
+		);
 	}
 
 	/**
@@ -89,18 +140,8 @@ final class Activity {
 		if ( ! $types ) {
 			return array();
 		}
-		$query = new \WP_Query(
-			array(
-				'post_type'              => $types,
-				'post_status'            => array( 'publish', 'draft', 'pending', 'future' ),
-				'orderby'                => 'modified',
-				'order'                  => 'DESC',
-				'posts_per_page'         => $limit,
-				'no_found_rows'          => true,
-				'ignore_sticky_posts'    => true,
-				'update_post_term_cache' => false,
-			)
-		);
+		$now   = time();
+		$query = new \WP_Query( self::query( $types, $limit, $now ) );
 		$out   = array();
 		foreach ( $query->posts as $post ) {
 			$user_id = (int) get_post_meta( $post->ID, '_edit_last', true ) ?: (int) $post->post_author;
@@ -110,8 +151,14 @@ final class Activity {
 				'verb'  => self::verb( $post->post_date_gmt, $post->post_modified_gmt ),
 				'title' => self::title( $post->post_title ),
 				'url'   => (string) get_edit_post_link( $post->ID, 'raw' ),
-				/* translators: %s: human time difference, e.g. "2 hours". */
-				'ago'   => sprintf( __( '%s ago', 'favr-sites' ), human_time_diff( self::changed( self::gmtDates( $post ), time() ) ) ),
+				'ago'   => self::when(
+					(string) $post->post_status,
+					(int) strtotime( $post->post_date_gmt . ' UTC' ),
+					self::changed( self::gmtDates( $post ), $now ),
+					$now,
+					'human_time_diff',
+					static fn( string $format, int $stamp ): string => (string) wp_date( $format, $stamp )
+				),
 			);
 		}
 		return $out;

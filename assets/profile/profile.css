@@ -2,7 +2,7 @@
    (h1) and the cards are dashboard.css's. */
 
 .favr-profile {
-	max-width: 780px;
+	max-width: 880px; /* The width of Header & footer, Approvals and Alert banner. */
 }
 
 /* The title starts at the left edge, as on every screen; the photo sits across from it. */

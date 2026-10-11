@@ -8,6 +8,7 @@
  */
 
 use FavrSites\Dashboard\Icons;
+use FavrSites\Menus\Screen;
 use FavrSites\Menus\Slots;
 
 defined( 'ABSPATH' ) || exit;
@@ -48,22 +49,8 @@ $favr_row   = static function ( array $row, bool $invalid ) use ( $favr_tools ):
 		<h1 class="favr-menus__title"><?php esc_html_e( 'Header & footer', 'favr-sites' ); ?></h1>
 		<p class="favr-menus__sub"><?php esc_html_e( 'Your site’s header and footer appear on every page. Edit their design in Elementor; manage their menu links here (drag to reorder, or use the arrows). Changes go live when you save.', 'favr-sites' ); ?></p>
 	</header>
+	<hr class="wp-header-end">
 
-	<?php if ( '' !== $view['saved'] && in_array( $view['saved'], Slots::SLOTS, true ) ) : ?>
-		<div class="favr-menus__notice is-success" role="status">
-			<?php
-			/* translators: %s: "Header menu" or "Footer menu". */
-			echo esc_html( sprintf( __( '%s saved. It’s live on the site.', 'favr-sites' ), Slots::label( $view['saved'] ) ) );
-			?>
-		</div>
-	<?php endif; ?>
-	<?php if ( $view['errors'] ) : ?>
-		<div class="favr-menus__notice is-error" role="alert">
-			<?php foreach ( $view['errors'] as $favr_error ) : ?>
-				<p><?php echo esc_html( (string) $favr_error ); ?></p>
-			<?php endforeach; ?>
-		</div>
-	<?php endif; ?>
 	<p class="favr-menus__nojs"><?php esc_html_e( 'Editing menus needs JavaScript. Turn it on (or try another browser) to make changes.', 'favr-sites' ); ?></p>
 
 	<?php foreach ( $view['slots'] as $favr_slot => $favr_data ) : ?>
@@ -78,6 +65,17 @@ $favr_row   = static function ( array $row, bool $invalid ) use ( $favr_tools ):
 					<a class="favr-menu__design" href="<?php echo esc_url( $favr_data['design'] ); ?>"><?php echo esc_html( 'footer' === $favr_slot ? __( 'Edit footer design', 'favr-sites' ) : __( 'Edit header design', 'favr-sites' ) ); ?></a>
 				<?php endif; ?>
 			</div>
+			<?php $favr_errors = $view['errors'][ $favr_slot ] ?? array(); ?>
+			<?php if ( $view['saved'] && ( $favr_errors || in_array( $favr_slot, $view['saved'], true ) ) ) : ?>
+				<div class="favr-menus__notice is-success" role="status"><?php echo esc_html( Screen::savedNotice( $view['saved'] ) ); ?></div>
+			<?php endif; ?>
+			<?php if ( $favr_errors ) : ?>
+				<div class="favr-menus__notice is-error" role="alert">
+					<?php foreach ( $favr_errors as $favr_error ) : ?>
+						<p><?php echo esc_html( (string) $favr_error ); ?></p>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
 			<div class="favr-menu__head">
 				<h3><?php esc_html_e( 'Menu links', 'favr-sites' ); ?></h3>
 				<?php if ( $favr_data['menu'] ) : ?>

@@ -49,7 +49,12 @@
 	display: none !important;
 }
 
-/* A card: Header or Footer */
+/* A card: Header or Footer. After a save the page opens at the saved card; the margin keeps its
+   title, and the "saved" notice under it, clear of the toolbar. */
+.favr-menu {
+	scroll-margin-top: 48px;
+}
+
 .favr-menu__top {
 	display: flex;
 	flex-wrap: wrap;
@@ -143,6 +148,33 @@
 	border: 1px solid var(--favr-line);
 	border-radius: var(--favr-radius-sm);
 	background: var(--favr-paper);
+}
+
+/* A row that was just added flashes once, so the eye finds where it went. */
+.favr-menu-row.is-new > .favr-menu-row__main {
+	animation: favr-menu-new 1.8s ease-out;
+}
+
+.favr-menu-row:focus {
+	outline: none;
+}
+
+.favr-menu-row:focus-visible > .favr-menu-row__main {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+@keyframes favr-menu-new {
+	0%,
+	35% {
+		border-color: var(--favr-accent);
+		background: var(--favr-accent-soft);
+	}
+
+	100% {
+		border-color: var(--favr-line);
+		background: var(--favr-paper);
+	}
 }
 
 .favr-menu-row:not([data-level="0"]) > .favr-menu-row__main {
@@ -444,6 +476,11 @@
 }
 
 @media (max-width: 782px) {
+	/* The toolbar is taller on a phone. */
+	.favr-menu {
+		scroll-margin-top: 62px;
+	}
+
 	.favr-menu__add {
 		grid-template-columns: minmax(0, 1fr);
 	}
@@ -494,6 +531,31 @@
 	}
 }
 
+/* On a phone every tray row is built the same way: the page name on its own line, the two
+   buttons under it at equal width. Before, short names kept their buttons beside them and long
+   names pushed them under, so the rows alternated. */
+@media (max-width: 480px) {
+	.favr-menus__tray-list li {
+		display: grid;
+		gap: 8px;
+		justify-content: stretch;
+	}
+
+	.favr-menus__tray-actions {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: minmax(0, 1fr);
+	}
+
+	.favr-menus__tray-actions button {
+		justify-content: center;
+	}
+
+	.favr-menu__actions {
+		flex-wrap: wrap;
+	}
+}
+
 .favr-menus__tray[hidden] {
 	display: none;
 }
@@ -503,5 +565,10 @@
 	.favr-menus__tray-actions button,
 	.favr-menu__save {
 		transition: none;
+	}
+
+	/* No fade: the new row holds its tint, then drops it. */
+	.favr-menu-row.is-new > .favr-menu-row__main {
+		animation-timing-function: step-end;
 	}
 }

@@ -28,6 +28,7 @@ $favr_email  = is_array( $view['new_email'] ) ? (string) ( $view['new_email']['n
 			</p>
 		</div>
 	</header>
+	<hr class="wp-header-end">
 
 	<?php if ( $view['updated'] ) : ?>
 		<div class="favr-profile__notice is-success" role="status"><?php esc_html_e( 'Profile updated.', 'favr-sites' ); ?></div>

@@ -54,6 +54,72 @@ final class Screen {
 		return sprintf( __( 'The banner stopped showing on %s.', 'favr-sites' ), $format( (int) $window['until'] ) );
 	}
 
+	/**
+	 * The confirmation after a save: what visitors see now, not only that the form was stored.
+	 *
+	 * @param Banner             $banner Banner.
+	 * @param \DateTimeImmutable $now    Now.
+	 * @param \DateTimeZone      $zone   Site time zone.
+	 */
+	public static function savedNotice( Banner $banner, \DateTimeImmutable $now, \DateTimeZone $zone ): string {
+		$state = $banner->state( $now, $zone );
+		if ( 'live' === $state ) {
+			return __( 'Banner saved. It is showing on the site now.', 'favr-sites' );
+		}
+		if ( 'pending' === $state ) {
+			return __( 'Banner saved. It is not on the site yet.', 'favr-sites' );
+		}
+		if ( ! $banner->enabled() ) {
+			return __( 'Banner saved. It is off the site now.', 'favr-sites' );
+		}
+		return '' === $banner->message()
+			? __( 'Banner saved. It needs a message before it can show.', 'favr-sites' )
+			: __( 'Banner saved. Its hide time has passed, so it is off the site.', 'favr-sites' );
+	}
+
+	/**
+	 * The label over the preview when the banner is not on the site; none while it is live.
+	 *
+	 * @param string $state live|pending|off.
+	 */
+	public static function previewLabel( string $state ): string {
+		if ( 'live' === $state ) {
+			return '';
+		}
+		return 'pending' === $state ? __( 'Preview (not on the site yet)', 'favr-sites' ) : __( 'Preview (not on the site)', 'favr-sites' );
+	}
+
+	/**
+	 * The site's time zone as people say it: "Eastern Time", not "America/New_York".
+	 *
+	 * @param \DateTimeZone      $zone Site time zone.
+	 * @param \DateTimeImmutable $now  Now.
+	 */
+	public static function zoneName( \DateTimeZone $zone, \DateTimeImmutable $now ): string {
+		$id = $zone->getName();
+		if ( 'UTC' === $id || preg_match( '/^[+-]\d/', $id ) ) {
+			return 'UTC' === $id ? 'UTC' : 'UTC' . $id;
+		}
+		// North American zones by their abbreviation (EST and EDT are both Eastern Time). Only there:
+		// "CST" is also China's.
+		$names = array(
+			'E'  => __( 'Eastern Time', 'favr-sites' ),
+			'C'  => __( 'Central Time', 'favr-sites' ),
+			'M'  => __( 'Mountain Time', 'favr-sites' ),
+			'P'  => __( 'Pacific Time', 'favr-sites' ),
+			'AK' => __( 'Alaska Time', 'favr-sites' ),
+			'H'  => __( 'Hawaii Time', 'favr-sites' ),
+		);
+		$short = $now->setTimezone( $zone )->format( 'T' );
+		if ( preg_match( '#^(America/|US/|Pacific/Honolulu$)#', $id ) && preg_match( '/^(E|C|M|P|AK|H)[SD]T$/', $short, $match ) ) {
+			return $names[ $match[1] ];
+		}
+		// Anywhere else: the zone's city.
+		$parts = explode( '/', $id );
+		/* translators: %s: a city, e.g. "London". */
+		return sprintf( __( '%s time', 'favr-sites' ), str_replace( '_', ' ', (string) end( $parts ) ) );
+	}
+
 	/** Hooks. */
 	public function hook(): void {
 		add_action( 'admin_menu', array( $this, 'menu' ) );
@@ -106,9 +172,9 @@ final class Screen {
 			'banner'   => $banner,
 			'state'    => $banner->state( $now, $zone ),
 			'status'   => self::status( $banner, $now, $zone, static fn( int $timestamp ): string => (string) wp_date( 'j M Y, g:i a', $timestamp ) ),
-			'zone'     => wp_timezone_string(),
+			'zone'     => self::zoneName( $zone, $now ),
 			'colors'   => Display::colors( $banner->style(), Display::kitColor() ),
-			'saved'    => isset( $_GET['saved'] ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display-only flag.
+			'saved'    => isset( $_GET['saved'] ) ? self::savedNotice( $banner, $now, $zone ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display-only flag.
 			'warnings' => is_array( $warnings ) ? $warnings : array(),
 			'action'   => self::SAVE,
 		);

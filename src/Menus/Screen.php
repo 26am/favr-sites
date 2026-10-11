@@ -56,6 +56,9 @@ final class Screen {
 					'needsLabel' => __( 'Give the link a label.', 'favr-sites' ),
 					'badUrl'     => __( 'Use a web address (https://…), an email (mailto:…), a phone number (tel:…) or a path on this site (/…).', 'favr-sites' ),
 					'unsaved'    => __( 'You have unsaved menu changes.', 'favr-sites' ),
+					'saveBoth'   => __( 'Save both menus', 'favr-sites' ),
+					'inHeader'   => __( 'Unsaved changes in the header menu', 'favr-sites' ),
+					'inFooter'   => __( 'Unsaved changes in the footer menu', 'favr-sites' ),
 				),
 			)
 		);
@@ -122,8 +125,8 @@ final class Screen {
 			'slots'    => $slots,
 			'pages'    => $pages,
 			'unplaced' => Tree::unplacedPages( $pages, $in_menus ),
-			'saved'    => isset( $_GET['saved'] ) ? sanitize_key( wp_unslash( $_GET['saved'] ) ) : '',
-			'errors'   => is_array( $errors ) ? $errors : array(),
+			'saved'    => self::savedSlots( isset( $_GET['saved'] ) ? sanitize_key( wp_unslash( $_GET['saved'] ) ) : '' ),
+			'errors'   => self::errorsBySlot( $errors ),
 			'action'   => self::SAVE,
 			'nonce'    => self::NONCE,
 		);
@@ -131,21 +134,131 @@ final class Screen {
 		include FAVR_SITES_PATH . 'templates/menus.php';
 	}
 
-	/** Save one menu from the submitted rows. */
+	/**
+	 * The menus one Save press carries: the pressed menu's rows and, each proven by its own nonce,
+	 * the other menu's unsaved rows. So "Save footer menu" never throws away a change made to the
+	 * header a moment before.
+	 *
+	 * @param int                  $menu_id The pressed menu.
+	 * @param array<string, mixed> $post    The submitted fields, unslashed.
+	 * @param array<string, ?int>  $slots   Slot => connected menu id.
+	 * @return array<string, string> Slot => rows as JSON, the pressed menu first.
+	 */
+	public static function batch( int $menu_id, array $post, array $slots ): array {
+		$pressed = array_search( $menu_id, $slots, true );
+		if ( ! is_string( $pressed ) ) {
+			return array();
+		}
+		$out  = array( $pressed => is_string( $post['rows'] ?? null ) ? $post['rows'] : '' );
+		$also = is_array( $post['also'] ?? null ) ? $post['also'] : array();
+		foreach ( $also as $id => $extra ) {
+			$slot = array_search( (int) $id, $slots, true );
+			if ( ! is_string( $slot ) || isset( $out[ $slot ] ) || ! is_array( $extra ) || ! is_string( $extra['rows'] ?? null ) ) {
+				continue;
+			}
+			if ( ! wp_verify_nonce( (string) ( $extra['nonce'] ?? '' ), self::NONCE . (int) $id ) ) {
+				continue;
+			}
+			$out[ $slot ] = $extra['rows'];
+		}
+		return $out;
+	}
+
+	/**
+	 * The "saved" flag for the address after a save: "header", "footer" or "header-footer".
+	 *
+	 * @param list<string> $saved Saved slots.
+	 */
+	public static function savedFlag( array $saved ): string {
+		return implode( '-', array_values( array_intersect( Slots::SLOTS, $saved ) ) );
+	}
+
+	/**
+	 * The slots a "saved" flag names.
+	 *
+	 * @param string $flag Flag from the address.
+	 * @return list<string>
+	 */
+	public static function savedSlots( string $flag ): array {
+		return array_values( array_intersect( Slots::SLOTS, explode( '-', $flag ) ) );
+	}
+
+	/**
+	 * The confirmation after a save. It names every menu that went live, because it is printed in
+	 * the card whose button was pressed.
+	 *
+	 * @param list<string> $saved Saved slots.
+	 */
+	public static function savedNotice( array $saved ): string {
+		if ( count( $saved ) > 1 ) {
+			return __( 'Header and footer menus saved. They’re live on the site.', 'favr-sites' );
+		}
+		if ( ! $saved ) {
+			return '';
+		}
+		/* translators: %s: "Header menu" or "Footer menu". */
+		return sprintf( __( '%s saved. It’s live on the site.', 'favr-sites' ), Slots::label( (string) reset( $saved ) ) );
+	}
+
+	/**
+	 * Save errors by slot, from the stored value.
+	 *
+	 * @param mixed $stored Stored errors.
+	 * @return array<string, list<string>>
+	 */
+	public static function errorsBySlot( $stored ): array {
+		$out = array();
+		foreach ( is_array( $stored ) ? $stored : array() as $slot => $errors ) {
+			if ( in_array( $slot, Slots::SLOTS, true ) && is_array( $errors ) && $errors ) {
+				$out[ $slot ] = array_values( array_map( 'strval', $errors ) );
+			}
+		}
+		return $out;
+	}
+
+	/** Save the pressed menu, and the other one when it has unsaved changes too. */
 	public function save(): void {
 		$menu_id = isset( $_POST['menu_id'] ) ? absint( wp_unslash( $_POST['menu_id'] ) ) : 0;
 		check_admin_referer( self::NONCE . $menu_id );
 		if ( ! current_user_can( 'edit_pages' ) ) {
 			wp_die( esc_html__( 'Sorry, you are not allowed to edit menus.', 'favr-sites' ), 403 );
 		}
-		$slot = $menu_id ? array_search( $menu_id, Slots::current(), true ) : false;
+		$slots = Slots::current();
+		$slot  = $menu_id ? array_search( $menu_id, $slots, true ) : false;
 		if ( ! is_string( $slot ) ) {
 			wp_die( esc_html__( 'That menu isn’t one of this site’s Favr menus.', 'favr-sites' ), 403 );
 		}
 
-		$submitted = json_decode( (string) wp_unslash( $_POST['rows'] ?? '' ), true ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON; every field is cleaned by Tree::plan().
+		$saved  = array();
+		$errors = array();
+		foreach ( self::batch( $menu_id, wp_unslash( $_POST ), $slots ) as $name => $json ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON; every field is cleaned by Tree::plan().
+			$failed = self::saveMenu( (int) $slots[ $name ], $json );
+			if ( $failed ) {
+				$errors[ $name ] = $failed;
+			} else {
+				$saved[] = $name;
+			}
+		}
+
+		// Elementor caches rendered widgets; Nav Menu widgets must show the new menu.
+		if ( $saved && did_action( 'elementor/loaded' ) && class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->files_manager ) ) {
+			\Elementor\Plugin::$instance->files_manager->clear_cache();
+		}
+
+		self::back( $slot, $saved, $errors );
+	}
+
+	/**
+	 * Save one menu from its submitted rows.
+	 *
+	 * @param int    $menu_id Menu.
+	 * @param string $json    Rows as JSON.
+	 * @return list<string> Errors; empty when the menu was saved.
+	 */
+	private static function saveMenu( int $menu_id, string $json ): array {
+		$submitted = json_decode( $json, true );
 		if ( ! is_array( $submitted ) ) {
-			self::back( $slot, array( __( 'Nothing was saved. Reload the page and try again.', 'favr-sites' ) ) );
+			return array( __( 'Nothing was saved. Reload the page and try again.', 'favr-sites' ) );
 		}
 
 		$items = array();
@@ -154,7 +267,7 @@ final class Screen {
 		}
 		$plan = Tree::plan( Tree::rows( array_values( $items ) ), $submitted );
 		if ( $plan['errors'] ) {
-			self::back( $slot, $plan['errors'] );
+			return array_values( $plan['errors'] );
 		}
 
 		foreach ( $plan['delete'] as $id ) {
@@ -182,12 +295,7 @@ final class Screen {
 		/** This action is documented in wp-includes/nav-menu.php */
 		do_action( 'wp_update_nav_menu', $menu_id, array( 'menu-name' => $menu ? $menu->name : '' ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hook.
 
-		// Elementor caches rendered widgets; Nav Menu widgets must show the new menu.
-		if ( did_action( 'elementor/loaded' ) && class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->files_manager ) ) {
-			\Elementor\Plugin::$instance->files_manager->clear_cache();
-		}
-
-		self::back( $slot, $failed ? array( __( 'Some items couldn’t be saved. Check the menu and try again.', 'favr-sites' ) ) : array() );
+		return $failed ? array( __( 'Some items couldn’t be saved. Check the menu and try again.', 'favr-sites' ) ) : array();
 	}
 
 	/**
@@ -263,19 +371,21 @@ final class Screen {
 	}
 
 	/**
-	 * Back to the screen, with errors if any.
+	 * Back to the screen, at the card whose button was pressed, with what was saved and any errors.
 	 *
-	 * @param string       $slot   Slot.
-	 * @param list<string> $errors Errors.
+	 * @param string                      $slot   The pressed slot.
+	 * @param list<string>                $saved  Saved slots.
+	 * @param array<string, list<string>> $errors Errors by slot.
 	 */
-	private static function back( string $slot, array $errors ): never {
+	private static function back( string $slot, array $saved, array $errors ): never {
 		if ( $errors ) {
 			set_transient( self::errorsKey(), $errors, 5 * MINUTE_IN_SECONDS );
 		}
-		$url = add_query_arg(
+		$flag = self::savedFlag( $saved );
+		$url  = add_query_arg(
 			array(
 				'page'  => self::PAGE,
-				'saved' => $errors ? false : $slot,
+				'saved' => '' !== $flag ? $flag : false,
 			),
 			admin_url( 'admin.php' )
 		);

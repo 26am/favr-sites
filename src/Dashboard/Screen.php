@@ -86,7 +86,7 @@ final class Screen {
 				'label'      => __( 'Edit pages', 'favr-sites' ),
 				'url'        => admin_url( 'edit.php?post_type=page' ),
 				'capability' => 'edit_pages',
-				'icon'       => 'page',
+				'icon'       => 'pages',
 				'priority'   => 90,
 			),
 		);
@@ -101,7 +101,7 @@ final class Screen {
 					'label'      => $label,
 					'url'        => Routing::elementorUrl( $templates[ $role ] ),
 					'capability' => 'edit_pages',
-					'icon'       => 'page',
+					'icon'       => $role, // A bar at the top or at the bottom of a page.
 					'priority'   => 'header' === $role ? 20 : 21,
 				);
 			}
