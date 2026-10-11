@@ -18,7 +18,7 @@ plugin notices appear on the Favr screen.
 For the Editor role (Administrators keep stock WordPress):
 
 - **Pages open only in Elementor.** Titles, Edit links and direct `post.php?action=edit` URLs go to
-  Elementor; "Add Page" creates an Elementor page; Elementor's Exit returns to the Pages list.
+  Elementor; "Add page" creates an Elementor page; Elementor's Exit returns to the Pages list.
 - **Anything that doesn't fit is locked** ("Managed by Favr"): pages not built with Elementor
   (e.g. Favr Members' login and account pages, so a shortcode page can't be broken) and News posts
   built with Elementor. Enforced through WordPress capabilities.
@@ -30,14 +30,29 @@ For the Editor role (Administrators keep stock WordPress):
   Angie" prompt), Components and Globals tabs, single-post, shop and other-theme widget groups
   are gone, from search too; so are the Design System, Page Settings and Finder buttons.
   Everyday widgets (Layout, Basic, General, Pro, Site) stay.
-- **Lists:** only View and a small bin icon under titles; no Comments or Yoast columns.
+- **Lists:** only View and a small bin icon under titles; no Comments, Yoast or Rank Math
+  columns. Dates read "Oct 8, 2026", with a word above them only when the item is not published
+  ("Scheduled", "Last modified"); the Media Library's list uses the same dates. Favr's own lists
+  (Members, Directory, Events, Documents, People, Sponsors) have no month filter; News, Pages and
+  Media keep theirs.
 - **No WordPress credit** ("Thank you for creating with WordPress", the version) under an
   Editor's screens.
-- **Menu:** Dashboard, Pages, News, Header & Footer, Alert banner, Media, Approvals, Directory, Events, Members,
-  Documents, People, Sponsors, Profile (the last three come from Favr Content).
-  Everything else is hidden (allow-list). "Posts" is called "News".
+- **Menu:** Dashboard and Approvals, then two groups with a small heading each. **Website**:
+  Pages, News, Header & footer, Alert banner, Media. **Organization**: Members, Directory, Events,
+  Documents, People, Sponsors (the last three come from Favr Content). Profile comes last.
+  Everything else is hidden (allow-list). A group nobody has installed, or that the Editor may
+  not open, has no heading; the collapsed menu shows a hairline between groups.
+- **Words:** "Posts" is called "News", and labels are in sentence case: "All pages / Add page",
+  "Library / Add media", "All categories / Add category", "Header & footer". The Media screens'
+  own title, button and search say the same ("Media library", "Add media", "Search media").
+- **Edit screens** (classic ones; not the block editor or Elementor): a "← All events" link above
+  the title goes back to the list ("← All categories" on a category). Editors have no Screen
+  Options, no Help tab and no Author, Slug, Attributes, Custom Fields, Discussion, Comments,
+  Trackbacks or Revisions box. Because nobody can bring back what Screen Options once hid,
+  earlier choices (hidden boxes, hidden columns, one-column layout) stop applying. The permalink
+  under the title can still be edited.
 - **Admin bar** (wp-admin and the public site): the WordPress logo menu becomes a Favr help menu
-  (help centre, email and phone from the help links); the account menu shows the first name,
+  (help center, email and phone from the help links); the account menu shows the first name,
   "Site editor", "Your profile" and "Log out"; "New" lists only News post, Page and Media; Elementor's
   "Edit with Elementor" dropdown is hidden (WordPress's Edit link already opens pages in Elementor).
 - **Elementor editor** (0.5): the main menu keeps User Preferences and Keyboard Shortcuts; Site
@@ -47,12 +62,13 @@ For the Editor role (Administrators keep stock WordPress):
   (`assets/elementor/editor.js`), so a renamed Elementor item falls back to its default.
 
 - **Your profile** (0.6): Editors get a short Favr profile page: name, email (WordPress's confirm-by-email
-  step still applies), password, photo via Gravatar, and a one-row colour-scheme picker (50px swatches).
+  step still applies), password and photo via Gravatar. There is no colour scheme to pick (Editors
+  always get Favr's), and saving leaves the scheme stored for the user as it was.
   Nickname and display name follow First/Last name. Pinned for Editors: toolbar always on (except inside Elementor's editor preview, where it would sit on top of the page's header), Media
   infinite scrolling on, application passwords off, Elementor AI off. Saving uses WordPress's own
   profile update.
 
-- **Header & Footer** (0.7 as Menus; renamed in 0.8): a Favr screen for the site's **Header** and **Footer** menus instead of
+- **Header & footer** (0.7 as Menus; renamed in 0.8): a Favr screen for the site's **Header** and **Footer** menus instead of
   Appearance → Menus. Drag or use the arrows to reorder, rename in place, make an item a dropdown
   item (one level), remove (its dropdown items move up), add a page or a link (web address, email,
   phone or a `/path`). "Pages not in a menu yet" suggests published pages in neither menu. Each
@@ -78,12 +94,17 @@ If Elementor isn't active, the page rules switch off and pages use the block edi
 
 - **Favr admin colour scheme** (Profile → Admin Color Scheme), from the Favr brand palette:
   aubergine menus and admin bar, rust highlights, links and buttons, gold notification bubbles and
-  a cream page. It's the default for Editors who have never picked a scheme; everyone can choose it.
+  a cream page. Every Editor gets it, whatever scheme is stored for them (WordPress stores its own
+  default for each new user, so "Editors who never chose" was nobody); everyone else can choose it.
   Whoever uses it keeps those colours on the toolbar on the public site too (0.9.1).
   Source: `assets/admin-colors/favr/colors.scss` (built on WordPress's own scheme sources);
   rebuild with `npx --yes sass@1 --no-source-map --style=compressed assets/admin-colors/favr/colors.scss assets/admin-colors/favr/colors.css`.
 - **Favr screens** (dashboard, admin-bar logo) use the brand tokens in `assets/dashboard/tokens.css`
   and the brand fonts Fraunces and Source Sans 3 (self-hosted, OFL).
+- **The skin**: for Editors every other wp-admin screen (lists, edit screens, categories, Media,
+  the Favr plugins' screens) is drawn with the same tokens by the sheets in `assets/skin/`
+  (`base.css` documents the selector rules). Administrators keep stock WordPress. Design:
+  `docs/superpowers/specs/2026-10-11-editor-skin-design.md`.
 
 ## Help links
 
@@ -119,12 +140,12 @@ posts index (it creates a plain News page instead). A trashed Home/News is repla
 `favr_sites_foundations` option; if anything goes wrong while repairing, it's logged and wp-admin
 keeps working.
 
-Editors can edit Home, Header and Footer (the Header & Footer screen's "Edit header design" /
+Editors can edit Home, Header and Footer (the Header & footer screen's "Edit header design" /
 "Edit footer design", or the dashboard's "Edit header" / "Edit footer"), but can't delete or
 unpublish any of the four, or change any Elementor template's display conditions. The News page
 is "Managed by Favr" (WordPress shows posts there, not the page's own content). In Elementor,
 Editors don't get "Display Conditions" (Save Draft stays: on a published page Elementor only saves
-a draft revision), and Exit returns to Header & Footer.
+a draft revision), and Exit returns to Header & footer.
 Administrators are never locked; they can add more specific headers (e.g. for Events).
 
 ## Menus
@@ -167,6 +188,12 @@ add_filter( 'favr_sites_dashboard_cards', function ( array $cards ): array {
 	return $cards;
 } );
 ```
+
+The dashboard follows the Editor's menu: the quick actions and cards Favr knows by `id` are
+placed in a fixed order whatever their `priority` (actions: `add-event`, `add-post`, `add-member`,
+`add-listing`, `add-document`, `edit-pages`, `edit-header`, `edit-footer`, `banner`; cards:
+`members`, `dues`, `directory`, `events`, `content`). Anything else follows, by `priority` then
+name. The lists are `Dashboard\Items::ACTION_ORDER` and `CARD_ORDER`.
 
 Other filters: `favr_sites_dashboard_enabled` (bool, WP_User) and `favr_sites_activity_post_types`.
 

@@ -31,16 +31,36 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
 - `Dashboard\Screen` builds the view model; `templates/dashboard.php` escapes everything.
 - Other plugins contribute **plain data only** via `favr_sites_quick_actions` and
   `favr_sites_dashboard_cards` (arrays, or closures/[object, method] returning an array, which are
-  built inside try/catch). `Dashboard\Items` normalizes, filters by capability and sorts.
+  built inside try/catch). `Dashboard\Items` normalizes, filters by capability and sorts by
+  priority, then puts the ids it knows in the menu's order (`ACTION_ORDER`, `CARD_ORDER`; unknown
+  ids follow). A new sibling action or card needs its id added there to get a fixed place.
 - `Dashboard\Attention` reads the existing `favr_approvals_providers` contract (favr/core inbox).
 - `Dashboard\Activity`: 10 most recent changes across editable post types; nothing is stored.
 - `Help\Links`: constant (`FAVR_SITES_HELP_URL`, …) → `favr_sites_help` option → default.
 - `Editors\*` (Editor role only, via `Audience::current()`): `PageLock` (map_meta_cap denies
   edit/delete/publish incl. `edit_page`/`delete_page`, which Elementor checks, on pages not built
   with Elementor and on News posts built with Elementor), `Routing` (pages → Elementor, no Elementor on posts), `BlockList`,
-  `ListTables`, `Menu` (allow-list + "News"; hooked on the front end too for the admin bar
-  labels), `AdminBar` (Favr help menu, account menu, short "New", no Elementor dropdown). Opening a page in Elementor stamps it as an Elementor
+  `ListTables` (row actions, no SEO columns, "Oct 8, 2026" dates with a status word only when
+  not published, no month filter on Favr post types), `Menu`, `Chrome`, `Wayfinding`,
+  `AdminBar` (Favr help menu, account menu, short "New", no Elementor dropdown). Opening a page in Elementor stamps it as an Elementor
   page immediately, so never "test" a locked page by loading `action=elementor` on a real site.
+- `Editors\Menu`: allow-list in `TOP` + `GROUPS` (website, organization, account). `arrange()`
+  (pure) returns the kept slugs with a `separator-favr-{group}` before each group that has an
+  entry. The separators are put into `$menu` inside the `menu_order` filter (`withSeparators()`),
+  not on `admin_menu`: only then has WordPress dropped the entries the user may not open, so an
+  empty group gets no heading. The headings' words are inline CSS on the `favr-sites-skin` handle
+  (`headingCss()`, escaped by `cssString()`); `assets/skin/base.css` draws them. Also the
+  sentence-case words: submenu labels (`relabel()`), post type and taxonomy labels for News, Pages,
+  Media, News categories and tags (`LABELS`; these filters run on the front end too, for the
+  toolbar), and WordPress's hard-coded Media screen words via `gettext` on those two screens only
+  (`mediaWords()`).
+- `Editors\Chrome`: no Screen Options, no Help tabs, and `BOXES` removed from classic edit
+  screens (never `postexcerpt`: Favr Events' summary). Two consequences it handles: saved Screen
+  Options choices stop applying (`hidden_meta_boxes`, `hidden_columns`, `screen_layout_*`), and it
+  prints a hidden `post_name` field, because WordPress keeps the field the permalink editor saves
+  through inside the Slug box.
+- `Editors\Wayfinding`: the "← All events" link (`.favr-back`) on `all_admin_notices` at the last
+  priority, so it lands right above `.wrap`, on classic `post.php`/`post-new.php` and `term.php`.
 - `ElementorEditor` also drops Elementor's `editor-widget-creation` package and the Angie auto-guide for
   Editors (PHP filters), hides widget groups (`HIDE_CATEGORIES`, CSS from `panelCss()`; `editor.js` sets
   `show_in_panel` so search agrees) and colours the top bar (`assets/elementor/editor.css`).
@@ -49,7 +69,9 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   dequeues `e-editor-notifications`. Check the ids when Elementor updates.
 - `Profile\ProfilePage` + `templates/profile.php`: Editors' profile.php takeover (GET and the
   `action=update` POST, which it saves via `personal_options_update` + `edit_user()`); core's
-  `newuseremail`/`dismiss` GET links are left to core.
+  `newuseremail`/`dismiss` GET links are left to core. No colour scheme picker; `save()` posts the
+  stored `admin_color` back (`keptScheme()`), because `edit_user()` writes "fresh" when the field
+  is missing.
 - `Menus\*`: `Tree` (pure: nav items → depth-first rows with levels; submitted rows → a plan of
   updates/creates/deletes with the one-dropdown-level rule, foreign ids ignored, `cleanUrl`),
   `Slots` (Header/Footer → menu term ids; Settings → Favr; fresh-site defaults), `Usage`
@@ -69,14 +91,23 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   inline `assets/banner/banner.js`). The stored times are local strings; keep `banner.js`'s
   window check in step with `Banner::state()`.
 - `Comments\Off`: comments off for everyone; no data touched.
-- `Brand\ColorScheme`: the "Favr" admin colour scheme (default for Editors with no saved choice).
+- `Brand\ColorScheme`: the "Favr" admin colour scheme. `forUser()` returns it for every Editor
+  whatever is stored (the skin is drawn for it); everybody else keeps their choice.
   `assets/admin-colors/favr/toolbar.css` holds the scheme's `#wpadminbar` rules for the public site,
   where WordPress loads no scheme; it is copied from `colors.css` (a test fails if they drift).
   Edit `assets/admin-colors/favr/colors.scss`, then rebuild `colors.css` with
   `npx --yes sass@1 --no-source-map --style=compressed assets/admin-colors/favr/colors.scss assets/admin-colors/favr/colors.css`
   and commit both (no build step on client sites).
-- Styles: brand tokens only in `assets/dashboard/tokens.css`; everything else in
-  `dashboard.css`, scoped under `.favr-dash-screen` / `.favr-dash`.
+- `Skin\Skin` (Editors only): body class `favr-skin`, `tokens.css` and the sheets in
+  `assets/skin/` (the block editor only gets `base` and `media`). Design and the rules every sheet
+  follows: `docs/superpowers/specs/2026-10-11-editor-skin-design.md`.
+- Styles: brand tokens only in `assets/dashboard/tokens.css`. The four Favr screens (dashboard,
+  Header & footer, Alert banner, Profile) carry `favr-dash-screen` and have their own sheets
+  (`dashboard.css`, `menus/menus.css`, `banner/screen.css`, `profile/profile.css`), scoped under `.favr-dash-screen` / `.favr-dash`.
+  Every other Editor screen is styled by `assets/skin/*.css`, one surface per sheet: `base`
+  (shell, menu groups, shared components), `lists`, `edit`, `fields`, `screens`, `media`. Shell
+  rules start `body.favr-skin`; content rules start
+  `body.favr-skin:where(:not(.favr-dash-screen))`. Text Editors read is US English, sentence case.
 
 ## Conventions
 
