@@ -1,7 +1,7 @@
 <?php
 /**
  * The admin bar for Editors: a Favr help menu instead of WordPress's, a friendlier account menu,
- * a shorter "New" menu and no Elementor dropdown.
+ * a "New" menu in Favr's order and no Elementor dropdown.
  *
  * @package FavrSites
  */
@@ -20,7 +20,13 @@ final class AdminBar {
 
 	private const LOGO_PARENTS = array( 'wp-logo', 'wp-logo-default', 'wp-logo-external' );
 	private const NEW_PARENTS  = array( 'new-content', 'new-content-default' );
-	private const NEW_KEEP     = array( 'new-content-default', 'new-post', 'new-page', 'new-media' );
+
+	/**
+	 * What "New" offers, by post type: first what the dashboard's quick actions add, in their order
+	 * (Dashboard\Items::ACTION_ORDER: event, news post, member, directory listing, document), then
+	 * the rest in the menu's order, Media last. Other post types are not offered.
+	 */
+	public const NEW_ORDER = array( 'favr_event', 'post', 'favr_member', 'favr_business', 'favr_document', 'page', 'favr_person', 'favr_sponsor', 'attachment' );
 
 	/**
 	 * Help menu items from the Favr help links; empty links are skipped.
@@ -80,7 +86,7 @@ final class AdminBar {
 	}
 
 	/**
-	 * "New" entries other than News post, Page and Media.
+	 * Everything WordPress put under "New"; Favr's entries are added in their place.
 	 *
 	 * @param array<string, string> $parents Node id => parent id.
 	 * @return list<string>
@@ -88,11 +94,47 @@ final class AdminBar {
 	public static function newNodesToRemove( array $parents ): array {
 		$out = array();
 		foreach ( $parents as $id => $parent ) {
-			if ( in_array( $parent, self::NEW_PARENTS, true ) && ! in_array( $id, self::NEW_KEEP, true ) ) {
+			if ( in_array( $parent, self::NEW_PARENTS, true ) && ! in_array( $id, self::NEW_PARENTS, true ) ) {
 				$out[] = (string) $id;
 			}
 		}
 		return $out;
+	}
+
+	/**
+	 * The entries of "New", in Favr's order, each named by its post type in sentence case.
+	 *
+	 * @param array<string, string> $labels Post type => its singular name, for the post types that
+	 *                                      exist and the user may add to.
+	 * @return list<array{id: string, title: string, path: string}> `path` is inside wp-admin.
+	 */
+	public static function newItems( array $labels ): array {
+		$items = array();
+		foreach ( self::NEW_ORDER as $type ) {
+			$title = Words::sentence( (string) ( $labels[ $type ] ?? '' ) );
+			if ( '' === $title ) {
+				continue;
+			}
+			$items[] = array(
+				'id'    => 'attachment' === $type ? 'new-media' : 'new-' . $type,
+				'title' => $title,
+				'path'  => self::newPath( $type ),
+			);
+		}
+		return $items;
+	}
+
+	/**
+	 * Where a post type is added.
+	 *
+	 * @param string $type Post type.
+	 */
+	private static function newPath( string $type ): string {
+		$paths = array(
+			'post'       => 'post-new.php',
+			'attachment' => 'media-new.php',
+		);
+		return $paths[ $type ] ?? 'post-new.php?post_type=' . rawurlencode( $type );
 	}
 
 	/**
@@ -145,9 +187,32 @@ final class AdminBar {
 			}
 		}
 
-		// "New": News post, Page, Media.
+		// "New": everything this Editor can add, in the dashboard's order. Its own link adds the first.
 		foreach ( self::newNodesToRemove( $parents ) as $id ) {
 			$bar->remove_node( $id );
+		}
+		if ( isset( $parents['new-content'] ) ) {
+			$items = self::newItems( self::addableLabels() );
+			if ( ! $items ) {
+				$bar->remove_node( 'new-content' );
+			} else {
+				$bar->add_node(
+					array(
+						'id'   => 'new-content',
+						'href' => admin_url( $items[0]['path'] ),
+					)
+				);
+			}
+			foreach ( $items as $item ) {
+				$bar->add_node(
+					array(
+						'parent' => 'new-content',
+						'id'     => $item['id'],
+						'title'  => esc_html( $item['title'] ),
+						'href'   => admin_url( $item['path'] ),
+					)
+				);
+			}
 		}
 
 		// Account menu: their name, "Site editor", "Your profile", "Log out".
@@ -180,6 +245,23 @@ final class AdminBar {
 				)
 			);
 		}
+	}
+
+	/**
+	 * The post types on "New" that exist and that the user may add to, each with the name
+	 * WordPress uses for it on the toolbar.
+	 *
+	 * @return array<string, string> Post type => name.
+	 */
+	private static function addableLabels(): array {
+		$labels = array();
+		foreach ( self::NEW_ORDER as $name ) {
+			$type = get_post_type_object( $name );
+			if ( $type && current_user_can( $type->cap->create_posts ) ) {
+				$labels[ $name ] = (string) ( $type->labels->name_admin_bar ?? $type->labels->singular_name ?? '' );
+			}
+		}
+		return $labels;
 	}
 
 	/**
