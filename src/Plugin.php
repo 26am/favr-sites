@@ -49,6 +49,7 @@ final class Plugin {
 			( new Dashboard\Takeover() )->hook();
 			( new Editors\ListTables() )->hook();
 			( new Editors\AdminFooter() )->hook();
+			( new Skin\Skin() )->hook();
 		}
 	}
 }

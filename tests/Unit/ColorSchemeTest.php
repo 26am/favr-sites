@@ -12,9 +12,10 @@ final class ColorSchemeTest extends TestCase {
 		$this->assertSame( 'favr', ColorScheme::forUser( '', true ) );
 	}
 
-	public function test_a_chosen_scheme_is_kept(): void {
-		$this->assertSame( 'light', ColorScheme::forUser( 'light', true ) );
-		$this->assertSame( 'fresh', ColorScheme::forUser( 'fresh', true ) );
+	public function test_editors_always_get_favr_whatever_is_saved(): void {
+		// WordPress saves its own default scheme for every new user, so "never chose" is rare.
+		$this->assertSame( 'favr', ColorScheme::forUser( 'modern', true ) );
+		$this->assertSame( 'favr', ColorScheme::forUser( 'fresh', true ) );
 	}
 
 	public function test_everyone_else_is_left_alone(): void {

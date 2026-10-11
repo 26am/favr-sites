@@ -12,8 +12,8 @@ namespace FavrSites\Brand;
 use FavrSites\Dashboard\Audience;
 
 /**
- * Registers "Favr" under Profile → Admin Color Scheme for everyone, and makes it the default for
- * Editors who have never picked one. Built from WordPress's own scheme sources
+ * Registers "Favr" under Profile → Admin Color Scheme for everyone, and makes it the scheme every
+ * Editor sees. Built from WordPress's own scheme sources
  * (assets/admin-colors/favr/colors.scss → colors.css), so every part of wp-admin is covered.
  */
 final class ColorScheme {
@@ -21,14 +21,16 @@ final class ColorScheme {
 	public const SLUG = 'favr';
 
 	/**
-	 * The scheme a user sees.
+	 * The scheme a user sees. Editors always get Favr: WordPress saves its own default scheme for
+	 * every new user, so waiting for "never chose" left client staff on WordPress's colours, and
+	 * the skin (Skin\Skin) is drawn for this scheme.
 	 *
 	 * @param string|false $saved     Their saved admin_color (false/'' when they never chose).
 	 * @param bool         $is_editor In the Favr audience.
 	 * @return string|false
 	 */
 	public static function forUser( $saved, bool $is_editor ) {
-		return $is_editor && ( false === $saved || '' === $saved ) ? self::SLUG : $saved;
+		return $is_editor ? self::SLUG : $saved;
 	}
 
 	/**
@@ -76,7 +78,7 @@ final class ColorScheme {
 	}
 
 	/**
-	 * Favr by default for Editors.
+	 * Favr for Editors.
 	 *
 	 * @param mixed    $result Saved value.
 	 * @param string   $option Option name.

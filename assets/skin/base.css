@@ -1,0 +1,618 @@
+/*
+ * Favr skin: base. The Favr look for every wp-admin screen an Editor sees.
+ *
+ * Loaded for Editors only (Skin\Skin adds `favr-skin` to <body>). Brand tokens come from
+ * assets/dashboard/tokens.css. This sheet owns the shell and the shared components (page title,
+ * buttons, fields, notices, cards, plain tables); the other sheets in this folder style one
+ * surface each and reuse these components instead of inventing new ones.
+ *
+ * Two prefixes, on purpose:
+ *   body.favr-skin                                    the shell: menu, toolbar, page background.
+ *   body.favr-skin:where(:not(.favr-dash-screen))     the content area. The Favr screens
+ *       (dashboard, Header & footer, Alert banner, Profile) carry `favr-dash-screen` and have
+ *       their own sheets, so nothing here reaches into them.
+ */
+
+/* ---------- 1. Shell ---------- */
+
+body.favr-skin,
+body.favr-skin #wpcontent,
+body.favr-skin #wpbody-content {
+	background: var(--favr-paper);
+}
+
+body.favr-skin {
+	color: var(--favr-ink);
+	font-family: var(--favr-font-sans);
+}
+
+body.favr-skin #wpadminbar * {
+	font-family: var(--favr-font-sans);
+}
+
+body.favr-skin #wpfooter,
+body.favr-skin #screen-meta,
+body.favr-skin #screen-meta-links {
+	display: none;
+}
+
+/* ---------- 2. The menu ---------- */
+
+body.favr-skin #adminmenu {
+	margin-top: 8px;
+}
+
+body.favr-skin #adminmenu .wp-menu-name {
+	font-size: 14.5px;
+	font-weight: 500;
+}
+
+body.favr-skin #adminmenu li.current .wp-menu-name,
+body.favr-skin #adminmenu li.wp-has-current-submenu .wp-menu-name {
+	font-weight: 600;
+}
+
+body.favr-skin #adminmenu .wp-submenu a {
+	font-size: 13.5px;
+}
+
+/* Group headings: Editors\Menu adds separators with these classes and prints each label as
+   inline CSS (`content: "…"`), so the words stay translatable. */
+body.favr-skin #adminmenu li.favr-menu-group {
+	height: auto;
+	margin: 0;
+	padding: 18px 12px 6px;
+	cursor: default;
+}
+
+body.favr-skin #adminmenu li.favr-menu-group .separator {
+	display: none;
+}
+
+body.favr-skin #adminmenu li.favr-menu-group::before {
+	display: block;
+	overflow: hidden;
+	color: rgba(251, 246, 239, 0.55);
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	line-height: 1.3;
+	text-overflow: ellipsis;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+/* Collapsed menu (and WordPress's automatic collapse on narrow windows): a hairline instead of words. */
+body.favr-skin.folded #adminmenu li.favr-menu-group {
+	padding: 8px 8px;
+}
+
+body.favr-skin.folded #adminmenu li.favr-menu-group::before {
+	height: 1px;
+	background: rgba(251, 246, 239, 0.18);
+	content: "" !important;
+}
+
+@media only screen and (max-width: 960px) and (min-width: 783px) {
+	body.favr-skin.auto-fold #adminmenu li.favr-menu-group {
+		padding: 8px 8px;
+	}
+
+	body.favr-skin.auto-fold #adminmenu li.favr-menu-group::before {
+		height: 1px;
+		background: rgba(251, 246, 239, 0.18);
+		content: "" !important;
+	}
+}
+
+/* ---------- 3. The page frame ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap {
+	margin: 24px 24px 48px 4px;
+	color: var(--favr-ink);
+	font-size: 14.5px;
+	line-height: 1.5;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap > h1,
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap > h1.wp-heading-inline {
+	margin: 0 12px 14px 0;
+	padding: 0;
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 34px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	line-height: 1.15;
+}
+
+/* The action beside the title ("Add event"). Filled where adding is the point of the screen
+   (lists), quiet on edit screens where Save is. */
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap .page-title-action {
+	position: relative;
+	top: -7px;
+	display: inline-flex;
+	align-items: center;
+	min-height: 36px;
+	margin: 0;
+	padding: 0 16px;
+	border: 1px solid var(--favr-accent);
+	border-radius: 999px;
+	background: var(--favr-accent);
+	color: var(--favr-paper);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1;
+	text-decoration: none;
+	box-shadow: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap .page-title-action:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap .page-title-action:focus {
+	border-color: var(--favr-accent-strong);
+	background: var(--favr-accent-strong);
+	color: var(--favr-paper);
+}
+
+body.favr-skin.post-php:where(:not(.favr-dash-screen)) .wrap .page-title-action,
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) .wrap .page-title-action {
+	border-color: var(--favr-line);
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+}
+
+body.favr-skin.post-php:where(:not(.favr-dash-screen)) .wrap .page-title-action:hover,
+body.favr-skin.post-php:where(:not(.favr-dash-screen)) .wrap .page-title-action:focus,
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) .wrap .page-title-action:hover,
+body.favr-skin.term-php:where(:not(.favr-dash-screen)) .wrap .page-title-action:focus {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+}
+
+/* "← All events" above the title on edit screens (Editors\Wayfinding prints it). */
+body.favr-skin .favr-back {
+	margin: 20px 24px -12px 4px;
+	font-size: 13.5px;
+	font-weight: 600;
+}
+
+body.favr-skin .favr-back a {
+	display: inline-flex;
+	gap: 6px;
+	align-items: center;
+	color: var(--favr-muted);
+	text-decoration: none;
+}
+
+body.favr-skin .favr-back a:hover,
+body.favr-skin .favr-back a:focus {
+	color: var(--favr-accent);
+}
+
+/* ---------- 4. Type ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap h2 {
+	color: var(--favr-ink);
+	font-family: var(--favr-font-display);
+	font-size: 19px;
+	font-weight: 500;
+	line-height: 1.25;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap h3,
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap h4 {
+	color: var(--favr-ink);
+	font-size: 14.5px;
+	font-weight: 600;
+}
+
+/* Link colours come from the Favr colour scheme (Brand\ColorScheme); only the focus ring is ours. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) a {
+	transition: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) a:focus {
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) a:focus-visible {
+	border-radius: 4px;
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap p,
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap label,
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap li,
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap td,
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap th {
+	font-size: 14.5px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap .description,
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap p.description,
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap .howto {
+	color: var(--favr-muted);
+	font-size: 13.5px;
+	font-style: normal;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap code,
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap kbd {
+	border-radius: 6px;
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap hr {
+	border: 0;
+	border-top: 1px solid var(--favr-line);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wrap hr.wp-header-end {
+	border: 0;
+}
+
+/* ---------- 5. Buttons ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .button,
+body.favr-skin:where(:not(.favr-dash-screen)) .button-secondary {
+	min-height: 36px;
+	padding: 0 16px;
+	border: 1px solid var(--favr-line);
+	border-radius: 999px;
+	background: var(--favr-surface);
+	color: var(--favr-ink);
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 34px;
+	box-shadow: none;
+	text-shadow: none;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .button:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .button-secondary:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .button:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .button-secondary:focus {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent-soft);
+	color: var(--favr-ink);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .button:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) .button-primary:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .button-primary {
+	border-color: var(--favr-accent);
+	background: var(--favr-accent);
+	color: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .button-primary:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .button-primary:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .button-primary:active {
+	border-color: var(--favr-accent-strong);
+	background: var(--favr-accent-strong);
+	color: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .button.button-small {
+	min-height: 30px;
+	padding: 0 12px;
+	font-size: 13px;
+	line-height: 28px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .button.button-large,
+body.favr-skin:where(:not(.favr-dash-screen)) .button.button-hero {
+	min-height: 40px;
+	padding: 0 22px;
+	font-size: 15px;
+	line-height: 38px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .button[disabled],
+body.favr-skin:where(:not(.favr-dash-screen)) .button:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) .button.disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) .button-primary[disabled],
+body.favr-skin:where(:not(.favr-dash-screen)) .button-primary:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) .button-primary.disabled {
+	border-color: var(--favr-line) !important;
+	background: var(--favr-sand) !important;
+	color: #9a8c93 !important;
+	cursor: default;
+}
+
+/* Text buttons. */
+body.favr-skin:where(:not(.favr-dash-screen)) .button-link {
+	color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .button-link:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .button-link:focus {
+	color: var(--favr-accent-strong);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) .button-link-delete,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) a.submitdelete,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) .delete a,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) .trash a {
+	color: var(--favr-danger);
+}
+
+/* The colour swatch button keeps WordPress's shape. */
+body.favr-skin:where(:not(.favr-dash-screen)) .button.wp-color-result {
+	min-height: 30px;
+	padding: 0 0 0 30px;
+	border-radius: 6px;
+	line-height: 28px;
+}
+
+/* ---------- 6. Fields ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="search"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="email"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="url"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="tel"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="number"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="password"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="date"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="time"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="datetime-local"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) select,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) textarea {
+	min-height: 40px;
+	border: 1px solid var(--favr-field-line);
+	border-radius: var(--favr-radius-sm);
+	background-color: var(--favr-field);
+	color: var(--favr-ink);
+	font-size: 14.5px;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="text"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="search"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="email"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="url"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="tel"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="number"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="password"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="date"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="time"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="datetime-local"] {
+	padding: 0 12px;
+	line-height: 38px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) select {
+	padding: 0 32px 0 12px;
+	background-position: right 10px top 55%;
+	line-height: 38px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) textarea {
+	padding: 9px 12px;
+	line-height: 1.5;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) select:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) textarea:focus {
+	border-color: var(--favr-accent);
+	outline: 2px solid var(--favr-accent-soft);
+	outline-offset: 0;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) ::placeholder {
+	color: #8d7f88;
+	opacity: 1;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="checkbox"],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="radio"] {
+	border-color: #b8a99c;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="checkbox"]:checked,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="radio"]:checked {
+	border-color: var(--favr-accent);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="checkbox"]:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="radio"]:focus {
+	border-color: var(--favr-accent);
+	outline: 2px solid var(--favr-accent-soft);
+	outline-offset: 1px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[readonly],
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) select:disabled,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) textarea:disabled {
+	border-color: var(--favr-line);
+	background-color: var(--favr-sand);
+	color: var(--favr-muted);
+}
+
+/* ---------- 7. Notices ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .notice,
+body.favr-skin:where(:not(.favr-dash-screen)) div.updated,
+body.favr-skin:where(:not(.favr-dash-screen)) div.error {
+	margin: 0 0 16px;
+	padding: 4px 16px;
+	border: 0;
+	border-left: 4px solid var(--favr-aubergine);
+	border-radius: var(--favr-radius-sm);
+	background: var(--favr-sand);
+	color: var(--favr-ink);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .notice p,
+body.favr-skin:where(:not(.favr-dash-screen)) div.updated p,
+body.favr-skin:where(:not(.favr-dash-screen)) div.error p {
+	margin: 8px 0;
+	font-size: 14.5px;
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .notice-success,
+body.favr-skin:where(:not(.favr-dash-screen)) div.updated {
+	border-left-color: var(--favr-ok);
+	background: var(--favr-ok-soft);
+	color: var(--favr-ok);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .notice-error,
+body.favr-skin:where(:not(.favr-dash-screen)) div.error {
+	border-left-color: var(--favr-danger);
+	background: var(--favr-danger-soft);
+	color: var(--favr-danger);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .notice-warning {
+	border-left-color: var(--favr-gold);
+	background: var(--favr-attention-soft);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) .notice a {
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .notice-dismiss::before {
+	color: currentcolor;
+	opacity: 0.6;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .notice-dismiss:hover::before,
+body.favr-skin:where(:not(.favr-dash-screen)) .notice-dismiss:focus::before {
+	color: currentcolor;
+	opacity: 1;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .notice-dismiss:focus {
+	border-radius: 6px;
+	outline: 2px solid currentcolor;
+	box-shadow: none;
+}
+
+/* ---------- 8. Cards and plain tables ---------- */
+
+body.favr-skin:where(:not(.favr-dash-screen)) .postbox,
+body.favr-skin:where(:not(.favr-dash-screen)) .card,
+body.favr-skin:where(:not(.favr-dash-screen)) .stuffbox {
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat {
+	overflow: hidden;
+	border: 1px solid var(--favr-line);
+	border-radius: var(--favr-radius);
+	border-spacing: 0;
+	background: var(--favr-surface);
+	box-shadow: var(--favr-shadow);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat thead th,
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat thead td,
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat tfoot th,
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat tfoot td {
+	border-color: var(--favr-line);
+	color: var(--favr-muted);
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat thead th a,
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat tfoot th a {
+	color: var(--favr-muted);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat td,
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat tbody th {
+	color: var(--favr-ink);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat tbody tr > * {
+	border-top: 1px solid var(--favr-line);
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat tbody tr:first-child > * {
+	border-top: 0;
+}
+
+/* No zebra stripes: a hairline between rows and a warm hover instead. */
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat.striped > tbody > :nth-child(odd),
+body.favr-skin:where(:not(.favr-dash-screen)) ul.striped > :nth-child(odd),
+body.favr-skin:where(:not(.favr-dash-screen)) .alternate {
+	background-color: transparent;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) table.widefat > tbody > tr:hover {
+	background-color: var(--favr-paper);
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .form-table th {
+	color: var(--favr-ink);
+	font-size: 14.5px;
+	font-weight: 600;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .spinner {
+	filter: sepia(1) saturate(0.6);
+}
+
+/* ---------- 9. Small screens ---------- */
+
+@media (max-width: 782px) {
+	body.favr-skin:where(:not(.favr-dash-screen)) .wrap {
+		margin: 16px 12px 32px 0;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wrap > h1,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wrap > h1.wp-heading-inline {
+		font-size: 28px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wrap .page-title-action {
+		top: -4px;
+	}
+
+	body.favr-skin .favr-back {
+		margin: 16px 12px -8px 0;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .button,
+	body.favr-skin:where(:not(.favr-dash-screen)) .button-secondary,
+	body.favr-skin:where(:not(.favr-dash-screen)) .button-primary {
+		min-height: 40px;
+		line-height: 38px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body.favr-skin:where(:not(.favr-dash-screen)) .button,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wrap .page-title-action {
+		transition: none;
+	}
+}

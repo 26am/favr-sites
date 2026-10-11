@@ -16,7 +16,8 @@
 	font-display: swap;
 }
 
-.favr-dash-screen {
+.favr-dash-screen,
+.favr-skin {
 	--favr-ink: #2e2230;
 	--favr-muted: #5b4b57;
 	--favr-paper: #fbf6ef;
@@ -30,6 +31,12 @@
 	--favr-aubergine: #3a2738;
 	--favr-attention: #a9472a;
 	--favr-attention-soft: #f8e6c8;
+	--favr-ok: #1f5a33;
+	--favr-ok-soft: #e7f2ea;
+	--favr-danger: #8a2415;
+	--favr-danger-soft: #fbe9e6;
+	--favr-field: #fff;
+	--favr-field-line: #dfd2bf;
 	--favr-radius: 14px;
 	--favr-radius-sm: 10px;
 	--favr-gap: 20px;
