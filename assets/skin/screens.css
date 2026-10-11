@@ -9,10 +9,12 @@
 
 /* ---------- 1. Status pills ---------- */
 
-/* Invoice badges (Favr Payments) and member statuses (Favr Members), wherever they are printed;
-   in the lists also a renewal date that has passed and a document's file. Neutral unless a rule
-   below says otherwise. */
+/* Invoice badges and the status of each payment (Favr Payments) and member statuses (Favr
+   Members), wherever they are printed; in the lists also a renewal date that has passed and a
+   document's file. Neutral (a cancelled payment, a void invoice) unless a rule below says
+   otherwise. */
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-badge,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-ledger-status,
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-status,
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-overdue,
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-list-missing,
@@ -34,8 +36,9 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-approvals__queue .count {
 	vertical-align: middle;
 }
 
-/* Good: paid, active. */
+/* Good: paid, active, a payment that went through. */
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-badge--paid,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-ledger-status--succeeded,
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-status--active {
 	background: var(--favr-ok-soft);
 	color: var(--favr-ok);
@@ -43,14 +46,17 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-status--active {
 
 /* Waiting: unpaid, pending, awaiting payment. */
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-badge--open,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-ledger-status--pending,
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-status--pending,
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-status--awaiting_payment {
 	background: var(--favr-attention-soft);
 	color: var(--favr-accent-strong);
 }
 
-/* Bad: overdue, lapsed, a renewal date that has passed, a document without its file. */
+/* Bad: overdue, lapsed, a payment that failed, a renewal date that has passed, a document
+   without its file. */
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-badge--overdue,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-ledger-status--failed,
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-status--lapsed,
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-overdue,
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-list-missing {
@@ -145,6 +151,13 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-approvals > .notice {
 	order: -2;
 }
 
+/* With that card on the page every group is empty: five lines of "Nothing waiting." under it
+   would only repeat it. */
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-approvals:has(> .favr-approvals__done) > .favr-approvals__queue,
+body.favr-skin:where(:not(.favr-dash-screen)) .favr-approvals:has(> .favr-approvals__done) > .favr-approvals__empty {
+	display: none;
+}
+
 /* What is waiting comes first; the groups with nothing waiting become a short quiet list at the
    end, one line each. They hold nothing to click, so the order of the keyboard is unchanged. */
 @supports selector(:has(*)) {
@@ -179,7 +192,7 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-approvals > .notice {
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-approvals > .favr-approvals__item {
 	box-sizing: border-box;
 	max-width: none;
-	margin: 0 0 14px;
+	margin: 0 0 20px;
 	padding: 20px 22px;
 	border: 1px solid var(--favr-line);
 	border-radius: var(--favr-radius);
@@ -412,6 +425,29 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .invoices td.colum
 	}
 }
 
+/* Between the phone layout and 1200px seven equal columns would squeeze the name onto two
+   lines. There the table sizes each column by what is in it: numbers, dates and pills stay on
+   one line and "Billed to" takes the room that is left. */
+@media (min-width: 783px) and (max-width: 1199px) {
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin table.invoices {
+		table-layout: auto;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .invoices th,
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .invoices td {
+		white-space: nowrap;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .invoices td.column-member {
+		width: 34%;
+		white-space: normal;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .invoices .column-balance {
+		padding-right: 24px;
+	}
+}
+
 /* Every row answers the pointer, here and on one invoice's payments (base.css's hover loses to
    its own no-stripes rule on every other row). */
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin table.widefat.striped > tbody > tr:not(.no-items):not(:has(> td[colspan])):hover {
@@ -468,24 +504,11 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .favr-pay-export >
 
 /* ---------- 4. Invoices: one invoice ---------- */
 
-/* Beside the title: the status, then a quiet way back (Record payment is this screen's action). */
+/* Beside the title: the status. (The way back is the link above the title.) */
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin > .favr-pay-badge {
 	position: relative;
 	top: -7px;
 	margin-right: 8px;
-}
-
-body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin > .favr-pay-badge ~ .page-title-action {
-	border-color: var(--favr-line);
-	background: var(--favr-surface);
-	color: var(--favr-ink);
-}
-
-body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin > .favr-pay-badge ~ .page-title-action:hover,
-body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin > .favr-pay-badge ~ .page-title-action:focus {
-	border-color: var(--favr-accent);
-	background: var(--favr-accent-soft);
-	color: var(--favr-ink);
 }
 
 /* The page is as wide as the dashboard; a message above it keeps to the same width. */
@@ -500,9 +523,9 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin > .favr-pay-badge 
 	max-width: 1180px;
 }
 
-/* The boxes on the right: one card per job. */
+/* The boxes on the right: one card per job, the dashboard's 20px apart. */
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .favr-pay-box {
-	margin: 0 0 16px;
+	margin: 0 0 20px;
 	padding: 14px 16px 16px;
 	border: 1px solid var(--favr-line);
 	border-radius: var(--favr-radius);
@@ -573,7 +596,7 @@ body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .favr-pay-danger:f
    one box, so the box steps aside and its two parts become the cards. */
 body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .favr-pay-main > .favr-pay-box {
 	display: grid;
-	gap: 16px;
+	gap: 20px;
 	margin: 0;
 	padding: 0;
 	border: 0;
@@ -896,10 +919,9 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-level__swatch
 	border-radius: 50%;
 }
 
-/* Level names are chips (Directory's Level column, Sponsors' Levels column). WordPress prints
-   those as bare links, and Members prints its level as bare text, so no chip can carry the
-   level's own colour dot yet: .favr-level-chip is ready for
-   <span class="favr-level-chip"><span class="favr-level__swatch" style="background:#…"></span>Name</span>. */
+/* Level names are chips. Directory and Members print .favr-level-chip with the level's own
+   colour dot (a link in Directory, plain text in Members); Sponsors' levels are WordPress's bare
+   links and have no colour of their own, so their chips carry no dot. */
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-taxonomy-favr_member_level a,
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-taxonomy-favr_sponsor_level a,
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-level-chip {
@@ -921,26 +943,40 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-level-chip {
 	vertical-align: middle;
 }
 
+/* A chip that is a link filters the list by that level: it answers the pointer and the keyboard. */
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-taxonomy-favr_member_level a:hover,
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-taxonomy-favr_member_level a:focus,
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-taxonomy-favr_sponsor_level a:hover,
-body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-taxonomy-favr_sponsor_level a:focus {
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-taxonomy-favr_sponsor_level a:focus,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table a.favr-level-chip:hover,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table a.favr-level-chip:focus {
 	background: var(--favr-accent-soft);
 	color: var(--favr-ink);
 	text-decoration: none;
+	box-shadow: none;
+}
+
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-taxonomy-favr_member_level a:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-taxonomy-favr_sponsor_level a:focus-visible,
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table a.favr-level-chip:focus-visible {
+	outline: 2px solid var(--favr-accent);
+	outline-offset: 2px;
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-level-chip .favr-level__swatch {
 	margin: -2px 6px 0 0;
 }
 
-/* Directory: the logo, or a letter tile when there is none. */
+/* The tile that starts a row (Directory's logo or letter, People's photo or initials): 44px
+   square, the same corners, initials in the display face. Set on the top of its line so every
+   row with a tile is the same height, whatever is in it. */
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table img.favr-list-logo,
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-list-logo--empty {
 	box-sizing: border-box;
 	border: 1px solid var(--favr-line);
 	border-radius: var(--favr-radius-sm);
 	background: var(--favr-field);
+	vertical-align: top;
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-list-logo--empty {
@@ -988,8 +1024,12 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.manage-col
 	display: none;
 }
 
+/* 16px, the height of the other headers' line, so this header row is no taller than theirs. */
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.column-favr_featured .dashicons {
+	width: 16px;
+	height: 16px;
 	color: var(--favr-muted);
+	font-size: 16px;
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table thead th.column-favr_featured.sorted .dashicons,
@@ -1031,7 +1071,8 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-meter + small
 /* Contact (Directory and Members): the phone and the e-mail on a line each. A long address ends
    in an ellipsis instead of breaking inside a word: it is its own box, so the ellipsis and the
    focus ring both end where it does. Directory prints an icon before it (one <div> per line);
-   Members prints it bare. */
+   Members prints it bare. Two 22px lines are the height of a tile, so these rows are as tall as
+   People's and Sponsors'. */
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-favr_contact a {
 	display: inline-block;
 	overflow: hidden;
@@ -1043,10 +1084,6 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-favr_cont
 
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-favr_contact > div > a {
 	max-width: calc(100% - 24px);
-}
-
-body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-favr_contact > div + div {
-	margin-top: 2px;
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-favr_contact .dashicons {
@@ -1103,10 +1140,8 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-favr_when
 	color: var(--favr-gold);
 }
 
-/* Documents: the file type is a neutral pill and the members-only lock is muted. Favr Content
-   prints both as plain text today ("PDF · 1 KB", "Members only"), so only "No file" is a pill
-   yet; these two rules are ready for <span class="favr-doc-type">PDF</span> in the File cell
-   and a dashicon in the Access cell. */
+/* Documents: the file type is a neutral pill before the size, and the lock on a members-only
+   document is muted. */
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-doc-type {
 	margin-right: 6px;
 }
@@ -1119,31 +1154,43 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table td.column-favr_acce
 	vertical-align: -3px;
 }
 
-/* People and Sponsors: the photo or initials, the logo, the handle that reorders. */
+/* People: the photo or initials, in the tile recipe above. */
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-list-photo {
+	width: 44px;
+	height: 44px;
 	border-radius: var(--favr-radius-sm);
 	background: var(--favr-sand);
 	color: var(--favr-aubergine);
-	font-size: 13px;
-	font-weight: 600;
+	font-family: var(--favr-font-display);
+	font-size: 17px;
+	font-weight: 500;
+	line-height: 1;
+	vertical-align: top;
 }
 
+body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-list-photo img {
+	width: 44px;
+	height: 44px;
+}
+
+/* Sponsors: the whole logo on a white tile, every tile the same 120px so the names line up. */
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table span.favr-list-logo:not(.favr-list-logo--empty) {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	box-sizing: border-box;
-	min-width: 44px;
-	min-height: 44px;
+	width: 120px;
+	height: 44px;
 	padding: 4px 8px;
 	border: 1px solid var(--favr-line);
 	border-radius: var(--favr-radius-sm);
 	background: var(--favr-field);
+	vertical-align: top;
 }
 
 body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table span.favr-list-logo:not(.favr-list-logo--empty) img {
 	display: block;
-	max-width: 86px;
+	max-width: 100%;
 	max-height: 34px;
 }
 
@@ -1169,10 +1216,15 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-order__move:f
 /* ---------- 6. Column widths ---------- */
 
 /* The plugins' short columns take what their text needs, so the name gets the rest. Widths are
-   the text's: the cells' padding comes on top (not for a sortable column or a percentage). */
+   the text's: the cells' 28px of padding comes on top, except in a sortable column (Date, When,
+   Status, Renewal), whose width is the whole cell's. Sized for windows 1024, 1280, 1366, 1440 and
+   1920 wide; the page itself stops growing at 1180px, or 1400px for Directory, Members and
+   Invoices (lists.css). */
 @media (min-width: 783px) {
-	/* Directory. The logo column is the tile's width; the name starts one padding after it. */
-	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .fixed .column-favr_logo {
+	/* The tile's column (Directory's logo, People's photo) is as wide as the tile; the name
+	   starts one padding after it. */
+	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .fixed .column-favr_logo,
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_photo {
 		width: 44px;
 		padding-right: 0;
 	}
@@ -1182,30 +1234,106 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-order__move:f
 		padding-left: 0;
 	}
 
-	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-taxonomy-favr_member_level {
-		width: 86px;
+	/* A level chip: its colour dot and a name as long as "Professional", at every width. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-taxonomy-favr_member_level,
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-favr_level {
+		width: 104px;
+	}
+
+	/* A date is always as short as "Sep 30, 2026". */
+	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-date,
+	body.favr-skin.post-type-favr_document:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-date {
+		width: 118px;
+	}
+
+	/* Directory on a small window: the name first, then the category; Contact keeps room for a
+	   phone number and the start of an address. */
+	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .fixed .column-taxonomy-favr_business_cat {
+		width: 13%;
 	}
 
 	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .fixed .column-favr_contact {
-		width: 17%;
-	}
-
-	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_city {
-		width: 11%;
+		width: 122px;
 	}
 
 	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_complete {
-		width: 92px;
+		width: 80px;
 	}
 
-	/* Members. Wide enough for "Individual", "Professional" (as a chip with its dot, when the
-	   plugin prints one) and "Awaiting payment" on one line. */
+	/* Members. "Individual" with its icon; "Awaiting payment" on one line from 1200px; a renewal
+	   date as short as "Sep 30, 2027", also as the pill of one that has passed. */
 	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_type {
 		width: 96px;
 	}
 
-	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_level {
-		width: 104px;
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_status {
+		width: 112px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-favr_renewal {
+		width: 118px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_logins {
+		width: 72px;
+	}
+
+	body.favr-skin.post-type-favr_member:where(:not(.favr-dash-screen)) .fixed .column-favr_contact {
+		width: 122px;
+	}
+
+	/* Documents. "PDF 1 KB" and "Members only" need little; the title gets the rest. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_file {
+		width: 102px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_access {
+		width: 122px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-taxonomy-favr_document_cat {
+		width: 15%;
+	}
+
+	/* Events. When holds "Oct 16, 2026 · 8:00 am" and an icon on one line. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-favr_when {
+		width: 208px;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-favr_host {
+		width: 15%;
+	}
+
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-taxonomy-favr_event_cat {
+		width: 14%;
+	}
+
+	/* Sponsors: the logo tile's 120px. */
+	body.favr-skin.post-type-favr_sponsor:where(:not(.favr-dash-screen)) .fixed .column-favr_logo {
+		width: 120px;
+	}
+
+	/* Membership levels. The table shares the page with the "Add level" form, so at 1024 it is
+	   about 500px wide: the name and Order (a number) keep to what they hold and Dues gets the
+	   rest, enough for "$1,250.00 per year" and "Join form: Individuals" on a line each. */
+	body.favr-skin.taxonomy-favr_member_level:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-name {
+		width: 26%;
+	}
+
+	body.favr-skin.taxonomy-favr_member_level:where(:not(.favr-dash-screen)) .fixed .column-favr_order {
+		width: 52px;
+	}
+}
+
+/* From 1200px the window has room to spare: Contact grows with it, so an e-mail address of
+   ordinary length shows whole. */
+@media (min-width: 1200px) {
+	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .fixed .column-taxonomy-favr_business_cat {
+		width: 12%;
+	}
+
+	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .fixed .column-favr_contact {
+		width: 24%;
 	}
 
 	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_status {
@@ -1213,42 +1341,64 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-order__move:f
 	}
 
 	body.favr-skin.post-type-favr_member:where(:not(.favr-dash-screen)) .fixed .column-favr_contact {
-		width: 19%;
-	}
-
-	/* Sponsors. */
-	body.favr-skin.post-type-favr_sponsor:where(:not(.favr-dash-screen)) .fixed .column-favr_logo {
-		width: 104px;
+		width: 24%;
 	}
 }
 
-/* A window too narrow for every column drops the ones an Editor needs least in a list: the
-   profile score first, then the city and who can log in. All of them are on the edit screen,
-   and on a phone WordPress folds every column behind the row's button instead. (From 1280px
-   wide every column shows.) */
+@media (min-width: 1400px) {
+	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .fixed .column-favr_contact,
+	body.favr-skin.post-type-favr_member:where(:not(.favr-dash-screen)) .fixed .column-favr_contact {
+		width: 24%;
+	}
+
+	/* "St. Petersburg" on one line. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-favr_city {
+		width: 124px;
+	}
+}
+
+/* A window too narrow for every column drops the ones an Editor needs least in a list: the city
+   first (under 1500px, so that at 1440 the name and a whole e-mail address fit), then the profile
+   score (under 1280px), then who can log in (under 1200px), and on a tablet (under 1024px) the
+   date and whether a member is a person or a business. All of them are on the edit screen, and
+   on a phone WordPress folds every column behind the row's button instead. */
+@media (min-width: 783px) and (max-width: 1499px) {
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_city {
+		display: none;
+	}
+}
+
 @media (min-width: 783px) and (max-width: 1279px) {
 	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_complete {
 		display: none;
 	}
 }
 
+/* Below 1200px the e-mail address needs the room more than the date a listing was added or
+   a member's type (the type is also a filter above the list). */
 @media (min-width: 783px) and (max-width: 1199px) {
-	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_city,
-	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_logins {
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_logins,
+	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-date,
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_type {
 		display: none;
 	}
 
-	/* Members: the name and the renewal date need the room more than the short columns do. */
-	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_level {
-		width: 84px;
-	}
-
-	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_status {
-		width: 112px;
-	}
-
+	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .fixed .column-favr_contact,
 	body.favr-skin.post-type-favr_member:where(:not(.favr-dash-screen)) .fixed .column-favr_contact {
-		width: 17%;
+		width: 26%;
+	}
+}
+
+@media (min-width: 783px) and (max-width: 1023px) {
+	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-date,
+	body.favr-skin.post-type-favr_document:where(:not(.favr-dash-screen)) .wp-list-table.fixed .column-date,
+	body.favr-skin:where(:not(.favr-dash-screen)) .fixed .column-favr_type {
+		display: none;
+	}
+
+	/* Directory: a category as long as "Restaurants & cafés" on two lines, not three. */
+	body.favr-skin.post-type-favr_business:where(:not(.favr-dash-screen)) .fixed .column-taxonomy-favr_business_cat {
+		width: 16%;
 	}
 }
 
@@ -1395,6 +1545,11 @@ body.favr-skin:where(:not(.favr-dash-screen)) .wp-list-table .favr-order__move:f
 	/* One invoice. */
 	body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .favr-pay-columns {
 		margin-top: 14px;
+	}
+
+	/* 16px, like every field on a phone: a smaller one makes iOS zoom the page on focus. */
+	body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .favr-pay-box input.code {
+		font-size: 16px;
 	}
 
 	body.favr-skin:where(:not(.favr-dash-screen)) .favr-pay-admin .favr-pay-main .favr-pay-meta {
