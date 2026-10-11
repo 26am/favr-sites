@@ -20,6 +20,9 @@ use FavrSites\Skin\Skin;
  * records behind it) and the Editor's own profile. Each group starts with a separator entry that
  * the skin (assets/skin/base.css) draws as a heading; the words are printed as inline CSS so they
  * stay translatable. A group with no entry has no heading.
+ *
+ * WordPress's words that are not labels (the Media screens' title, button and search among them)
+ * are in Editors\Words.
  */
 final class Menu {
 
@@ -306,42 +309,12 @@ final class Menu {
 		);
 	}
 
-	/**
-	 * WordPress's own words on the Media screens (it has no label for them) => Favr's, so the
-	 * screen says what the menu says.
-	 *
-	 * @return array<string, string>
-	 */
-	public static function mediaWords(): array {
-		return array(
-			'Media Library'    => __( 'Media library', 'favr-sites' ),
-			'Add Media File'   => __( 'Add media', 'favr-sites' ),
-			'Upload Media'     => __( 'Add media', 'favr-sites' ),
-			'Upload New Media' => __( 'Add media', 'favr-sites' ), // The same heading in older WordPress.
-			'Search Media'     => __( 'Search media', 'favr-sites' ),
-		);
-	}
-
-	/**
-	 * One of WordPress's own phrases in Favr's words; anything else as it was.
-	 *
-	 * @param string                $translation What would be shown.
-	 * @param string                $text        The phrase in the code.
-	 * @param string                $domain      Whose phrase it is ('default' is WordPress).
-	 * @param array<string, string> $words       Phrase in the code => Favr's words.
-	 */
-	public static function reword( string $translation, string $text, string $domain, array $words ): string {
-		return 'default' === $domain && isset( $words[ $text ] ) ? $words[ $text ] : $translation;
-	}
-
 	/** Hooks. The label filters also run on the public site, where the toolbar uses them. */
 	public function hook(): void {
 		add_action( 'admin_menu', array( $this, 'menu' ), PHP_INT_MAX );
 		add_filter( 'custom_menu_order', array( $this, 'custom' ) );
 		add_filter( 'menu_order', array( $this, 'order' ), PHP_INT_MAX );
 		add_action( 'admin_enqueue_scripts', array( $this, 'headingStyles' ), 21 ); // After Skin\Skin (20) registers the sheet.
-		add_action( 'load-upload.php', array( $this, 'mediaScreen' ) );
-		add_action( 'load-media-new.php', array( $this, 'mediaScreen' ) );
 		foreach ( array_keys( self::LABELS ) as $filter ) {
 			add_filter( $filter, array( $this, 'labels' ) );
 		}
@@ -394,15 +367,6 @@ final class Menu {
 		if ( Audience::current() ) {
 			wp_add_inline_style( Skin::HANDLE, self::headingCss( self::headings() ) );
 		}
-	}
-
-	/** The Media screens' title, button and search in the menu's words. */
-	public function mediaScreen(): void {
-		if ( ! Audience::current() ) {
-			return;
-		}
-		$words = self::mediaWords();
-		add_filter( 'gettext', static fn( $translation, $text, $domain ) => self::reword( (string) $translation, (string) $text, (string) $domain, $words ), 10, 3 );
 	}
 
 	/**

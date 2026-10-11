@@ -200,22 +200,11 @@ final class MenuTest extends TestCase {
 		}
 	}
 
-	public function test_the_media_screens_use_the_menus_words(): void {
-		$words = Menu::mediaWords();
-		$this->assertSame( 'Add media', $words['Add Media File'] );
-		$this->assertSame( 'Media library', $words['Media Library'] );
-		$this->assertSame( 'Search media', $words['Search Media'] );
-		$this->assertSame( 'Add media', $words['Upload Media'] );
-		foreach ( $words as $phrase => $favr ) {
-			$this->assertDoesNotMatchRegularExpression( '/\s[A-Z]/', $favr, $phrase );
-		}
-		$this->assertSame( 'Add media', Menu::reword( 'Add Media File', 'Add Media File', 'default', $words ) );
-	}
-
-	public function test_only_wordpress_own_words_are_replaced(): void {
-		$words = Menu::mediaWords();
-		$this->assertSame( 'Add Media File', Menu::reword( 'Add Media File', 'Add Media File', 'some-plugin', $words ) );
-		$this->assertSame( 'Medios', Menu::reword( 'Medios', 'Media', 'default', $words ) );
+	public function test_the_media_screens_words_come_from_the_dictionary(): void {
+		// WordPress has no label for the Media screens' title, button and search; Editors\Words has them.
+		$this->assertSame( Menu::mediaLabels()['add_new_item'], \FavrSites\Editors\Words::MAP['Add Media File'] );
+		$this->assertSame( Menu::mediaLabels()['add_new_item'], \FavrSites\Editors\Words::MAP['Upload Media'] );
+		$this->assertSame( Menu::mediaLabels()['all_items'], \FavrSites\Editors\Words::MAP['Media Library'] );
 	}
 
 	public function test_the_group_headings_are_printed_as_css_content(): void {
