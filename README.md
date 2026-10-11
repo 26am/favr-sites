@@ -33,8 +33,7 @@ For the Editor role (Administrators keep stock WordPress):
   Everyday widgets (Layout, Basic, General, Pro, Site) stay.
 - **Lists:** only View and a small bin icon under titles; no Author, Comments, Yoast or Rank Math
   columns. Dates read "Oct 8, 2026", with a word above them only when the item is not published
-  ("Scheduled", "Last modified"); the Media Library's list uses the same dates and keeps its
-  Author column (who uploaded the file). Favr's own lists
+  ("Scheduled", "Last modified"); the Media Library's list uses the same dates. Favr's own lists
   (Members, Directory, Events, Documents, People, Sponsors) have no month filter; News, Pages and
   Media keep theirs. On a phone every row can be opened to see its other columns, also a row with
   nothing to click under its title (a draft page managed by Favr).
@@ -106,6 +105,37 @@ For everyone: **comments are off** (no forms, REST route, pingbacks, menu or adm
 Existing comments are kept, so deactivating Favr Sites brings them back.
 
 If Elementor isn't active, the page rules switch off and pages use the block editor.
+
+### Added in 0.10.0
+
+- **Nothing is lost by leaving.** On every classic edit screen an Editor who changed something
+  (a panel field, a picture, hours, a repeater row, a category, the chosen file) is asked before
+  leaving the screen. Update, Publish, Save draft, Preview and Move to Trash never ask
+  (`assets/skin/edit-screen.js`).
+- **Update stays in view.** From 851px wide the Publish box sticks under the toolbar and, from
+  1241px, the field panel's tabs stay beside the fields; narrower screens get the action bar at
+  the bottom. Box titles no longer fold or drag, and saved box states are ignored.
+- **The back link remembers** the list as the Editor left it (search, view, page, order), also
+  after saving. A record waiting for approval links back to Approvals and says who sent it.
+- **Search.** The toolbar's magnifier (⌘K / Ctrl+K) finds members, directory listings, events,
+  documents, people, sponsors, pages, news posts and invoices by name (members and listings also
+  by company or e-mail) and opens the edit screen. REST route `favr-sites/v1/search`: Editors
+  only, each result checked with `edit_post`. "Patterns" and the site editor are closed to Editors.
+- **Pages by name.** "Add page" asks for the page's name before Elementor opens (no more
+  "Elementor #4413"); "Rename" under each page an Editor may edit changes its name and address.
+- **News editor:** Favr rust instead of WordPress blue, no welcome tour, one press to publish,
+  "All news" on the way back, no Slug, Author or Template rows.
+- **Inside Elementor** the image picker, the loading screen and the exit item carry the Favr look.
+- **Lists:** 50 rows a page; Members and Directory open A to Z; no "Mine" tab and no "Published"
+  tab that only repeats "All"; no Author column on Media; whole logos in the Media list and grid;
+  the same actions under every row (View and the bin), on categories and Media too.
+- **One width:** 1180px like the dashboard; 1400px for the Members, Directory and Invoices lists;
+  880px for form screens.
+- **Header & footer** saves both menus on one press and confirms inside the saved card.
+  **Approvals:** Enter in a note never approves, and Reject asks once.
+- **Words:** the Publish box on a 12-hour clock; "Category added." instead of "Item added.";
+  a Favr card with a way back instead of WordPress's bare error page; no "— WordPress" in the
+  browser tab.
 
 ## Favr look (0.4)
 

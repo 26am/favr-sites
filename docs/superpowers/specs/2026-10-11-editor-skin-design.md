@@ -1,7 +1,7 @@
 # One Favr look and one way of working on every Editor screen
 
-**Date:** 2026-10-11 · **Status:** built overnight at David's request, decisions below are Claude's
-and await his confirmation.
+**Date:** 2026-10-11 · **Status:** built overnight at David's request in three rounds (build, join-up,
+independent review and fixes). Every decision below is Claude's and awaits his confirmation.
 
 ## The request
 
@@ -35,12 +35,36 @@ Editor seems the nicest, then everything else in the UI kinda sucks. It's not co
 | D2 | Editors **always** get the Favr colour scheme; the scheme picker leaves their Profile screen. | Fixes audit item 2; the skin is drawn for this scheme. |
 | D3 | The menu is **grouped**: Dashboard, Approvals · **Website**: Pages, News, Header & footer, Alert banner, Media · **Organization**: Members, Directory, Events, Documents, People, Sponsors · Profile. | Two jobs, two groups; the inbox stays at the top. |
 | D4 | **Sentence case, "All x / Add x / Edit x"** everywhere. The Directory's admin words are "listing/listings" whatever the directory lists. | Audit item 4. |
-| D5 | Edit screens lose Author, Slug, Post Attributes, Custom Fields, Discussion, Revisions boxes, Screen Options and Help for Editors. Events keeps its summary box, renamed. | Editors cannot use them well; fewer things to read. |
+| D5 | Edit screens lose Author, Slug, Post Attributes, Custom Fields, Discussion, Revisions boxes, Screen Options and Help for Editors. The web address stays editable from the permalink line under the name. Saved Screen Options choices (hidden boxes and columns, layout) no longer apply to Editors. | Editors cannot use them well; fewer things to read. |
 | D6 | A **"← All events" back link** above the title on every edit screen. | One click back to the list, the same place on every screen. |
 | D7 | List dates read "Oct 8, 2026"; the word "Published" only shows when the item is *not* published. | Noise. |
-| D8 | Dashboard quick actions and cards follow the menu's order. | One mental map. |
+| D8 | Dashboard cards follow the menu's order. Quick actions and the toolbar's New menu are ordered by how often they are used: Add event, Add news post, Add member, Add directory listing, Add document, then the editing actions. | One mental map for places; speed for the daily jobs. (Changed in round 2: the first version put everything in menu order.) |
 | D9 | US spelling in text Editors read ("color"). | Clients are in the US; the text mixed both. |
-| D10 | Not changed: the block editor's own interface (News), the Elementor editor, the public site, wp-login.php, Administrator screens, Quick Edit, Bulk actions. | Out of scope or not clearly better. |
+| D10 | Not changed: the layout of the block editor (News) and of the Elementor editor, the public site, wp-login.php, Administrator screens, Quick Edit, Bulk actions. Round 3 does give both editors the Favr accent and removes WordPress's welcome tour (see below). | Out of scope or not clearly better. |
+| D11 | WordPress's own Title Case buttons and messages are reworded in sentence case for Editors (`Editors\Words`, about a hundred phrases, English only). | A product that says "Add Media" in one place and "Add event" in the next reads as two products. |
+| D12 | Category and level screens lose the Slug field, the Slug column and WordPress's help paragraphs for Editors (`Editors\Terms`). | Same reason as D5. |
+| D13 | The toolbar's New menu lists every type an Editor can add, in D8's order. | It offered three of nine. |
+| D14 | Elementor's AI buttons are off for every Editor. | They were on for anyone who had never saved their profile. |
+
+### Added in round 3 (after eight independent reviewers; also Claude's decisions)
+
+| # | Decision | Why |
+|---|----------|-----|
+| D15 | An Editor is asked before leaving an edit screen with unsaved changes. | The new back link (D6) made it easy to lose a change typed into the field panel; WordPress only guards the title and the big editor. |
+| D16 | Update stays in view on desktop (sticky Publish box and tabs); box titles do not fold or drag. | Long records meant scrolling back up for every save; a folded Publish box hid Update. |
+| D17 | One page width: 1180px, 1400px for the Members, Directory and Invoices lists, 880px for form screens. | On a wide monitor lists ran edge to edge while the dashboard stopped at 1180px. |
+| D18 | The toolbar search finds records (members, listings, events, documents, people, sponsors, pages, news, invoices); "Patterns" and the site editor are closed to Editors. | The only search in the toolbar found menu screens but no person. |
+| D19 | "Add page" asks for a name first; pages get a "Rename" action. | Editors got a page called "Elementor #4413" they could not rename. |
+| D20 | The News editor and the media window inside Elementor wear the Favr accent; no welcome tour; one press to publish; no Slug, Author or Template rows (D5 applies there too). | The one blue screen in the product. Their layouts stay WordPress's and Elementor's (D10). |
+| D21 | Lists: 50 rows, Members and Directory A to Z, no "Mine" tab, no "Published" tab that repeats "All", no Count on Membership levels (it added members and listings together). | Finding a person by eye; fewer numbers that say nothing. |
+| D22 | Header & footer saves both menus on one press. Approvals: Enter never approves, Reject asks once. | Saving one menu threw away the other's changes; Enter in a rejection note approved the item. |
+| D23 | A renamed category keeps its web address; the permalink line stays on records. | Changing an address silently breaks links; Editors do sometimes need to change a record's address. |
+| D24 | An event with a date and no start time is an all-day event (Favr Events). | "12:00 am" is never what the person meant. |
+
+Left for David: membership details kept on both the listing and the member record; whether the
+Directory Manager and Membership Manager roles should get the skin; darker field outlines for the
+3:1 contrast guideline (it changes the reference screens too); the phone menu needing two taps;
+one place for "View on site" on every list.
 
 ## Architecture
 
@@ -64,6 +88,18 @@ Editor seems the nicest, then everything else in the UI kinda sucks. It's not co
   | `screens.css` | Whole plugin screens: Approvals, Invoices (list, one invoice, record a payment, export), and the plugins' list columns (letter tiles, profile bars, stars, status pills, level chips). |
   | `media.css` | Media Library grid and its toolbar, the uploader, attachment details, and the media window that opens from edit screens. |
 
+- **Outside the six sheets** (each loaded by its own class, for Editors only):
+  `assets/skin/edit-screen.js` (`Editors\Chrome`: the unsaved-changes question, calm box titles,
+  tab dots), `assets/skin/search.js` and `search.css` (`Editors\Search`, loaded where WordPress
+  loads its command palette), `assets/skin/approvals.js` (`Editors\Approvals`),
+  `assets/editor/editor.css` and `editor.js` (`Editors\BlockEditor`, the News editor),
+  `assets/editor/pages.css` (`Editors\Pages`, the "Add page" and "Rename" screens). Inside the
+  Elementor editor `Editors\ElementorEditor` loads tokens.css and media.css and adds `favr-skin`
+  to the body, so only the media window is restyled there.
+- **Sticky edit screens:** on post.php / post-new.php from 851px wide and 600px high
+  `#post-body.columns-2` is a grid, `#submitdiv` is sticky at `top: 48px` (z-index 2, capped at
+  `calc(100vh - 64px)`), and `.favr-tabs` is sticky at the same offset above 1240px. Anything
+  else that sticks on an edit screen uses the same 48px.
 - **Selector rules** (see the header of `base.css`): shell rules start `body.favr-skin`; content
   rules start `body.favr-skin:where(:not(.favr-dash-screen))` so the four Favr screens are never
   touched. Wrap ids in `:where(#id)` so a rule never out-ranks a component by accident. No
@@ -138,12 +174,39 @@ wells are identical wherever they appear.
 - New `Editors\Wayfinding`: the back link (`<p class="favr-back"><a>← All events</a></p>`,
   printed above `.wrap` on `post.php`, `post-new.php` and `term.php`).
 - `Editors\ListTables`: D7 dates; the month filter is dropped on Favr post types.
+  Round 3: one rule for row actions on every list (posts, categories, Media), 50 rows, no "Mine"
+  or redundant "Published" tab, Members and Directory A to Z, whole pictures in the Media list
+  and grid (`wholeTile()`), locked pages marked in the Pages list.
+- `Editors\Words` (D11), `Editors\Terms` (D12, plus confirmations built from each taxonomy's own
+  word and no Parent field or Count on Membership levels), `Editors\ErrorPage` (a Favr card for
+  `wp_die` inside wp-admin; no "— WordPress" in the tab title).
+- `Editors\Search`: REST route `favr-sites/v1/search` (logged-in Editors, `edit_post` per result,
+  8 per type, 20 in all) and a command loader for WordPress's palette.
+- `Editors\Pages`: the name-first "Add page" screen and "Rename" (nonce, `edit_post`, never a
+  locked page). `Editors\BlockEditor`: the News editor's accent, preferences and labels.
+- `Editors\Approvals`: the small script that keeps Enter from approving (favr/core prints the
+  form and could not change).
+- `Menus\Screen`: one press saves every menu with unsaved changes; the notice is printed inside
+  the saved card.
 - `Dashboard\Items`: D8 ordering by a known-id list, unknown ids keep their own order after.
 
 ## Sibling plugins
 
-Labels only (D4), plus: Events moves its description editor into the field panel if favr/core
-allows it without a core change, and renames the Excerpt box ("Short summary"); US spelling (D9).
+Labels (D4) and US spelling (D9), plus:
+
+- **Events:** the description editor is a "Description" tab inside the field panel with a
+  "Short summary" field (the old Excerpt box); the public description is wrapped paragraph by
+  paragraph.
+- **Directory and Members:** the level column is a chip with the level's color dot
+  (`a.favr-level-chip > span.favr-level__swatch`), the same words for levels in both, and role
+  capabilities are only ever added on a version change (never re-created).
+- **Content:** the file type is a pill (`span.favr-doc-type`), members-only documents carry a
+  lock, sponsor logos are shown whole.
+- **Payments:** short dates on staff screens (`Dates::short()`), ledger status classes
+  (`favr-pay-ledger-status--{succeeded|pending|failed|cancelled}`), a back link on one invoice.
+- Every plugin always loads `jquery-ui-sortable` with favr/core's field script (the script calls
+  `.sortable()` without checking).
+
 Each plugin gets a patch version bump.
 
 ## Verification

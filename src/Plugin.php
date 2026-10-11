@@ -39,6 +39,11 @@ final class Plugin {
 		( new Profile\ProfilePage() )->hook();
 		( new Editors\Menu() )->hook(); // Also on the front end: the admin bar uses the News, Pages and Media labels.
 		( new Banner\Display() )->hook();
+		( new Editors\Search() )->hook();
+		( new Editors\BlockEditor() )->hook();
+		( new Editors\Pages() )->hook();
+		( new Editors\ErrorPage() )->hook();
+		( new Editors\Approvals() )->hook();
 
 		if ( is_admin() ) {
 			( new Admin\SettingsPage() )->hook();
