@@ -13,7 +13,8 @@ use FavrSites\Dashboard\Audience;
 use FavrSites\Site\Protect;
 
 /**
- * Routes every way into a page editor to Elementor, and takes Elementor off posts.
+ * Routes every way into a page editor to Elementor, and takes Elementor off posts. A new page
+ * is named first (Editors\Pages), then opens in Elementor.
  */
 final class Routing {
 
@@ -21,7 +22,6 @@ final class Routing {
 	public function hook(): void {
 		add_filter( 'get_edit_post_link', array( $this, 'editLink' ), 10, 3 );
 		add_action( 'load-post.php', array( $this, 'redirectEdit' ) );
-		add_action( 'load-post-new.php', array( $this, 'redirectNew' ) );
 		add_filter( 'elementor/document/urls/exit_to_dashboard', array( $this, 'exitUrl' ), 10, 2 );
 		add_action( 'init', array( $this, 'postsWithoutElementor' ), 20 );
 	}
@@ -71,16 +71,6 @@ final class Routing {
 			return;
 		}
 		wp_safe_redirect( self::elementorUrl( $post_id ) );
-		exit;
-	}
-
-	/** Post-new.php?post_type=page → a new Elementor page. */
-	public function redirectNew(): void {
-		$type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : 'post'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( 'page' !== $type || ! self::active() || ! class_exists( '\Elementor\Core\Documents_Manager' ) ) {
-			return;
-		}
-		wp_safe_redirect( \Elementor\Core\Documents_Manager::get_create_new_post_url( 'page' ) );
 		exit;
 	}
 

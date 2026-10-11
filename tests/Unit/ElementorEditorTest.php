@@ -73,4 +73,29 @@ final class ElementorEditorTest extends TestCase {
 		$this->assertSame( array( 'angie' => array( 'other' => 1 ), 'kept' => 'yes' ), ElementorEditor::settingsFor( $settings, true ) );
 		$this->assertSame( $settings, ElementorEditor::settingsFor( $settings, false ) );
 	}
+
+	public function test_the_page_editor_loads_the_brand_tokens_and_the_image_pickers_look(): void {
+		$this->assertSame(
+			array(
+				'favr-sites-tokens'     => 'assets/dashboard/tokens.css',
+				'favr-sites-skin-media' => 'assets/skin/media.css',
+			),
+			ElementorEditor::SHEETS
+		);
+	}
+
+	public function test_the_page_editor_document_carries_the_skin_class_once(): void {
+		$this->assertSame( 'lang="en-US" class="favr-skin"', ElementorEditor::htmlAttributes( 'lang="en-US"' ) );
+		$this->assertSame( 'class="favr-skin"', ElementorEditor::htmlAttributes( '' ) );
+		$this->assertSame( 'lang="en-US" class="favr-skin no-js"', ElementorEditor::htmlAttributes( 'lang="en-US" class="no-js"' ) );
+		$this->assertSame( 'class="favr-skin"', ElementorEditor::htmlAttributes( 'class="favr-skin"' ) );
+	}
+
+	public function test_editors_are_answered_with_no_class_usage_instead_of_a_refusal(): void {
+		// Elementor asks for this on every load; Editors may not read it, so the request failed (403).
+		$this->assertTrue( ElementorEditor::answersUsage( '/elementor/v1/global-classes/usage', 'GET', true ) );
+		$this->assertFalse( ElementorEditor::answersUsage( '/elementor/v1/global-classes/usage', 'GET', false ) );
+		$this->assertFalse( ElementorEditor::answersUsage( '/elementor/v1/global-classes/usage', 'POST', true ) );
+		$this->assertFalse( ElementorEditor::answersUsage( '/elementor/v1/global-classes', 'GET', true ) );
+	}
 }

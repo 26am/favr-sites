@@ -17,7 +17,8 @@ use FavrSites\Help\Links;
  * In the Elementor editor, Editors don't get Site Settings, Theme Builder, "Connect my account",
  * Angie, "Send feedback" or the "What's new" megaphone; Help goes to Favr and Exit is
  * "Back to Pages". Done through Elementor's own menu registry (assets/elementor/editor.js), so an
- * item Elementor renames simply falls back to its default.
+ * item Elementor renames simply falls back to its default. The image picker and the loading
+ * screen take the Favr look (the brand tokens and the skin's media sheet load here too).
  */
 final class ElementorEditor {
 
@@ -129,8 +130,51 @@ final class ElementorEditor {
 		);
 	}
 
+	/**
+	 * The Favr sheets the page editor loads beside its own, by handle: the brand tokens and the
+	 * skin's media window, so the image picker looks as it does everywhere else.
+	 */
+	public const SHEETS = array(
+		'favr-sites-tokens'     => 'assets/dashboard/tokens.css',
+		'favr-sites-skin-media' => 'assets/skin/media.css',
+	);
+
+	/**
+	 * Pure: the page editor's `<html>` attributes with the `favr-skin` class, which the tokens hang
+	 * on. (Elementor prints `<body>` without a filter; assets/elementor/editor.js adds the class there.)
+	 *
+	 * @param string $attributes Attributes from language_attributes().
+	 */
+	public static function htmlAttributes( string $attributes ): string {
+		if ( preg_match( '/\bclass="([^"]*)"/', $attributes, $match ) ) {
+			if ( in_array( 'favr-skin', preg_split( '/\s+/', $match[1] ) ?: array(), true ) ) {
+				return $attributes;
+			}
+			return str_replace( $match[0], 'class="' . trim( 'favr-skin ' . $match[1] ) . '"', $attributes );
+		}
+		return ltrim( $attributes . ' class="favr-skin"' );
+	}
+
+	/** Elementor's route for where each design-system class is used. */
+	public const USAGE_ROUTE = '/elementor/v1/global-classes/usage';
+
+	/**
+	 * Pure: is this the request Favr answers itself? Elementor asks where its design-system
+	 * classes are used every time the editor loads; Editors may not read that (and never see the
+	 * design system), so the request failed in the console on every page.
+	 *
+	 * @param string $route     REST route.
+	 * @param string $method    HTTP method.
+	 * @param bool   $is_editor In the Favr audience.
+	 */
+	public static function answersUsage( string $route, string $method, bool $is_editor ): bool {
+		return $is_editor && 'GET' === $method && self::USAGE_ROUTE === $route;
+	}
+
 	/** Hooks. */
 	public function hook(): void {
+		add_filter( 'rest_pre_dispatch', array( $this, 'usage' ), 10, 3 );
+		add_action( 'elementor/editor/init', array( $this, 'markDocument' ) );
 		// After Elementor's own enqueues (priority 10) on both of its editor hooks.
 		add_action( 'elementor/editor/v2/scripts/enqueue', array( $this, 'enqueue' ), 20 );
 		add_action( 'elementor/editor/after_enqueue_scripts', array( $this, 'enqueue' ), 20 );
@@ -169,9 +213,40 @@ final class ElementorEditor {
 		if ( ! Audience::current() ) {
 			return;
 		}
+		foreach ( self::SHEETS as $handle => $sheet ) {
+			wp_enqueue_style( $handle, FAVR_SITES_URL . $sheet, 'favr-sites-tokens' === $handle ? array() : array( 'favr-sites-tokens' ), FAVR_SITES_VERSION . '.' . (int) filemtime( FAVR_SITES_PATH . $sheet ) );
+		}
 		$file = 'assets/elementor/editor.css';
-		wp_enqueue_style( 'favr-sites-elementor-editor', FAVR_SITES_URL . $file, array(), FAVR_SITES_VERSION . '.' . (int) filemtime( FAVR_SITES_PATH . $file ) );
+		wp_enqueue_style( 'favr-sites-elementor-editor', FAVR_SITES_URL . $file, array( 'favr-sites-tokens' ), FAVR_SITES_VERSION . '.' . (int) filemtime( FAVR_SITES_PATH . $file ) );
 		wp_add_inline_style( 'favr-sites-elementor-editor', self::panelCss() );
+	}
+
+	/** The page editor's document carries the skin class from its first paint, for Editors. */
+	public function markDocument(): void {
+		if ( Audience::current() ) {
+			add_filter( 'language_attributes', array( self::class, 'htmlAttributes' ), PHP_INT_MAX );
+		}
+	}
+
+	/**
+	 * "No classes in use" for an Editor's page editor, in place of Elementor's refusal.
+	 *
+	 * @param mixed $result  Earlier answer, if any.
+	 * @param mixed $server  REST server.
+	 * @param mixed $request Request.
+	 * @return mixed
+	 */
+	public function usage( $result, $server, $request ) {
+		if ( null !== $result || ! $request instanceof \WP_REST_Request || self::USAGE_ROUTE !== $request->get_route() ) {
+			return $result;
+		}
+		if ( ! self::answersUsage( self::USAGE_ROUTE, (string) $request->get_method(), Audience::current() ) ) {
+			return $result;
+		}
+		return array(
+			'data' => new \stdClass(),
+			'meta' => new \stdClass(),
+		);
 	}
 
 	/**

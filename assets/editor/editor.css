@@ -1,0 +1,43 @@
+/*
+ * Favr Sites: the News post editor (the block editor) in Favr's colours, for site Editors
+ * (loaded only for them by Editors\BlockEditor). The editor keeps its own interface; this
+ * sheet only changes its accent colour and takes one row out of the settings panel.
+ */
+
+/* Favr rust instead of WordPress blue. WordPress writes these variables inline on the
+   editor's root, so only !important reaches them; the page itself and the windows the
+   editor opens get the same values. The two
+   "rgb" forms are the same colours as numbers: --favr-accent and --favr-accent-strong. */
+body.favr-skin,
+body.favr-skin [data-wpds-root-provider],
+body.favr-skin .components-popover,
+body.favr-skin .components-modal__screen-overlay {
+	--wp-admin-theme-color: var(--favr-accent) !important;
+	--wp-admin-theme-color--rgb: 169, 71, 42 !important;
+	--wp-admin-theme-color-darker-10: var(--favr-accent-strong) !important;
+	--wp-admin-theme-color-darker-10--rgb: 142, 58, 33 !important;
+	--wp-admin-theme-color-darker-20: var(--favr-accent-strong) !important;
+	--wp-admin-theme-color-darker-20--rgb: 142, 58, 33 !important;
+	--wp-components-color-accent: var(--favr-accent) !important;
+	--wp-components-color-accent-darker-10: var(--favr-accent-strong) !important;
+	--wp-components-color-accent-darker-20: var(--favr-accent-strong) !important;
+	--wpds-color-background-interactive-brand-strong: var(--favr-accent) !important;
+	--wpds-color-background-interactive-brand-strong-active: var(--favr-accent-strong) !important;
+	--wpds-color-background-interactive-brand-weak-active: var(--favr-accent-soft) !important;
+	--wpds-color-background-surface-brand: var(--favr-accent-soft) !important;
+	--wpds-color-background-thumb-brand: var(--favr-accent) !important;
+	--wpds-color-background-thumb-brand-active: var(--favr-accent-strong) !important;
+	--wpds-color-foreground-interactive-brand: var(--favr-accent) !important;
+	--wpds-color-foreground-interactive-brand-active: var(--favr-accent-strong) !important;
+	--wpds-color-stroke-focus: var(--favr-accent) !important;
+	--wpds-color-stroke-interactive-brand: var(--favr-accent) !important;
+	--wpds-color-stroke-interactive-brand-active: var(--favr-accent-strong) !important;
+	--wpds-color-stroke-surface-brand: var(--favr-accent-soft) !important;
+	--wpds-color-stroke-surface-brand-strong: var(--favr-accent) !important;
+}
+
+/* No Slug row in the settings panel: the address follows the title, as on every other
+   edit screen. (Author and Template are taken out in Editors\BlockEditor.) */
+body.favr-skin .editor-post-panel__row:has(.editor-post-url__panel-toggle) {
+	display: none;
+}

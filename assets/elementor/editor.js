@@ -13,6 +13,12 @@
 	var icons = v2.icons || {};
 	var config = window.favrSitesElementor || {};
 
+	// The skin's class, so the image picker looks as it does on every other screen
+	// (assets/skin/media.css). Elementor prints <body> without a filter, hence here.
+	if ( document.body ) {
+		document.body.classList.add( 'favr-skin' );
+	}
+
 	if ( ! bar || ! bar.mainMenu ) {
 		return;
 	}
@@ -82,10 +88,10 @@
 		window.jQuery( window ).on( 'elementor:init', watchPanel );
 	}
 
-	// Exit says where it goes.
+	// Exit says where it goes, with an arrow back instead of the WordPress logo.
 	if ( config.back ) {
 		replace( bar.mainMenu, 'registerLink', 'exit-to-wordpress', 'exits', function () {
-			return { title: config.back.label, href: config.back.href, icon: icons.WordpressIcon };
+			return { title: config.back.label, href: config.back.href, icon: icons.ArrowLeftIcon || icons.WordpressIcon };
 		} );
 	}
 }() );
