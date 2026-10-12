@@ -663,6 +663,14 @@ body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) textarea:d
 	color: var(--favr-muted);
 }
 
+/* A ticked box or a chosen option that cannot be changed must still read as ticked. Its mark is
+   white, so it needs a dark fill behind it, not the sand of a disabled field. */
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="checkbox"]:disabled:checked,
+body.favr-skin:where(:not(.favr-dash-screen)) :where(#wpbody-content) input[type="radio"]:disabled:checked {
+	border-color: var(--favr-muted);
+	background-color: var(--favr-muted);
+}
+
 /* ---------- 7. Notices ---------- */
 
 body.favr-skin:where(:not(.favr-dash-screen)) .notice,

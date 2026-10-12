@@ -106,6 +106,13 @@ Existing comments are kept, so deactivating Favr Sites brings them back.
 
 If Elementor isn't active, the page rules switch off and pages use the block editor.
 
+### Fixed in 0.10.1
+
+- **A greyed-out check box still shows its check.** A checked box or chosen option that an
+  Editor may look at but not change lost its mark under the skin (white mark on the sand fill of
+  a disabled field), so a setting that was on read as off. It now keeps a dark fill
+  (`assets/skin/base.css`). Seen first on Favr Payments' read-only settings.
+
 ### Added in 0.10.0
 
 - **Nothing is lost by leaving.** On every classic edit screen an Editor who changed something
