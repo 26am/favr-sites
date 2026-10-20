@@ -125,6 +125,16 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   (`admin.php?page=favr-banner`, cap `edit_pages`), `Display` (`wp_body_open`, footer fallback,
   inline `assets/banner/banner.js`). The stored times are local strings; keep `banner.js`'s
   window check in step with `Banner::state()`.
+- `Site\Credit` (0.11): "Website powered by Favr" after the site footer
+  (`elementor/theme/after_do_footer`, else `wp_footer` priority 1), once per page; inline
+  `assets/credit/credit.css` and `credit.js` (matches the footer's bottom-row background, picks
+  readable text). Option `favr_sites_credit` (`on` | `off`; missing = on). The switch is a card on
+  Header & footer (`Menus\Screen`), saved through `admin_post_favr_sites_save_credit`, cap
+  `edit_pages`; `menus.js` saves it the moment it changes (`favr_js=1` → JSON), so it never meets
+  an unsaved menu edit. Not printed in Elementor's editor. Only "Favr" is linked, a plain followed
+  link (no rel, no tracking): David's call. `credit.js` skips hidden, zero-size and fixed/absolute
+  rows, never reads a widget's or button's colour, and tones the text towards the background only
+  as far as 4.5:1; `node tests/browser/credit.mjs` (Chrome) checks it against footer shapes.
 - `Comments\Off`: comments off for everyone; no data touched.
 - `Brand\ColorScheme`: the "Favr" admin colour scheme. `forUser()` returns it for every Editor
   whatever is stored (the skin is drawn for it); everybody else keeps their choice.

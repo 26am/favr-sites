@@ -572,3 +572,9 @@
 		animation-timing-function: step-end;
 	}
 }
+
+/* Footer credit switch. */
+.favr-credit-card__choice { margin: 4px 0 6px; }
+.favr-credit-card__choice label { display: inline-flex; align-items: flex-start; gap: 8px; font-weight: 600; }
+.favr-credit-card__choice input { margin-top: 3px; }
+.favr-credit-card__hint { margin: 0 0 12px; color: var(--favr-muted, #646970); }

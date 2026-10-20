@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace FavrSites\Menus;
 
 use FavrSites\Editors\Routing;
+use FavrSites\Site\Credit;
 use FavrSites\Site\Protect;
 use FavrSites\Site\Setup;
 
@@ -122,13 +123,16 @@ final class Screen {
 
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- display-only flags.
 		$view = array(
-			'slots'    => $slots,
-			'pages'    => $pages,
-			'unplaced' => Tree::unplacedPages( $pages, $in_menus ),
-			'saved'    => self::savedSlots( isset( $_GET['saved'] ) ? sanitize_key( wp_unslash( $_GET['saved'] ) ) : '' ),
-			'errors'   => self::errorsBySlot( $errors ),
-			'action'   => self::SAVE,
-			'nonce'    => self::NONCE,
+			'slots'        => $slots,
+			'pages'        => $pages,
+			'unplaced'     => Tree::unplacedPages( $pages, $in_menus ),
+			'saved'        => self::savedSlots( isset( $_GET['saved'] ) ? sanitize_key( wp_unslash( $_GET['saved'] ) ) : '' ),
+			'errors'       => self::errorsBySlot( $errors ),
+			'action'       => self::SAVE,
+			'nonce'        => self::NONCE,
+			// The footer credit's switch (FavrSites\Site\Credit) lives on this screen too.
+			'credit'       => Credit::on(),
+			'credit_saved' => isset( $_GET['credit'] ),
 		);
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 		include FAVR_SITES_PATH . 'templates/menus.php';

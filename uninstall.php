@@ -8,3 +8,4 @@
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 delete_option( 'favr_sites_help' );
+delete_option( 'favr_sites_credit' );

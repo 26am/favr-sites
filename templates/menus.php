@@ -10,6 +10,7 @@
 use FavrSites\Dashboard\Icons;
 use FavrSites\Menus\Screen;
 use FavrSites\Menus\Slots;
+use FavrSites\Site\Credit;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -177,6 +178,23 @@ $favr_row   = static function ( array $row, bool $invalid ) use ( $favr_tools ):
 			</ul>
 		</section>
 	<?php endif; ?>
+
+	<section class="favr-dash__card favr-credit-card" id="favr-credit" aria-labelledby="favr-credit-title">
+		<h2 id="favr-credit-title"><?php esc_html_e( 'Footer credit', 'favr-sites' ); ?></h2>
+		<?php if ( $view['credit_saved'] ) : ?>
+			<div class="favr-menus__notice is-success" role="status"><?php echo esc_html( $view['credit'] ? __( 'Saved. The credit shows at the bottom of the site.', 'favr-sites' ) : __( 'Saved. The credit is hidden.', 'favr-sites' ) ); ?></div>
+		<?php endif; ?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" data-favr-credit-form data-on="<?php esc_attr_e( 'Saved. The credit shows at the bottom of the site.', 'favr-sites' ); ?>" data-off="<?php esc_attr_e( 'Saved. The credit is hidden.', 'favr-sites' ); ?>" data-failed="<?php esc_attr_e( 'That didn’t save. Check your connection and try again.', 'favr-sites' ); ?>">
+			<input type="hidden" name="action" value="<?php echo esc_attr( Credit::ACTION ); ?>">
+			<?php wp_nonce_field( Credit::ACTION ); ?>
+			<p class="favr-credit-card__choice">
+				<label><input type="checkbox" name="<?php echo esc_attr( Credit::FIELD ); ?>" value="1"<?php checked( $view['credit'] ); ?>> <?php esc_html_e( 'Show “Website powered by Favr” at the bottom of the site', 'favr-sites' ); ?></label>
+			</p>
+			<p class="favr-credit-card__hint"><?php esc_html_e( 'A small line under your footer, in your footer’s colours. Untick the box to hide it.', 'favr-sites' ); ?></p>
+			<p class="favr-credit-card__status" role="status" aria-live="polite" data-favr-credit-status hidden></p>
+			<p data-favr-credit-save><button type="submit" class="favr-menu__save"><?php esc_html_e( 'Save', 'favr-sites' ); ?></button></p>
+		</form>
+	</section>
 
 	<template id="favr-menu-row">
 		<?php

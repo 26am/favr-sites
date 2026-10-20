@@ -39,6 +39,7 @@ final class Plugin {
 		( new Profile\ProfilePage() )->hook();
 		( new Editors\Menu() )->hook(); // Also on the front end: the admin bar uses the News, Pages and Media labels.
 		( new Banner\Display() )->hook();
+		( new Site\Credit() )->hook(); // The footer credit; its switch is saved through admin-post.
 		( new Editors\Search() )->hook();
 		( new Editors\BlockEditor() )->hook();
 		( new Editors\Pages() )->hook();

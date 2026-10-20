@@ -427,6 +427,48 @@
 		form.querySelector( '.favr-menu__save' ).disabled = false;
 	} ) );
 
+	// The footer credit's switch saves on its own, the moment it changes, so it never meets an unsaved
+	// menu edit (a Save press here would have left the page; a menu Save would have ignored the box).
+	const credit = document.querySelector( '[data-favr-credit-form]' );
+	if ( credit && window.fetch && window.FormData ) {
+		const box = credit.querySelector( 'input[type="checkbox"]' );
+		const status = credit.querySelector( '[data-favr-credit-status]' );
+		const save = credit.querySelector( '[data-favr-credit-save]' );
+		const notice = credit.closest( 'section' ) && credit.closest( 'section' ).querySelector( '.favr-menus__notice' );
+		if ( save ) {
+			save.hidden = true;
+		}
+		const say = ( text ) => {
+			if ( notice ) {
+				notice.hidden = true;
+			}
+			status.textContent = text;
+			status.hidden = false;
+		};
+		box.addEventListener( 'change', () => {
+			const data = new FormData( credit );
+			data.append( 'favr_js', '1' );
+			box.disabled = true;
+			// getAttribute: the form's hidden field named "action" shadows form.action.
+			fetch( credit.getAttribute( 'action' ), { method: 'POST', body: data, credentials: 'same-origin' } )
+				.then( ( response ) => ( response.ok ? response.json() : Promise.reject() ) )
+				.then( ( answer ) => {
+					if ( ! answer || ! answer.success ) {
+						return Promise.reject();
+					}
+					box.checked = !! answer.data.on;
+					say( box.checked ? credit.dataset.on : credit.dataset.off );
+				} )
+				.catch( () => {
+					box.checked = ! box.checked;
+					say( credit.dataset.failed );
+				} )
+				.finally( () => {
+					box.disabled = false;
+				} );
+		} );
+	}
+
 	window.addEventListener( 'beforeunload', ( event ) => {
 		if ( dirty.size ) {
 			event.preventDefault();

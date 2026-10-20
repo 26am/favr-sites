@@ -106,6 +106,19 @@ Existing comments are kept, so deactivating Favr Sites brings them back.
 
 If Elementor isn't active, the page rules switch off and pages use the block editor.
 
+### Added in 0.11.0
+
+- **"Website powered by Favr"** at the bottom of every Favr site: one small line right after the
+  site footer (after Elementor Pro's footer, or from `wp_footer` on any other theme). A small
+  inline script gives it the background of the footer's bottom row and white or near-black text,
+  whichever reads better; without scripts it sits on the page background. Only "Favr" is a link,
+  a plain followed link to https://favr.site/ (David's choice; Google's spam policy counts links
+  repeated in many sites' footers as a possible link scheme, so the link text stays the brand name).
+  On by default; staff (`edit_pages`) turn it off under **Header & footer → Footer credit**
+  (option `favr_sites_credit`, `on` | `off`); with scripts on, the box saves the moment it changes.
+  Saving fires `litespeed_purge_all` and `favr_sites_credit_saved`. The text is toned towards the
+  background but always at least 4.5:1. Not shown in Elementor's editor.
+
 ### Fixed in 0.10.1
 
 - **A greyed-out check box still shows its check.** A checked box or chosen option that an
