@@ -135,6 +135,9 @@ Local test site: `http://sermonator-test.local/`, with this repo symlinked to
   link (no rel, no tracking): David's call. `credit.js` skips hidden, zero-size and fixed/absolute
   rows, never reads a widget's or button's colour, and tones the text towards the background only
   as far as 4.5:1; `node tests/browser/credit.mjs` (Chrome) checks it against footer shapes.
+- `Site\SourceNote` (0.12): a comment ("This site is powered by Favr. Websites for Associations,
+  Clubs and Chambers: https://favr.site/") and `<meta name="generator" content="Favr">` as the
+  first thing in `wp_head` (`PHP_INT_MIN`), once per page; always on (David), no version in it.
 - `Comments\Off`: comments off for everyone; no data touched.
 - `Brand\ColorScheme`: the "Favr" admin colour scheme. `forUser()` returns it for every Editor
   whatever is stored (the skin is drawn for it); everybody else keeps their choice.

@@ -106,6 +106,15 @@ Existing comments are kept, so deactivating Favr Sites brings them back.
 
 If Elementor isn't active, the page rules switch off and pages use the block editor.
 
+### Added in 0.12.0
+
+- **A note at the top of the page source.** Anyone who views a Favr site's source reads
+  "This site is powered by Favr. Websites for Associations, Clubs and Chambers: https://favr.site/"
+  in a comment, followed by `<meta name="generator" content="Favr">` (no version), so services
+  such as BuiltWith and Wappalyzer recognise Favr sites. It is the first thing printed in
+  `wp_head` (`PHP_INT_MIN`), always on, and not printed in feeds or Elementor's editor. An HTML
+  minifier that strips comments removes the comment but keeps the generator tag.
+
 ### Added in 0.11.0
 
 - **"Website powered by Favr"** at the bottom of every Favr site: one small line right after the

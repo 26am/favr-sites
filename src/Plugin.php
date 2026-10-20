@@ -40,6 +40,7 @@ final class Plugin {
 		( new Editors\Menu() )->hook(); // Also on the front end: the admin bar uses the News, Pages and Media labels.
 		( new Banner\Display() )->hook();
 		( new Site\Credit() )->hook(); // The footer credit; its switch is saved through admin-post.
+		( new Site\SourceNote() )->hook(); // "This site is powered by Favr." at the top of the page source.
 		( new Editors\Search() )->hook();
 		( new Editors\BlockEditor() )->hook();
 		( new Editors\Pages() )->hook();
